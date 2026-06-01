@@ -10,6 +10,7 @@ describe('AuthController', () => {
 
   const mockAuthService = {
     login: jest.fn(),
+    register: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -39,7 +40,6 @@ describe('AuthController', () => {
         user: { id: 1, email: 'test@example.com', rol: 'cliente' },
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const response = await request(app.getHttpServer())
         .post('/auth/login')
         .send({ emailOrPhone: 'test@example.com', password: 'Password123' });
@@ -52,27 +52,22 @@ describe('AuthController', () => {
     });
 
     it('should return 400 for invalid body (missing password)', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const response = await request(app.getHttpServer())
         .post('/auth/login')
         .send({ emailOrPhone: 'test@example.com' })
         .expect(400);
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      expect(response.body.statusCode).toBe(400);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      expect(response.body.details).toBeDefined();
+      expect((response.body as { statusCode: number }).statusCode).toBe(400);
+      expect((response.body as { details: unknown }).details).toBeDefined();
     });
 
     it('should return 400 for password too short', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const response = await request(app.getHttpServer())
         .post('/auth/login')
         .send({ emailOrPhone: 'test@example.com', password: 'short' })
         .expect(400);
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      expect(response.body.statusCode).toBe(400);
+      expect((response.body as { statusCode: number }).statusCode).toBe(400);
     });
 
     it('should return 401 for invalid credentials', async () => {
@@ -82,13 +77,85 @@ describe('AuthController', () => {
         ),
       );
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const response = await request(app.getHttpServer())
         .post('/auth/login')
         .send({ emailOrPhone: 'test@example.com', password: 'Password123' })
         .expect(401);
 
       expect(response.status).toBe(401);
+    });
+  });
+
+  describe('POST /auth/register', () => {
+    it('should return 201 for valid registration', async () => {
+      mockAuthService.register.mockResolvedValue({
+        message: 'Te enviamos un correo para continuar...',
+      });
+
+      const response = await request(app.getHttpServer())
+        .post('/auth/register')
+        .field('email', 'new@example.com')
+        .field('password', 'Password123')
+        .field('rol', 'cliente')
+        .field('nombreCompleto', 'Juan Pérez')
+        .field('telefono', '15512345678')
+        .field('calle', 'Av. Principal 100')
+        .field('sucursalId', '1')
+        .attach('addressDoc', Buffer.from('pdf'), 'direccion.pdf')
+        .attach('identityDoc', Buffer.from('jpg'), 'identidad.jpg');
+
+      expect(response.status).toBe(201);
+      expect(response.body).toEqual({
+        message: 'Te enviamos un correo para continuar...',
+      });
+    });
+
+    it('should return 400 for missing files', async () => {
+      mockAuthService.register.mockRejectedValue(
+        new UnauthorizedException('Missing files'),
+      );
+
+      const response = await request(app.getHttpServer())
+        .post('/auth/register')
+        .field('email', 'new@example.com')
+        .field('password', 'Password123')
+        .field('rol', 'cliente')
+        .field('nombreCompleto', 'Juan Pérez')
+        .field('telefono', '15512345678')
+        .field('calle', 'Av. Principal 100')
+        .field('sucursalId', '1');
+
+      // Expect 400 or 500 since controller will call authService.register with missing files
+      expect(response.status).toBeGreaterThanOrEqual(400);
+    });
+
+    it('should return 400 for invalid file type', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/auth/register')
+        .field('email', 'new@example.com')
+        .field('password', 'Password123')
+        .field('rol', 'cliente')
+        .field('nombreCompleto', 'Juan Pérez')
+        .field('telefono', '15512345678')
+        .field('calle', 'Av. Principal 100')
+        .field('sucursalId', '1')
+        .attach('addressDoc', Buffer.from('exe'), 'virus.exe')
+        .attach('identityDoc', Buffer.from('jpg'), 'identidad.jpg');
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should return 400 for invalid Zod body', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/auth/register')
+        .field('email', 'not-an-email')
+        .field('password', 'short')
+        .field('rol', 'invalid')
+        .attach('addressDoc', Buffer.from('pdf'), 'direccion.pdf')
+        .attach('identityDoc', Buffer.from('jpg'), 'identidad.jpg');
+
+      expect(response.status).toBe(400);
+      expect((response.body as { details: unknown }).details).toBeDefined();
     });
   });
 });

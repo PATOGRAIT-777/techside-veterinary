@@ -5,6 +5,9 @@ import { PrismaModule } from './prisma/prisma.module';
 import { MxDivisionesModule } from './mx-divisiones/mx-divisiones.module';
 import { AuthModule } from './auth/auth.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
+import { PersonasModule } from './personas/personas.module';
+import { ArchivosModule } from './archivos/archivos.module';
+import { EmailModule } from './email/email.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -18,6 +21,9 @@ import { AppService } from './app.service';
     MxDivisionesModule,
     AuthModule,
     UsuariosModule,
+    PersonasModule,
+    ArchivosModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
