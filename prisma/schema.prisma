@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Rol {
+  cliente
+  medico
+  admin
+}
+
+enum UsuarioStatus {
+  activo
+  pendiente
+  inactivo
+}
+
+enum ArchivoTipo {
+  validacion_direccion
+  validacion_identidad
+}
+
+model MxDivision {
+  id          Int      @id @default(autoincrement())
+  nombre      String   @db.VarChar(120)
+  clave       String   @unique @db.VarChar(20)
+  direccion   String?  @db.VarChar(255)
+  telefono    String?  @db.VarChar(15)
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  personas    Persona[]
+  @@map("mx_divisiones")
+}
+
+model Persona {
+  id                  Int      @id @default(autoincrement())
+  nombreCompleto      String   @map("nombre_completo") @db.VarChar(200)
+  telefono            String   @db.VarChar(15)
+  telefonoSecundario  String?  @map("telefono_secundario") @db.VarChar(15)
+  calle               String   @db.VarChar(200)
+  numExterior         String?  @map("num_exterior") @db.VarChar(20)
+  numInterior         String?  @map("num_interior") @db.VarChar(20)
+  sucursalId          Int      @map("sucursal_id")
+  sucursal            MxDivision @relation(fields: [sucursalId], references: [id])
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+  usuario             Usuario?
+  archivos            Archivo[]
+  @@index([telefono])
+  @@index([sucursalId])
+  @@map("persona")
+}
+
+model Usuario {
+  id            Int           @id @default(autoincrement())
+  email         String        @unique @db.VarChar(255)
+  telefono      String        @unique @db.VarChar(15)
+  passwordHash  String        @map("password_hash") @db.Text
+  rol           Rol
+  status        UsuarioStatus @default(pendiente)
+  personaId     Int           @unique @map("persona_id")
+  persona       Persona       @relation(fields: [personaId], references: [id], onDelete: Cascade)
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  emailVerifications  EmailVerificationToken[]
+  passwordResets      PasswordResetToken[]
+  @@index([email])
+  @@index([telefono])
+  @@index([rol])
+  @@map("usuario")
+}
+
+model Archivo {
+  id          Int      @id @default(autoincrement())
+  personaId   Int      @map("persona_id")
+  persona     Persona  @relation(fields: [personaId], references: [id], onDelete: Cascade)
+  tipo        ArchivoTipo
+  nombre      String   @db.VarChar(255)
+  mimeType    String   @map("mime_type") @db.VarChar(100)
+  tamañoBytes Int      @map("tamaño_bytes")
+  ruta        String   @db.Text
+  checksum    String?  @db.VarChar(64)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  @@index([personaId])
+  @@index([tipo])
+  @@map("archivos")
+}
+
+model EmailVerificationToken {
+  id        Int      @id @default(autoincrement())
+  usuarioId Int      @map("usuario_id")
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  token     String   @unique @db.VarChar(255)
+  expiresAt DateTime @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  @@index([token])
+  @@index([usuarioId])
+  @@map("email_verification_tokens")
+}
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  usuarioId Int      @map("usuario_id")
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  token     String   @unique @db.VarChar(255)
+  expiresAt DateTime @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  @@index([token])
+  @@index([usuarioId])
+  @@map("password_reset_tokens")
+}
