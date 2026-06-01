@@ -10,6 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { Throttle } from '@nestjs/throttler';
 import { Rol } from '@prisma/client';
 import { AuthService } from './auth.service';
 import { loginSchema } from './dto/login.dto';
@@ -28,6 +29,7 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(200)
+  @Throttle({ auth: { limit: 5, ttl: 900000 } })
   @UsePipes(new ZodValidationPipe(loginSchema))
   async login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
@@ -35,6 +37,7 @@ export class AuthController {
 
   @Post('register')
   @HttpCode(201)
+  @Throttle({ auth: { limit: 5, ttl: 900000 } })
   @UseGuards(OptionalJwtAuthGuard)
   @UseInterceptors(
     FileFieldsInterceptor(
