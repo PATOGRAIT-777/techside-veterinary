@@ -7,14 +7,18 @@ import {
   UseInterceptors,
   UploadedFiles,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { Rol } from '@prisma/client';
 import { AuthService } from './auth.service';
 import { loginSchema } from './dto/login.dto';
 import type { LoginDto } from './dto/login.dto';
 import { registerSchema } from './dto/register.dto';
 import type { RegisterDto } from './dto/register.dto';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
+import { OptionalJwtAuthGuard } from '../common/guards/optional-jwt-auth.guard';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 const ALLOWED_MIME_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
 
@@ -31,6 +35,7 @@ export class AuthController {
 
   @Post('register')
   @HttpCode(201)
+  @UseGuards(OptionalJwtAuthGuard)
   @UseInterceptors(
     FileFieldsInterceptor(
       [
@@ -55,8 +60,9 @@ export class AuthController {
   )
   async register(
     @Body() body: Record<string, unknown>,
+    @CurrentUser() user?: { sub: number; email: string; rol: Rol },
     @UploadedFiles()
-    files: {
+    files?: {
       addressDoc?: Express.Multer.File[];
       identityDoc?: Express.Multer.File[];
     },
@@ -76,9 +82,20 @@ export class AuthController {
 
     const dto: RegisterDto = parseResult.data;
 
+    if (!this.isRegistrationAllowed(dto.rol, user?.rol)) {
+      return { message: 'Te enviamos un correo para continuar...' };
+    }
+
     return this.authService.register(dto, {
-      addressDoc: files.addressDoc?.[0],
-      identityDoc: files.identityDoc?.[0],
+      addressDoc: files?.addressDoc?.[0],
+      identityDoc: files?.identityDoc?.[0],
     });
+  }
+
+  private isRegistrationAllowed(requestedRol: Rol, callerRol?: Rol): boolean {
+    if (requestedRol === 'cliente') return true;
+    if (requestedRol === 'medico') return callerRol === 'admin';
+    if (requestedRol === 'admin') return callerRol === 'admin';
+    return false;
   }
 }
