@@ -106,3 +106,64 @@ model PasswordResetToken {
   @@index([usuarioId])
   @@map("password_reset_tokens")
 }
+
+model Especie {
+  id        String   @id @default(uuid()) @db.Uuid
+  nombre    String   @unique @db.VarChar(120)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  razas     Raza[]
+  @@map("especies")
+}
+
+model Raza {
+  id        String   @id @default(uuid()) @db.Uuid
+  nombre    String   @db.VarChar(120)
+  especieId String   @map("especie_id") @db.Uuid
+  especie   Especie  @relation(fields: [especieId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@unique([especieId, nombre])
+  @@map("razas")
+}
+
+model Color {
+  id        String   @id @default(uuid()) @db.Uuid
+  nombre    String   @unique @db.VarChar(120)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@map("colores")
+}
+
+model TipoPelo {
+  id        String   @id @default(uuid()) @db.Uuid
+  nombre    String   @unique @db.VarChar(120)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@map("tipos_pelo")
+}
+
+model PatronPelo {
+  id        String   @id @default(uuid()) @db.Uuid
+  nombre    String   @unique @db.VarChar(120)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@map("patrones_pelo")
+}
+
+model Comportamiento {
+  id            String   @id @default(uuid()) @db.Uuid
+  nombre        String   @unique @db.VarChar(120)
+  requiereBozal Boolean  @default(false) @map("requiere_bozal")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  @@map("comportamientos")
+}
+
+model CatalogoAlergia {
+  id        String   @id @default(uuid()) @db.Uuid
+  nombre    String   @unique @db.VarChar(120)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@map("catalogo_alergias")
+}

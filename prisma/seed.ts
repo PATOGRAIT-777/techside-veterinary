@@ -81,6 +81,113 @@ async function main() {
     },
   });
 
+  // 4. Seed catalogos
+  const especieCanino = await prisma.especie.upsert({
+    where: { nombre: 'Canino' },
+    update: {},
+    create: { nombre: 'Canino' },
+  });
+  const especieFelino = await prisma.especie.upsert({
+    where: { nombre: 'Felino' },
+    update: {},
+    create: { nombre: 'Felino' },
+  });
+  const especieAve = await prisma.especie.upsert({
+    where: { nombre: 'Ave' },
+    update: {},
+    create: { nombre: 'Ave' },
+  });
+  const especieReptil = await prisma.especie.upsert({
+    where: { nombre: 'Reptil' },
+    update: {},
+    create: { nombre: 'Reptil' },
+  });
+
+  const razas = [
+    { especieId: especieCanino.id, nombre: 'Labrador Retriever' },
+    { especieId: especieCanino.id, nombre: 'Pastor Alemán' },
+    { especieId: especieFelino.id, nombre: 'Siamés' },
+    { especieId: especieFelino.id, nombre: 'Persa' },
+    { especieId: especieAve.id, nombre: 'Canario' },
+    { especieId: especieAve.id, nombre: 'Periquito' },
+    { especieId: especieReptil.id, nombre: 'Iguana' },
+    { especieId: especieReptil.id, nombre: 'Tortuga' },
+  ];
+  for (const r of razas) {
+    await prisma.raza.upsert({
+      where: {
+        especieId_nombre: { especieId: r.especieId, nombre: r.nombre },
+      },
+      update: {},
+      create: r,
+    });
+  }
+
+  const colores = ['Negro', 'Blanco', 'Marrón', 'Gris', 'Naranja', 'Manchado'];
+  for (const nombre of colores) {
+    await prisma.color.upsert({
+      where: { nombre },
+      update: {},
+      create: { nombre },
+    });
+  }
+
+  const tiposPelo = ['Corto', 'Largo', 'Sin pelo', 'Rizado'];
+  for (const nombre of tiposPelo) {
+    await prisma.tipoPelo.upsert({
+      where: { nombre },
+      update: {},
+      create: { nombre },
+    });
+  }
+
+  const patronesPelo = [
+    'Sólido',
+    'Bicolor',
+    'Tricolor',
+    'Atigrado',
+    'Manchado',
+  ];
+  for (const nombre of patronesPelo) {
+    await prisma.patronPelo.upsert({
+      where: { nombre },
+      update: {},
+      create: { nombre },
+    });
+  }
+
+  const comportamientos = [
+    { nombre: 'Tranquilo', requiereBozal: false },
+    { nombre: 'Amigable', requiereBozal: false },
+    { nombre: 'Agresivo', requiereBozal: true },
+    { nombre: 'Nervioso', requiereBozal: false },
+    { nombre: 'Juguetón', requiereBozal: false },
+  ];
+  for (const c of comportamientos) {
+    await prisma.comportamiento.upsert({
+      where: { nombre: c.nombre },
+      update: {},
+      create: c,
+    });
+  }
+
+  const alergias = [
+    'Polen',
+    'Ácaros',
+    'Gluten',
+    'Lactosa',
+    'Pollos',
+    'Garrapatas',
+    'Moho',
+  ];
+  for (const nombre of alergias) {
+    await prisma.catalogoAlergia.upsert({
+      where: { nombre },
+      update: {},
+      create: { nombre },
+    });
+  }
+
   console.log('Seed complete.');
 }
 
