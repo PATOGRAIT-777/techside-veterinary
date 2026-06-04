@@ -65,6 +65,7 @@ model Usuario {
   updatedAt     DateTime         @updatedAt @map("updated_at")
   emailVerifications  EmailVerificationToken[]
   passwordResets      PasswordResetToken[]
+  mascotas            Mascota[]
   @@index([email])
   @@index([telefono])
   @@index([rol])
@@ -78,6 +79,8 @@ model Archivo {
   mime          String   @db.VarChar(100)
   tamano        Int
   subidoEn      DateTime @default(now()) @map("subido_en")
+  mascotasFotoPerfil Mascota[] @relation("MascotaFotoPerfil")
+  mascotasCarnetVacunacion Mascota[] @relation("MascotaCarnetVacunacion")
   @@map("archivos")
 }
 
@@ -123,6 +126,7 @@ model Raza {
   especie   Especie  @relation(fields: [especieId], references: [id])
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  mascotas  Mascota[]
   @@unique([especieId, nombre])
   @@map("razas")
 }
@@ -132,6 +136,7 @@ model Color {
   nombre    String   @unique @db.VarChar(120)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  mascotas  Mascota[]
   @@map("colores")
 }
 
@@ -140,6 +145,7 @@ model TipoPelo {
   nombre    String   @unique @db.VarChar(120)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  mascotas  Mascota[]
   @@map("tipos_pelo")
 }
 
@@ -148,6 +154,7 @@ model PatronPelo {
   nombre    String   @unique @db.VarChar(120)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  mascotas  Mascota[]
   @@map("patrones_pelo")
 }
 
@@ -157,6 +164,7 @@ model Comportamiento {
   requiereBozal Boolean  @default(false) @map("requiere_bozal")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
+  mascotas      Mascota[]
   @@map("comportamientos")
 }
 
@@ -165,5 +173,49 @@ model CatalogoAlergia {
   nombre    String   @unique @db.VarChar(120)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  mascotas  MascotaAlergia[]
   @@map("catalogo_alergias")
+}
+
+model Mascota {
+  id                String   @id @default(uuid()) @db.Uuid
+  propietarioId     String   @map("propietario_id") @db.Uuid
+  propietario       Usuario  @relation(fields: [propietarioId], references: [id])
+  nombre            String   @db.VarChar(100)
+  razaId            String?  @map("raza_id") @db.Uuid
+  raza              Raza?    @relation(fields: [razaId], references: [id])
+  colorId           String?  @map("color_id") @db.Uuid
+  color             Color?   @relation(fields: [colorId], references: [id])
+  tipoPeloId        String?  @map("tipo_pelo_id") @db.Uuid
+  tipoPelo          TipoPelo? @relation(fields: [tipoPeloId], references: [id])
+  patronPeloId      String?  @map("patron_pelo_id") @db.Uuid
+  patronPelo        PatronPelo? @relation(fields: [patronPeloId], references: [id])
+  comportamientoId  String?  @map("comportamiento_id") @db.Uuid
+  comportamiento    Comportamiento? @relation(fields: [comportamientoId], references: [id])
+  fechaNacimiento   DateTime? @map("fecha_nacimiento")
+  sexo              String?  @db.VarChar(20)
+  peso              Decimal? @db.Decimal(10, 3)
+  esterilizado      Boolean  @default(false)
+  ruac              String?  @db.VarChar(50)
+  microchip         String?  @db.VarChar(100)
+  tatuaje           String?  @db.VarChar(100)
+  fotoPerfilId      String?  @map("foto_perfil_id") @db.Uuid
+  fotoPerfil        Archivo? @relation("MascotaFotoPerfil", fields: [fotoPerfilId], references: [id])
+  carnetVacunacionId String? @map("carnet_vacunacion_id") @db.Uuid
+  carnetVacunacion  Archivo? @relation("MascotaCarnetVacunacion", fields: [carnetVacunacionId], references: [id])
+  observaciones     String?  @db.Text
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  alergias          MascotaAlergia[]
+  @@map("mascotas")
+}
+
+model MascotaAlergia {
+  mascotaId   String          @map("mascota_id") @db.Uuid
+  alergiaId   String          @map("alergia_id") @db.Uuid
+  notas       String?         @db.VarChar(500)
+  mascota     Mascota         @relation(fields: [mascotaId], references: [id], onDelete: Cascade)
+  alergia     CatalogoAlergia @relation(fields: [alergiaId], references: [id], onDelete: Cascade)
+  @@id([mascotaId, alergiaId])
+  @@map("mascota_alergias")
 }
