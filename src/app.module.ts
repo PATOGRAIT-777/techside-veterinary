@@ -12,6 +12,7 @@ import { ArchivosModule } from './archivos/archivos.module';
 import { EmailModule } from './email/email.module';
 import { CatalogosModule } from './catalogos/catalogos.module';
 import { MascotasModule } from './mascotas/mascotas.module';
+import { CitasModule } from './citas/citas.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -47,6 +48,7 @@ const throttlerGuardProvider: Provider = {
     EmailModule,
     CatalogosModule,
     MascotasModule,
+    CitasModule,
   ],
   controllers: [AppController],
   providers: [AppService, throttlerGuardProvider],
