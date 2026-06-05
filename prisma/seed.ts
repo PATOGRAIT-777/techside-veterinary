@@ -188,6 +188,124 @@ async function main() {
     });
   }
 
+  // 5. Seed especialidades
+  const especialidades = [
+    'Cirugía General',
+    'Dermatología',
+    'Cardiología',
+    'Oftalmología',
+    'Odontología',
+    'Neurología',
+    'Oncología',
+    'Medicina Interna',
+  ];
+  for (const nombre of especialidades) {
+    await prisma.especialidad.upsert({
+      where: { nombre },
+      update: {},
+      create: { nombre },
+    });
+  }
+
+  // 6. Seed servicios
+  const servicios = [
+    { nombre: 'Consulta General', precioBase: 350 },
+    { nombre: 'Vacunación', precioBase: 200 },
+    { nombre: 'Desparasitación', precioBase: 150 },
+    { nombre: 'Cirugía Menor', precioBase: 1500 },
+    { nombre: 'Cirugía Mayor', precioBase: 3500 },
+    { nombre: 'Estética Canina', precioBase: 400 },
+    { nombre: 'Hospitalización', precioBase: 800 },
+    { nombre: 'Radiografía', precioBase: 600 },
+  ];
+  for (const s of servicios) {
+    await prisma.servicio.upsert({
+      where: { nombre: s.nombre },
+      update: {},
+      create: s,
+    });
+  }
+
+  // 7. Seed sucursales
+  const sucursalesData = [
+    {
+      nombre: 'Vetec Centro',
+      calleNumero: 'Av. Principal 100, Centro',
+      telefonoPrincipal: '55512345678',
+      whatsapp: '55512345678',
+      activo: true,
+    },
+    {
+      nombre: 'Vetec Norte',
+      calleNumero: 'Calle Norte 200, Col. Industrial',
+      telefonoPrincipal: '55598765432',
+      whatsapp: '55598765432',
+      activo: true,
+    },
+    {
+      nombre: 'Vetec Sur',
+      calleNumero: 'Av. Sur 300, Col. Reforma',
+      telefonoPrincipal: '55545678901',
+      whatsapp: '55545678901',
+      activo: true,
+    },
+  ];
+  const sucursalesCreadas: Record<string, string> = {};
+  for (const s of sucursalesData) {
+    const existente = await prisma.sucursal.findFirst({
+      where: { nombre: s.nombre },
+    });
+    if (!existente) {
+      const creada = await prisma.sucursal.create({ data: s });
+      sucursalesCreadas[s.nombre] = creada.id;
+    } else {
+      sucursalesCreadas[s.nombre] = existente.id;
+    }
+  }
+
+  // 8. Seed consultorios
+  if (sucursalesCreadas['Vetec Centro']) {
+    await prisma.consultorio.createMany({
+      data: [
+        {
+          sucursalId: sucursalesCreadas['Vetec Centro'],
+          nombre: 'Consultorio 1',
+          equipamiento: 'Mesa de exploración, estetoscopio',
+        },
+        {
+          sucursalId: sucursalesCreadas['Vetec Centro'],
+          nombre: 'Consultorio 2',
+          equipamiento: 'Mesa de exploración, ultrasonido',
+        },
+      ],
+      skipDuplicates: true,
+    });
+  }
+  if (sucursalesCreadas['Vetec Norte']) {
+    await prisma.consultorio.createMany({
+      data: [
+        {
+          sucursalId: sucursalesCreadas['Vetec Norte'],
+          nombre: 'Consultorio 1',
+          equipamiento: 'Mesa de exploración',
+        },
+      ],
+      skipDuplicates: true,
+    });
+  }
+  if (sucursalesCreadas['Vetec Sur']) {
+    await prisma.consultorio.createMany({
+      data: [
+        {
+          sucursalId: sucursalesCreadas['Vetec Sur'],
+          nombre: 'Consultorio 1',
+          equipamiento: 'Mesa de exploración',
+        },
+      ],
+      skipDuplicates: true,
+    });
+  }
+
   console.log('Seed complete.');
 }
 

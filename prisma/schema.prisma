@@ -29,6 +29,7 @@ model MxDivision {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   personas    Persona[]
+  sucursales  Sucursal[]
   @@map("mx_divisiones")
 }
 
@@ -66,6 +67,7 @@ model Usuario {
   emailVerifications  EmailVerificationToken[]
   passwordResets      PasswordResetToken[]
   mascotas            Mascota[]
+  medico              Medico?
   @@index([email])
   @@index([telefono])
   @@index([rol])
@@ -207,6 +209,7 @@ model Mascota {
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
   alergias          MascotaAlergia[]
+  citas             Cita[]
   @@map("mascotas")
 }
 
@@ -218,4 +221,240 @@ model MascotaAlergia {
   alergia     CatalogoAlergia @relation(fields: [alergiaId], references: [id], onDelete: Cascade)
   @@id([mascotaId, alergiaId])
   @@map("mascota_alergias")
+}
+
+// ============================================================
+// Dominio Médico — Citas, Médicos, Recetas y Consultas
+// ============================================================
+
+enum EstadoCita {
+  pendiente
+  en_curso
+  inasistencia
+  completada
+  cancelada
+}
+
+enum EstadoAsistencia {
+  asistencia
+  falta
+  retardo
+  justificado
+  incapacidad
+}
+
+enum DiaSemana {
+  domingo
+  lunes
+  martes
+  miercoles
+  jueves
+  viernes
+  sabado
+}
+
+model Sucursal {
+  id                String   @id @default(uuid()) @db.Uuid
+  nombre            String   @db.VarChar(120)
+  calleNumero       String?  @map("calle_numero") @db.VarChar(255)
+  ubicacionId       String?  @map("ubicacion_id") @db.Uuid
+  mapaCoords        String?  @map("mapa_coords") @db.VarChar(100)
+  descripcionWeb    String?  @map("descripcion_web") @db.Text
+  horarioAtencion   String?  @map("horario_atencion") @db.VarChar(255)
+  fotoPortadaId     String?  @map("foto_portada_id") @db.Uuid
+  telefonoPrincipal String?  @map("telefono_principal") @db.VarChar(20)
+  whatsapp          String?  @db.VarChar(20)
+  activo            Boolean  @default(true)
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  ubicacion         MxDivision? @relation(fields: [ubicacionId], references: [id])
+  consultorios      Consultorio[]
+  medicos           Medico[]
+  especialidades    SucursalEspecialidad[]
+  citas             Cita[]
+
+  @@index([ubicacionId])
+  @@index([activo])
+  @@map("sucursales")
+}
+
+model Consultorio {
+  id           String   @id @default(uuid()) @db.Uuid
+  sucursalId   String   @map("sucursal_id") @db.Uuid
+  nombre       String   @db.VarChar(100)
+  equipamiento String?  @db.Text
+
+  sucursal     Sucursal @relation(fields: [sucursalId], references: [id], onDelete: Cascade)
+  citas        Cita[]
+
+  @@index([sucursalId])
+  @@map("consultorios")
+}
+
+model Especialidad {
+  id          String   @id @default(uuid()) @db.Uuid
+  nombre      String   @unique @db.VarChar(120)
+  descripcion String?  @db.Text
+
+  medicos          Medico[]
+  sucursales       SucursalEspecialidad[]
+
+  @@map("especialidades")
+}
+
+model Servicio {
+  id         String   @id @default(uuid()) @db.Uuid
+  nombre     String   @unique @db.VarChar(120)
+  precioBase Decimal  @default(0) @map("precio_base") @db.Decimal(10, 2)
+
+  citas      Cita[]
+
+  @@map("servicios")
+}
+
+model SucursalEspecialidad {
+  sucursalId     String @map("sucursal_id") @db.Uuid
+  especialidadId String @map("especialidad_id") @db.Uuid
+
+  sucursal       Sucursal     @relation(fields: [sucursalId], references: [id], onDelete: Cascade)
+  especialidad   Especialidad @relation(fields: [especialidadId], references: [id], onDelete: Cascade)
+
+  @@id([sucursalId, especialidadId])
+  @@index([especialidadId])
+  @@map("sucursales_especialidades")
+}
+
+model Medico {
+  id                      String   @id @default(uuid()) @db.Uuid
+  usuarioId               String   @unique @map("usuario_id") @db.Uuid
+  sucursalId              String?  @map("sucursal_id") @db.Uuid
+  especialidadPrincipalId String?  @map("especialidad_principal_id") @db.Uuid
+  cedulaProfesional       String?  @map("cedula_profesional") @db.VarChar(50)
+  biografiaCorta          String?  @map("biografia_corta") @db.Text
+
+  usuario                 Usuario      @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  sucursal                Sucursal?    @relation(fields: [sucursalId], references: [id])
+  especialidadPrincipal   Especialidad? @relation(fields: [especialidadPrincipalId], references: [id])
+
+  horarios                MedicoHorario[]
+  asistencias             MedicoAsistencia[]
+  citas                   Cita[]
+  recetas                 Receta[]
+
+  @@index([sucursalId])
+  @@index([especialidadPrincipalId])
+  @@map("medicos")
+}
+
+model MedicoHorario {
+  id         String   @id @default(uuid()) @db.Uuid
+  medicoId   String   @map("medico_id") @db.Uuid
+  diaSemana  DiaSemana
+  horaInicio DateTime @map("hora_inicio") @db.Time
+  horaFin    DateTime @map("hora_fin") @db.Time
+
+  medico     Medico   @relation(fields: [medicoId], references: [id], onDelete: Cascade)
+
+  @@unique([medicoId, diaSemana, horaInicio])
+  @@index([medicoId])
+  @@map("medico_horarios")
+}
+
+model MedicoAsistencia {
+  id                String            @id @default(uuid()) @db.Uuid
+  medicoId          String            @map("medico_id") @db.Uuid
+  fecha             DateTime          @db.Date
+  horaEntradaReal   DateTime?         @map("hora_entrada_real") @db.Time
+  horaSalidaReal    DateTime?         @map("hora_salida_real") @db.Time
+  estado            EstadoAsistencia
+  observaciones     String?           @db.Text
+  creadoEn          DateTime          @default(now()) @map("creado_en")
+
+  medico            Medico            @relation(fields: [medicoId], references: [id], onDelete: Cascade)
+
+  @@unique([medicoId, fecha])
+  @@index([medicoId])
+  @@index([fecha])
+  @@map("medico_asistencias")
+}
+
+model Cita {
+  id             String     @id @default(uuid()) @db.Uuid
+  sucursalId     String     @map("sucursal_id") @db.Uuid
+  medicoId       String     @map("medico_id") @db.Uuid
+  mascotaId      String     @map("mascota_id") @db.Uuid
+  consultorioId  String     @map("consultorio_id") @db.Uuid
+  servicioId     String     @map("servicio_id") @db.Uuid
+  fecha          DateTime   @db.Date
+  horaInicio     DateTime   @map("hora_inicio") @db.Time
+  horaFin        DateTime   @map("hora_fin") @db.Time
+  estado         EstadoCita @default(pendiente)
+  motivo         String?    @db.Text
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
+
+  sucursal       Sucursal   @relation(fields: [sucursalId], references: [id])
+  medico         Medico     @relation(fields: [medicoId], references: [id])
+  mascota        Mascota    @relation(fields: [mascotaId], references: [id])
+  consultorio    Consultorio @relation(fields: [consultorioId], references: [id])
+  servicio       Servicio   @relation(fields: [servicioId], references: [id])
+  receta         Receta?
+  consulta       Consulta?
+
+  @@index([sucursalId])
+  @@index([medicoId])
+  @@index([mascotaId])
+  @@index([consultorioId])
+  @@index([servicioId])
+  @@index([fecha])
+  @@index([estado])
+  @@map("citas")
+}
+
+model Receta {
+  id            String   @id @default(uuid()) @db.Uuid
+  citaId        String   @unique @map("cita_id") @db.Uuid
+  diagnostico   String   @db.Text
+  observaciones String?  @db.Text
+  fechaReceta   DateTime @default(now()) @map("fecha_receta")
+
+  medicoId      String   @map("medico_id") @db.Uuid
+  medico        Medico   @relation(fields: [medicoId], references: [id])
+  cita          Cita     @relation(fields: [citaId], references: [id], onDelete: Cascade)
+  detalles      DetalleReceta[]
+
+  @@index([medicoId])
+  @@map("recetas")
+}
+
+model DetalleReceta {
+  id                String  @id @default(uuid()) @db.Uuid
+  recetaId          String  @map("receta_id") @db.Uuid
+  medicamento       String  @db.VarChar(500)
+  dosis             String  @db.VarChar(255)
+  frecuencia        String  @db.VarChar(255)
+  duracion          String  @db.VarChar(255)
+  viaAdministracion String  @map("via_administracion") @db.VarChar(255)
+  instrucciones     String? @db.Text
+
+  receta            Receta  @relation(fields: [recetaId], references: [id], onDelete: Cascade)
+
+  @@index([recetaId])
+  @@map("detalles_receta")
+}
+
+model Consulta {
+  id                     String  @id @default(uuid()) @db.Uuid
+  citaId                 String  @unique @map("cita_id") @db.Uuid
+  peso                   Decimal? @db.Decimal(10, 3)
+  temperatura            Decimal? @db.Decimal(5, 2)
+  frecuenciaCardiaca     Int?    @map("frecuencia_cardiaca")
+  frecuenciaRespiratoria Int?    @map("frecuencia_respiratoria")
+  presionArterial        String? @map("presion_arterial") @db.VarChar(20)
+  estadoGeneral          String? @map("estado_general") @db.VarChar(500)
+  notasEvolucion         String? @map("notas_evolucion") @db.Text
+
+  cita                   Cita    @relation(fields: [citaId], references: [id], onDelete: Cascade)
+
+  @@map("consultas")
 }
