@@ -11,6 +11,7 @@ import { ArchivosService } from '../archivos/archivos.service';
 import { EmailService } from '../email/email.service';
 import { MxDivisionesService } from '../mx-divisiones/mx-divisiones.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { MedicosService } from '../medicos/medicos.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
@@ -25,6 +26,7 @@ export class AuthService {
     private readonly mxDivisionesService: MxDivisionesService,
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly medicosService: MedicosService,
   ) {}
 
   async login(dto: LoginDto): Promise<{
@@ -55,6 +57,16 @@ export class AuthService {
     };
 
     const accessToken = this.jwtService.sign(payload);
+
+    // Asistencia automática para médicos
+    if (user.rol === 'medico') {
+      const medico = await this.prisma.medico.findFirst({
+        where: { usuarioId: user.id },
+      });
+      if (medico) {
+        await this.medicosService.registrarEntradaAutomatica(medico.id);
+      }
+    }
 
     return {
       accessToken,
