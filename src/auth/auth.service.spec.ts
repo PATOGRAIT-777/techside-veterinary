@@ -9,6 +9,7 @@ import { ArchivosService } from '../archivos/archivos.service';
 import { EmailService } from '../email/email.service';
 import { MxDivisionesService } from '../mx-divisiones/mx-divisiones.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { MedicosService } from '../medicos/medicos.service';
 import * as bcrypt from 'bcrypt';
 
 jest.mock('bcrypt');
@@ -44,6 +45,10 @@ describe('AuthService', () => {
     findById: jest.fn(),
   };
 
+  const mockMedicosService = {
+    registrarEntradaAutomatica: jest.fn(),
+  };
+
   const mockPrismaService = {
     $transaction: jest.fn(),
     persona: {
@@ -55,6 +60,9 @@ describe('AuthService', () => {
     },
     archivo: {
       create: jest.fn(),
+    },
+    medico: {
+      findFirst: jest.fn(),
     },
   };
 
@@ -69,6 +77,7 @@ describe('AuthService', () => {
         { provide: EmailService, useValue: mockEmailService },
         { provide: MxDivisionesService, useValue: mockMxDivisionesService },
         { provide: PrismaService, useValue: mockPrismaService },
+        { provide: MedicosService, useValue: mockMedicosService },
       ],
     }).compile();
 
@@ -183,6 +192,61 @@ describe('AuthService', () => {
         ),
       );
       expect(bcrypt.compare).toHaveBeenCalledWith('WrongPassword', 'hashed');
+    });
+
+    it('should call registrarEntradaAutomatica for medico login', async () => {
+      const mockUser = {
+        id: '00000000-0000-4000-8000-000000000001',
+        email: 'medico@example.com',
+        telefono: '55512345678',
+        passwordHash: 'hashed',
+        rol: 'medico',
+        status: 'activo',
+        personaId: '00000000-0000-4000-8000-000000000001',
+      };
+      mockUsuariosService.findByEmailOrPhone.mockResolvedValue(mockUser);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+      mockPrismaService.medico.findFirst.mockResolvedValue({
+        id: 'med-1',
+        usuarioId: mockUser.id,
+      });
+
+      const result = await service.login({
+        emailOrPhone: 'medico@example.com',
+        password: 'Password123',
+      });
+
+      expect(result.user.rol).toBe('medico');
+      expect(mockPrismaService.medico.findFirst).toHaveBeenCalledWith({
+        where: { usuarioId: mockUser.id },
+      });
+      expect(
+        mockMedicosService.registrarEntradaAutomatica,
+      ).toHaveBeenCalledWith('med-1');
+    });
+
+    it('should not call registrarEntradaAutomatica for cliente login', async () => {
+      const mockUser = {
+        id: '00000000-0000-4000-8000-000000000001',
+        email: 'cliente@example.com',
+        telefono: '55512345678',
+        passwordHash: 'hashed',
+        rol: 'cliente',
+        status: 'activo',
+        personaId: '00000000-0000-4000-8000-000000000001',
+      };
+      mockUsuariosService.findByEmailOrPhone.mockResolvedValue(mockUser);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+
+      const result = await service.login({
+        emailOrPhone: 'cliente@example.com',
+        password: 'Password123',
+      });
+
+      expect(result.user.rol).toBe('cliente');
+      expect(
+        mockMedicosService.registrarEntradaAutomatica,
+      ).not.toHaveBeenCalled();
     });
   });
 
