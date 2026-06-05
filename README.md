@@ -1,0 +1,197 @@
+# 🏥 Techside Veterinary API
+
+Backend API para clínica veterinaria. Sistema de agendamiento de citas, gestión de médicos, recetas médicas y historial clínico.
+
+## 🚀 Tecnologías
+
+- **Framework:** [NestJS](https://nestjs.com/) (Node.js/TypeScript)
+- **ORM:** [Prisma](https://prisma.io/)
+- **Base de datos:** PostgreSQL
+- **Auth:** JWT + bcrypt
+- **Validación:** Zod
+- **Tests:** Jest
+
+## 📋 Requisitos
+
+- Node.js 20+
+- PostgreSQL 15+
+- pnpm (o npm)
+
+## ⚙️ Configuración
+
+1. **Clonar el repo**
+   ```bash
+   git clone <repo-url>
+   cd techside-veterinary
+   ```
+
+2. **Instalar dependencias**
+   ```bash
+   pnpm install
+   ```
+
+3. **Configurar variables de entorno**
+   ```bash
+   cp .env.example .env
+   ```
+   Editar `.env` con tus credenciales de PostgreSQL.
+
+4. **Generar Prisma Client y correr migraciones**
+   ```bash
+   npx prisma generate
+   npx prisma migrate deploy
+   ```
+
+5. **Seed de datos**
+   ```bash
+   npx prisma db seed
+   ```
+
+## 🏃 Correr el proyecto
+
+```bash
+# Desarrollo
+pnpm run start:dev
+
+# Producción
+pnpm run build
+pnpm run start:prod
+```
+
+La API estará disponible en `http://localhost:3000`
+
+## 🧪 Tests
+
+```bash
+# Unit tests
+pnpm test
+
+# Coverage
+pnpm run test:cov
+
+# E2E
+pnpm run test:e2e
+```
+
+**Estado actual:** 24 suites, 140 tests — todos pasan ✅
+
+## 📚 Documentación de API
+
+Ver [`API-DOCS.md`](./API-DOCS.md) para documentación completa de todos los endpoints.
+
+### Módulos implementados
+
+| Módulo | Endpoints | Descripción |
+|--------|-----------|-------------|
+| **Auth** | `POST /auth/login`, `POST /auth/register` | Login JWT y registro de usuarios |
+| **Mascotas** | `POST/GET/PATCH /mascotas` | Gestión de mascotas del cliente |
+| **Catálogos** | `GET /catalogos/*` | Especies, razas, colores, alergias, etc. |
+| **Citas** | `POST/GET/PATCH/DELETE /api/v1/citas` | Agendamiento con validaciones de negocio |
+| **Médicos** | `POST/GET/PATCH /api/v1/medicos` | Perfiles, horarios y asistencias |
+| **Recetas** | `POST/GET /api/v1/recetas` | Generación al completar cita |
+| **Consultas** | `POST/GET/PATCH /api/v1/consultas` | Datos clínicos de la atención |
+
+## 🗄️ Base de Datos
+
+### Modelos principales
+
+```
+Usuario → Persona
+Usuario → Mascota
+Usuario → Medico
+
+Mascota → Raza → Especie
+Mascota → Color
+Mascota → TipoPelo
+Mascota → PatronPelo
+Mascota → Comportamiento
+
+Cita → Sucursal
+Cita → Medico
+Cita → Mascota
+Cita → Consultorio
+Cita → Servicio
+Cita → Receta (1:1)
+Cita → Consulta (1:1)
+
+Receta → DetalleReceta (1:N)
+Medico → MedicoHorario (1:N)
+Medico → MedicoAsistencia (1:N)
+```
+
+### Estados de cita
+
+```
+pendiente → en_curso → completada
+              ↓
+         inasistencia
+              ↓
+          cancelada
+```
+
+## 🔐 Autenticación
+
+La API usa JWT Bearer Token. Obtener token:
+
+```bash
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"emailOrPhone":"admin@vetec.local","password":"AdminPass123"}'
+```
+
+Incluir en headers:
+```http
+Authorization: Bearer <token>
+```
+
+## 🧑‍💻 Roles
+
+| Rol | Permisos |
+|-----|----------|
+| `cliente` | Registrar mascotas, agendar citas, ver sus recetas |
+| `medico` | Atender citas, generar recetas, registrar consultas, ver horarios |
+| `admin` | Todo lo anterior + gestionar médicos, horarios, asistencias |
+
+## 📁 Estructura del proyecto
+
+```
+src/
+├── auth/              # Login, register, JWT
+├── citas/             # Agendamiento y validaciones
+├── consultas/         # Datos clínicos
+├── medicos/           # Médicos, horarios, asistencias
+├── recetas/           # Recetas médicas
+├── mascotas/          # Gestión de mascotas
+├── catalogos/         # Catálogos (especies, razas, etc.)
+├── mx-divisiones/     # Sucursales
+├── personas/          # Datos personales
+├── usuarios/          # Gestión de usuarios
+├── common/            # Guards, pipes, decorators, filters
+├── prisma/            # Prisma service
+└── config/            # Configuración y validación de env
+```
+
+## 📝 Scripts útiles
+
+```bash
+# Prisma
+npx prisma migrate dev     # Crear migración en desarrollo
+npx prisma migrate deploy  # Aplicar migraciones en producción
+npx prisma db seed         # Poblar base de datos
+npx prisma studio          # UI visual de la BD
+
+# Lint y format
+pnpm run lint
+pnpm run format
+```
+
+## 🤝 Contribuir
+
+1. Crear rama desde `main`
+2. Implementar cambios con tests
+3. Abrir Pull Request
+4. Revisión de código antes de merge
+
+## 📄 Licencia
+
+[MIT](LICENSE)
