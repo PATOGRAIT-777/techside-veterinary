@@ -1,0 +1,30 @@
+{
+	"subagents": {
+		"agentOverrides": {
+			"context-builder": {
+				"model": "kimi-coding/kimi-k2-thinking"
+			},
+			"delegate": {
+				"model": "kimi-coding/kimi-k2-thinking"
+			},
+			"oracle": {
+				"model": "kimi-coding/kimi-k2-thinking"
+			},
+			"planner": {
+				"model": "kimi-coding/kimi-k2-thinking"
+			},
+			"researcher": {
+				"model": "kimi-coding/kimi-k2-thinking"
+			},
+			"reviewer": {
+				"model": "kimi-coding/kimi-k2-thinking"
+			},
+			"scout": {
+				"model": "kimi-coding/kimi-k2-thinking"
+			},
+			"worker": {
+				"model": "kimi-coding/kimi-k2-thinking"
+			}
+		}
+	}
+}

@@ -121,6 +121,14 @@ export class MedicosService {
       );
     }
 
+    // Verificar que el consultorio existe
+    const consultorio = await this.prisma.consultorio.findUnique({
+      where: { id: dto.consultorioId },
+    });
+    if (!consultorio) {
+      throw new NotFoundException('Consultorio no encontrado');
+    }
+
     // Verificar traslape con horarios existentes
     const horariosExistentes = await this.prisma.medicoHorario.findMany({
       where: {
@@ -148,6 +156,7 @@ export class MedicosService {
         diaSemana: dto.diaSemana,
         horaInicio,
         horaFin,
+        consultorioId: dto.consultorioId,
       },
     });
   }

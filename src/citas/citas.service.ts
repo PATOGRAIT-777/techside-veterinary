@@ -6,16 +6,21 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { EstadoCita, Rol } from '@prisma/client';
+import { EstadoCita, EstadoPago, Rol } from '@prisma/client';
 import { CreateCitaDto } from './dto/create-cita.dto';
 import { UpdateCitaDto } from './dto/update-cita.dto';
 import { CambiarEstadoCitaDto } from './dto/cambiar-estado-cita.dto';
 import { DisponibilidadQueryDto } from './dto/disponibilidad-query.dto';
 import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 
+import { FolioGenerator } from './helpers/folio-generator';
+
 @Injectable()
 export class CitasService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly folioGenerator: FolioGenerator,
+  ) {}
 
   async create(dto: CreateCitaDto, usuario: JwtPayload) {
     // V-01: Solo cliente o admin pueden crear
@@ -95,9 +100,15 @@ export class CitasService {
       horaFin,
     );
 
-    // V-07: No traslape consultorio
+    // V-07: Derivar consultorio desde el horario del médico
+    const consultorioId = await this.obtenerConsultorioDesdeHorario(
+      dto.medicoId,
+      fechaCita,
+    );
+
+    // V-08: No traslape consultorio
     await this.validarTraslapeConsultorio(
-      dto.consultorioId,
+      consultorioId,
       fechaCita,
       horaInicio,
       horaFin,
@@ -120,27 +131,46 @@ export class CitasService {
       horaInicio,
     );
 
-    return this.prisma.cita.create({
+    // Obtener precio de la especialidad del médico
+    const medicoData = await this.prisma.medico.findUnique({
+      where: { id: dto.medicoId },
+      include: { especialidadPrincipal: true },
+    });
+    const precio = medicoData?.especialidadPrincipal?.precio ?? 0;
+
+    // Generar folio de pago
+    const folioPago = await this.folioGenerator.generate();
+
+    // Crear cita + pago en transacción
+    const cita = await this.prisma.cita.create({
       data: {
         sucursalId: dto.sucursalId,
         medicoId: dto.medicoId,
         mascotaId: dto.mascotaId,
-        consultorioId: dto.consultorioId,
         servicioId: dto.servicioId,
         fecha: fechaCita,
         horaInicio,
         horaFin,
-        estado: EstadoCita.pendiente,
+        estado: EstadoCita.pendiente_de_pago,
         motivo: dto.motivo,
+        pago: {
+          create: {
+            folioPago,
+            cantidad: precio,
+            estado: EstadoPago.pendiente,
+          },
+        },
       },
       include: {
         sucursal: true,
         medico: true,
         mascota: true,
-        consultorio: true,
         servicio: true,
+        pago: true,
       },
     });
+
+    return cita;
   }
 
   async findAll(usuario: JwtPayload) {
@@ -172,7 +202,6 @@ export class CitasService {
         sucursal: true,
         medico: { include: { usuario: { select: { persona: true } } } },
         mascota: true,
-        consultorio: true,
         servicio: true,
       },
       orderBy: [{ fecha: 'asc' }, { horaInicio: 'asc' }],
@@ -186,7 +215,6 @@ export class CitasService {
         sucursal: true,
         medico: { include: { usuario: { select: { persona: true } } } },
         mascota: true,
-        consultorio: true,
         servicio: true,
         receta: { include: { detalles: true } },
         consulta: true,
@@ -246,7 +274,6 @@ export class CitasService {
 
     if (dto.sucursalId) data.sucursalId = dto.sucursalId;
     if (dto.medicoId) data.medicoId = dto.medicoId;
-    if (dto.consultorioId) data.consultorioId = dto.consultorioId;
     if (dto.servicioId) data.servicioId = dto.servicioId;
     if (dto.motivo !== undefined) data.motivo = dto.motivo;
 
@@ -263,15 +290,21 @@ export class CitasService {
       data.horaFin = horaFin;
 
       // Revalidar traslapes si cambió fecha u hora
+      const effectiveMedicoId = dto.medicoId || cita.medicoId;
+      const consultorioId = await this.obtenerConsultorioDesdeHorario(
+        effectiveMedicoId,
+        fechaCita,
+      );
+
       await this.validarTraslapeMedico(
-        dto.medicoId || cita.medicoId,
+        effectiveMedicoId,
         fechaCita,
         horaInicio,
         horaFin,
         id,
       );
       await this.validarTraslapeConsultorio(
-        dto.consultorioId || cita.consultorioId,
+        consultorioId,
         fechaCita,
         horaInicio,
         horaFin,
@@ -286,7 +319,6 @@ export class CitasService {
         sucursal: true,
         medico: true,
         mascota: true,
-        consultorio: true,
         servicio: true,
       },
     });
@@ -469,9 +501,22 @@ export class CitasService {
     horaFin: Date,
     excludeId?: string,
   ) {
-    const citas = await this.prisma.cita.findMany({
+    // Buscar todos los médicos que usan este consultorio en este día
+    const diaSemana = this.numToDiaSemana(fecha.getDay());
+    const horarios = await this.prisma.medicoHorario.findMany({
       where: {
         consultorioId,
+        diaSemana,
+      },
+      select: { medicoId: true },
+    });
+
+    const medicoIds = [...new Set(horarios.map((h) => h.medicoId))];
+    if (medicoIds.length === 0) return;
+
+    const citas = await this.prisma.cita.findMany({
+      where: {
+        medicoId: { in: medicoIds },
         fecha,
         estado: { not: EstadoCita.cancelada },
         ...(excludeId ? { id: { not: excludeId } } : {}),
@@ -490,6 +535,22 @@ export class CitasService {
         );
       }
     }
+  }
+
+  private async obtenerConsultorioDesdeHorario(
+    medicoId: string,
+    fecha: Date,
+  ): Promise<string> {
+    const diaSemana = this.numToDiaSemana(fecha.getDay());
+    const horario = await this.prisma.medicoHorario.findFirst({
+      where: { medicoId, diaSemana },
+    });
+    if (!horario) {
+      throw new BadRequestException(
+        'El médico no tiene horario configurado para este día',
+      );
+    }
+    return horario.consultorioId;
   }
 
   private async validarTraslapePaciente(

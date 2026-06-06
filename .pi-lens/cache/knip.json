@@ -1,0 +1,153 @@
+{
+  "success": true,
+  "issues": [
+    {
+      "type": "file",
+      "name": "test/app.e2e-spec.ts",
+      "file": "test/app.e2e-spec.ts"
+    },
+    {
+      "type": "file",
+      "name": "test/auth.e2e-spec.ts",
+      "file": "test/auth.e2e-spec.ts"
+    },
+    {
+      "type": "dependency",
+      "name": "passport-local",
+      "file": "package.json",
+      "line": 35
+    },
+    {
+      "type": "devDependency",
+      "name": "@eslint/eslintrc",
+      "file": "package.json",
+      "line": 42
+    },
+    {
+      "type": "devDependency",
+      "name": "@types/multer",
+      "file": "package.json",
+      "line": 50
+    },
+    {
+      "type": "devDependency",
+      "name": "@types/passport-local",
+      "file": "package.json",
+      "line": 53
+    },
+    {
+      "type": "devDependency",
+      "name": "source-map-support",
+      "file": "package.json",
+      "line": 61
+    },
+    {
+      "type": "devDependency",
+      "name": "ts-loader",
+      "file": "package.json",
+      "line": 64
+    },
+    {
+      "type": "unlisted",
+      "name": "express",
+      "file": "src/common/guards/optional-jwt-auth.guard.ts",
+      "line": 3
+    },
+    {
+      "type": "unlisted",
+      "name": "express",
+      "file": "src/common/filters/http-exception.filter.ts",
+      "line": 8
+    },
+    {
+      "type": "unlisted",
+      "name": "express",
+      "file": "src/common/interceptors/sanitize.interceptor.ts",
+      "line": 7
+    },
+    {
+      "type": "unlisted",
+      "name": "express",
+      "file": "src/common/decorators/current-user.decorator.ts",
+      "line": 2
+    }
+  ],
+  "unusedExports": [],
+  "unusedFiles": [
+    {
+      "type": "file",
+      "name": "test/app.e2e-spec.ts",
+      "file": "test/app.e2e-spec.ts"
+    },
+    {
+      "type": "file",
+      "name": "test/auth.e2e-spec.ts",
+      "file": "test/auth.e2e-spec.ts"
+    }
+  ],
+  "unusedDeps": [
+    {
+      "type": "dependency",
+      "name": "passport-local",
+      "file": "package.json",
+      "line": 35
+    },
+    {
+      "type": "devDependency",
+      "name": "@eslint/eslintrc",
+      "file": "package.json",
+      "line": 42
+    },
+    {
+      "type": "devDependency",
+      "name": "@types/multer",
+      "file": "package.json",
+      "line": 50
+    },
+    {
+      "type": "devDependency",
+      "name": "@types/passport-local",
+      "file": "package.json",
+      "line": 53
+    },
+    {
+      "type": "devDependency",
+      "name": "source-map-support",
+      "file": "package.json",
+      "line": 61
+    },
+    {
+      "type": "devDependency",
+      "name": "ts-loader",
+      "file": "package.json",
+      "line": 64
+    }
+  ],
+  "unlistedDeps": [
+    {
+      "type": "unlisted",
+      "name": "express",
+      "file": "src/common/guards/optional-jwt-auth.guard.ts",
+      "line": 3
+    },
+    {
+      "type": "unlisted",
+      "name": "express",
+      "file": "src/common/filters/http-exception.filter.ts",
+      "line": 8
+    },
+    {
+      "type": "unlisted",
+      "name": "express",
+      "file": "src/common/interceptors/sanitize.interceptor.ts",
+      "line": 7
+    },
+    {
+      "type": "unlisted",
+      "name": "express",
+      "file": "src/common/decorators/current-user.decorator.ts",
+      "line": 2
+    }
+  ],
+  "summary": "Found 12 issues"
+}

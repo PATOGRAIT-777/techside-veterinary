@@ -26,6 +26,9 @@ export const CreateMedicoHorarioDto = z
     horaFin: z
       .string()
       .regex(/^([01]\d|2[0-3]):[0-5]\d$/, { message: 'Formato HH:MM' }),
+    consultorioId: z
+      .string()
+      .uuid({ message: 'El consultorio es obligatorio' }),
   })
   .refine((data) => data.horaFin > data.horaInicio, {
     message: 'La hora de fin debe ser posterior a la de inicio',

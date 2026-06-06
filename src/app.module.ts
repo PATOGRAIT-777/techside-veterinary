@@ -16,6 +16,7 @@ import { CitasModule } from './citas/citas.module';
 import { MedicosModule } from './medicos/medicos.module';
 import { RecetasModule } from './recetas/recetas.module';
 import { ConsultasModule } from './consultas/consultas.module';
+import { PagosModule } from './pagos/pagos.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -55,6 +56,7 @@ const throttlerGuardProvider: Provider = {
     MedicosModule,
     RecetasModule,
     ConsultasModule,
+    PagosModule,
   ],
   controllers: [AppController],
   providers: [AppService, throttlerGuardProvider],

@@ -1,0 +1,1511 @@
+{
+  "version": 1,
+  "projectRoot": "/home/styc/Vetec/techside-veterinary",
+  "generatedAt": "2026-06-06T22:14:31.239Z",
+  "seq": 232,
+  "files": {
+    "/home/styc/Vetec/techside-veterinary/eslint.config.mjs": {
+      "path": "/home/styc/Vetec/techside-veterinary/eslint.config.mjs",
+      "mtimeMs": 1780265934905.8318,
+      "size": 899,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/prisma/seed.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/prisma/seed.ts",
+      "mtimeMs": 1780275689296.5164,
+      "size": 1892,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/app.controller.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/app.controller.spec.ts",
+      "mtimeMs": 1780265934905.9612,
+      "size": 617,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/app.controller.ts",
+        "/home/styc/Vetec/techside-veterinary/src/app.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/app.controller.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/app.controller.ts",
+      "mtimeMs": 1780265934905.8713,
+      "size": 274,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/app.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/app.module.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/app.module.ts",
+      "mtimeMs": 1780275653573.3638,
+      "size": 628,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/app.controller.ts",
+        "/home/styc/Vetec/techside-veterinary/src/app.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/archivos/archivos.module.ts",
+        "/home/styc/Vetec/techside-veterinary/src/auth/auth.module.ts",
+        "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.module.ts",
+        "/home/styc/Vetec/techside-veterinary/src/citas/citas.module.ts",
+        "/home/styc/Vetec/techside-veterinary/src/config/env.validation.ts",
+        "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.module.ts",
+        "/home/styc/Vetec/techside-veterinary/src/email/email.module.ts",
+        "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.module.ts",
+        "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.module.ts",
+        "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.module.ts",
+        "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.module.ts",
+        "/home/styc/Vetec/techside-veterinary/src/personas/personas.module.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.module.ts",
+        "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.module.ts",
+        "/home/styc/Vetec/techside-veterinary/src/usuarios/usuarios.module.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/app.service.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/app.service.ts",
+      "mtimeMs": 1780265934905.9307,
+      "size": 142,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/common/interceptors/sanitize.interceptor.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/common/interceptors/sanitize.interceptor.spec.ts",
+      "mtimeMs": 1780279050843.032,
+      "size": 1860,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/common/interceptors/sanitize.interceptor.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/common/interceptors/sanitize.interceptor.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/common/interceptors/sanitize.interceptor.ts",
+      "mtimeMs": 1780275608019.1694,
+      "size": 1105,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/common/utils/normalize-phone.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/common/utils/normalize-phone.spec.ts",
+      "mtimeMs": 1780279050843.032,
+      "size": 757,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/common/utils/normalize-phone.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/common/utils/normalize-phone.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/common/utils/normalize-phone.ts",
+      "mtimeMs": 1780275447137.4832,
+      "size": 227,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/config/env.validation.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/config/env.validation.spec.ts",
+      "mtimeMs": 1780279050843.032,
+      "size": 1695,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/config/env.validation.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/config/env.validation.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/config/env.validation.ts",
+      "mtimeMs": 1780275475890.6057,
+      "size": 527,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/main.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/main.ts",
+      "mtimeMs": 1780275627222.2515,
+      "size": 416,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/app.module.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/filters/http-exception.filter.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/interceptors/sanitize.interceptor.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.controller.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.controller.spec.ts",
+      "mtimeMs": 1780279050843.032,
+      "size": 2039,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.controller.ts",
+        "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.controller.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.controller.ts",
+      "mtimeMs": 1780275561512.971,
+      "size": 541,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.module.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.module.ts",
+      "mtimeMs": 1780275526007.8196,
+      "size": 333,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.controller.ts",
+        "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.service.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.service.spec.ts",
+      "mtimeMs": 1780279050843.032,
+      "size": 2572,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.service.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.service.ts",
+      "mtimeMs": 1780275526007.8196,
+      "size": 679,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.module.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.module.ts",
+      "mtimeMs": 1780275489838.6653,
+      "size": 210,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.spec.ts",
+      "mtimeMs": 1780279050843.032,
+      "size": 549,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts",
+      "mtimeMs": 1780275489838.6653,
+      "size": 265,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/test/app.e2e-spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/test/app.e2e-spec.ts",
+      "mtimeMs": 1780265934905.9822,
+      "size": 725,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/app.module.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/auth/interfaces/jwt-payload.interface.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/auth/interfaces/jwt-payload.interface.ts",
+      "mtimeMs": 1780279700968.467,
+      "size": 115,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/auth/strategies/jwt.strategy.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/auth/strategies/jwt.strategy.ts",
+      "mtimeMs": 1780279790377.9702,
+      "size": 905,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/auth/interfaces/jwt-payload.interface.ts",
+        "/home/styc/Vetec/techside-veterinary/src/config/env.validation.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/common/guards/jwt-auth.guard.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/common/guards/jwt-auth.guard.ts",
+      "mtimeMs": 1780279801004.0305,
+      "size": 160,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/common/decorators/current-user.decorator.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/common/decorators/current-user.decorator.ts",
+      "mtimeMs": 1780279830546.1978,
+      "size": 394,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/usuarios/usuarios.service.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/usuarios/usuarios.service.ts",
+      "mtimeMs": 1780279881194.4858,
+      "size": 1872,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/config/env.validation.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/usuarios/usuarios.module.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/usuarios/usuarios.module.ts",
+      "mtimeMs": 1780279901002.5989,
+      "size": 202,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/usuarios/usuarios.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/auth/dto/login.dto.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/auth/dto/login.dto.ts",
+      "mtimeMs": 1780279911065.6562,
+      "size": 205,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/common/pipes/zod-validation.pipe.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/common/pipes/zod-validation.pipe.ts",
+      "mtimeMs": 1780279923770.7288,
+      "size": 619,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.ts",
+      "mtimeMs": 1780280243744.5742,
+      "size": 1371,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/archivos/archivos.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/auth/dto/login.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/auth/dto/register.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/auth/interfaces/jwt-payload.interface.ts",
+        "/home/styc/Vetec/techside-veterinary/src/email/email.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/personas/personas.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/usuarios/usuarios.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/auth/auth.controller.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/auth/auth.controller.ts",
+      "mtimeMs": 1780280256272.647,
+      "size": 505,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/auth/dto/login.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/auth/dto/register.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/decorators/current-user.decorator.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/guards/optional-jwt-auth.guard.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/pipes/zod-validation.pipe.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/auth/auth.module.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/auth/auth.module.ts",
+      "mtimeMs": 1780280282578.8,
+      "size": 1010,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/archivos/archivos.module.ts",
+        "/home/styc/Vetec/techside-veterinary/src/auth/auth.controller.ts",
+        "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/auth/strategies/jwt.strategy.ts",
+        "/home/styc/Vetec/techside-veterinary/src/config/env.validation.ts",
+        "/home/styc/Vetec/techside-veterinary/src/email/email.module.ts",
+        "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.module.ts",
+        "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.module.ts",
+        "/home/styc/Vetec/techside-veterinary/src/personas/personas.module.ts",
+        "/home/styc/Vetec/techside-veterinary/src/usuarios/usuarios.module.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.spec.ts",
+      "mtimeMs": 1780280830887.6785,
+      "size": 4267,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/archivos/archivos.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/email/email.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/personas/personas.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/usuarios/usuarios.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/usuarios/usuarios.service.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/usuarios/usuarios.service.spec.ts",
+      "mtimeMs": 1780280443334.4111,
+      "size": 4543,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/usuarios/usuarios.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/auth/strategies/jwt.strategy.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/auth/strategies/jwt.strategy.spec.ts",
+      "mtimeMs": 1780280895381.942,
+      "size": 1145,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/auth/interfaces/jwt-payload.interface.ts",
+        "/home/styc/Vetec/techside-veterinary/src/auth/strategies/jwt.strategy.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/auth/auth.controller.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/auth/auth.controller.spec.ts",
+      "mtimeMs": 1780280990943.351,
+      "size": 2993,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/auth/auth.controller.ts",
+        "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/guards/optional-jwt-auth.guard.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/common/pipes/zod-validation.pipe.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/common/pipes/zod-validation.pipe.spec.ts",
+      "mtimeMs": 1780281217303.3909,
+      "size": 1531,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/common/pipes/zod-validation.pipe.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/auth/dto/register.dto.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/auth/dto/register.dto.ts",
+      "mtimeMs": 1780282853361.1377,
+      "size": 1257,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/common/utils/normalize-phone.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/personas/personas.service.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/personas/personas.service.ts",
+      "mtimeMs": 1780282878031.2405,
+      "size": 380,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/personas/personas.controller.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/personas/personas.controller.ts",
+      "mtimeMs": 1780282888735.2854,
+      "size": 105,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/personas/personas.module.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/personas/personas.module.ts",
+      "mtimeMs": 1780282888735.2854,
+      "size": 299,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/personas/personas.controller.ts",
+        "/home/styc/Vetec/techside-veterinary/src/personas/personas.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/archivos/archivos.service.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/archivos/archivos.service.ts",
+      "mtimeMs": 1780282935280.483,
+      "size": 1292,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/archivos/archivos.module.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/archivos/archivos.module.ts",
+      "mtimeMs": 1780282947411.5352,
+      "size": 202,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/archivos/archivos.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/email/email.service.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/email/email.service.ts",
+      "mtimeMs": 1780282959475.5872,
+      "size": 608,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/email/email.module.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/email/email.module.ts",
+      "mtimeMs": 1780282967842.6235,
+      "size": 187,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/email/email.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/email/email.service.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/email/email.service.spec.ts",
+      "mtimeMs": 1780283175648.5557,
+      "size": 1735,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/email/email.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/personas/personas.service.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/personas/personas.service.spec.ts",
+      "mtimeMs": 1780283266246.9775,
+      "size": 1590,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/personas/personas.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/archivos/archivos.service.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/archivos/archivos.service.spec.ts",
+      "mtimeMs": 1780283340518.2334,
+      "size": 4181,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/archivos/archivos.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/common/decorators/roles.decorator.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/common/decorators/roles.decorator.ts",
+      "mtimeMs": 1780284289838.0518,
+      "size": 192,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/common/guards/optional-jwt-auth.guard.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/common/guards/optional-jwt-auth.guard.ts",
+      "mtimeMs": 1780284289838.0518,
+      "size": 385,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/common/guards/roles.guard.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/common/guards/roles.guard.ts",
+      "mtimeMs": 1780284289838.0518,
+      "size": 1230,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/common/decorators/roles.decorator.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/common/guards/roles.guard.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/common/guards/roles.guard.spec.ts",
+      "mtimeMs": 1780284838225.478,
+      "size": 3303,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/common/guards/roles.guard.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/common/filters/http-exception.filter.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/common/filters/http-exception.filter.ts",
+      "mtimeMs": 1780285760410.9895,
+      "size": 2111,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/common/filters/http-exception.filter.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/common/filters/http-exception.filter.spec.ts",
+      "mtimeMs": 1780285889505.3718,
+      "size": 3182,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/common/filters/http-exception.filter.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/test/auth.e2e-spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/test/auth.e2e-spec.ts",
+      "mtimeMs": 1780286510614.6853,
+      "size": 12745,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/app.module.ts",
+        "/home/styc/Vetec/techside-veterinary/src/archivos/archivos.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/decorators/roles.decorator.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/guards/jwt-auth.guard.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/guards/roles.guard.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/usuarios/usuarios.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/test/setup-e2e.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/test/setup-e2e.ts",
+      "mtimeMs": 1780286246226.0352,
+      "size": 254,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.controller.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.controller.spec.ts",
+      "mtimeMs": 1780539628294.6235,
+      "size": 5288,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.controller.ts",
+        "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/guards/jwt-auth.guard.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.controller.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.controller.ts",
+      "mtimeMs": 1780539661797.0205,
+      "size": 1424,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/guards/jwt-auth.guard.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.service.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.service.spec.ts",
+      "mtimeMs": 1780539490708.9917,
+      "size": 5410,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.service.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.service.ts",
+      "mtimeMs": 1780539520830.3494,
+      "size": 1034,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.module.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.module.ts",
+      "mtimeMs": 1780539681153.2498,
+      "size": 359,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.controller.ts",
+        "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.module.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/mascotas/dto/actualizar-mascota.dto.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/mascotas/dto/actualizar-mascota.dto.ts",
+      "mtimeMs": 1780543058875.6396,
+      "size": 230,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/mascotas/dto/crear-mascota.dto.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/mascotas/dto/crear-mascota.dto.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/mascotas/dto/crear-mascota.dto.ts",
+      "mtimeMs": 1780543058875.5046,
+      "size": 825,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.controller.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.controller.ts",
+      "mtimeMs": 1780543058875.5046,
+      "size": 3765,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/common/decorators/current-user.decorator.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/guards/jwt-auth.guard.ts",
+        "/home/styc/Vetec/techside-veterinary/src/mascotas/dto/actualizar-mascota.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/mascotas/dto/crear-mascota.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.module.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.module.ts",
+      "mtimeMs": 1780543058875.5046,
+      "size": 430,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/archivos/archivos.module.ts",
+        "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.controller.ts",
+        "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.module.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.service.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.service.ts",
+      "mtimeMs": 1780543058875.5046,
+      "size": 1096,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/archivos/archivos.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/mascotas/dto/actualizar-mascota.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/mascotas/dto/crear-mascota.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.service.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.service.spec.ts",
+      "mtimeMs": 1780543356274.5415,
+      "size": 9307,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/archivos/archivos.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.controller.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.controller.spec.ts",
+      "mtimeMs": 1780543940071.3298,
+      "size": 5208,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/common/guards/jwt-auth.guard.ts",
+        "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.controller.ts",
+        "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/citas/dto/cambiar-estado-cita.dto.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/citas/dto/cambiar-estado-cita.dto.ts",
+      "mtimeMs": 1780628290628.299,
+      "size": 288,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/citas/dto/create-cita.dto.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/citas/dto/create-cita.dto.ts",
+      "mtimeMs": 1780628290628.299,
+      "size": 817,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/citas/dto/disponibilidad-query.dto.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/citas/dto/disponibilidad-query.dto.ts",
+      "mtimeMs": 1780628290628.299,
+      "size": 340,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/citas/dto/update-cita.dto.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/citas/dto/update-cita.dto.ts",
+      "mtimeMs": 1780628290628.299,
+      "size": 668,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/citas/citas.controller.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/citas/citas.controller.ts",
+      "mtimeMs": 1780628623027.235,
+      "size": 2468,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/auth/interfaces/jwt-payload.interface.ts",
+        "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/citas/dto/cambiar-estado-cita.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/citas/dto/create-cita.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/citas/dto/disponibilidad-query.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/citas/dto/update-cita.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/decorators/current-user.decorator.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/decorators/roles.decorator.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/guards/jwt-auth.guard.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/guards/roles.guard.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/pipes/zod-validation.pipe.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/citas/citas.module.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/citas/citas.module.ts",
+      "mtimeMs": 1780628622770.2324,
+      "size": 358,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/citas/citas.controller.ts",
+        "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/citas/helpers/folio-generator.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.module.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.ts",
+      "mtimeMs": 1780628540719.4478,
+      "size": 16386,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/auth/interfaces/jwt-payload.interface.ts",
+        "/home/styc/Vetec/techside-veterinary/src/citas/dto/cambiar-estado-cita.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/citas/dto/create-cita.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/citas/dto/disponibilidad-query.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/citas/dto/update-cita.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/citas/helpers/folio-generator.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.spec.ts",
+      "mtimeMs": 1780629046715.271,
+      "size": 5024,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/citas/helpers/folio-generator.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/medicos/dto/create-medico-asistencia.dto.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/medicos/dto/create-medico-asistencia.dto.ts",
+      "mtimeMs": 1780629500802.5793,
+      "size": 637,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/medicos/dto/create-medico-horario.dto.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/medicos/dto/create-medico-horario.dto.ts",
+      "mtimeMs": 1780629500787.619,
+      "size": 1619,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/medicos/dto/create-medico.dto.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/medicos/dto/create-medico.dto.ts",
+      "mtimeMs": 1780629500787.619,
+      "size": 412,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/medicos/dto/update-medico-horario.dto.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/medicos/dto/update-medico-horario.dto.ts",
+      "mtimeMs": 1780629500802.5793,
+      "size": 1849,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/medicos/dto/update-medico.dto.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/medicos/dto/update-medico.dto.ts",
+      "mtimeMs": 1780629500787.619,
+      "size": 478,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.controller.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.controller.ts",
+      "mtimeMs": 1780629739456.4827,
+      "size": 3243,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/common/decorators/roles.decorator.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/guards/jwt-auth.guard.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/guards/roles.guard.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/pipes/zod-validation.pipe.ts",
+        "/home/styc/Vetec/techside-veterinary/src/medicos/dto/create-medico-asistencia.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/medicos/dto/create-medico-horario.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/medicos/dto/create-medico.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/medicos/dto/update-medico-horario.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/medicos/dto/update-medico.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.ts",
+      "mtimeMs": 1780629702600.1914,
+      "size": 10328,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/medicos/dto/create-medico-asistencia.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/medicos/dto/create-medico-horario.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/medicos/dto/create-medico.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/medicos/dto/update-medico-horario.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/medicos/dto/update-medico.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.module.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.module.ts",
+      "mtimeMs": 1780629784925.8462,
+      "size": 374,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.controller.ts",
+        "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.module.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.spec.ts",
+      "mtimeMs": 1780630109857.5618,
+      "size": 5173,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/recetas/dto/detalle-receta.dto.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/recetas/dto/detalle-receta.dto.ts",
+      "mtimeMs": 1780630313753.3384,
+      "size": 800,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/recetas/dto/create-receta.dto.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/recetas/dto/create-receta.dto.ts",
+      "mtimeMs": 1780630333300.5107,
+      "size": 603,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/recetas/dto/detalle-receta.dto.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/consultas/dto/create-consulta.dto.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/consultas/dto/create-consulta.dto.ts",
+      "mtimeMs": 1780630404616.1418,
+      "size": 577,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/consultas/dto/update-consulta.dto.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/consultas/dto/update-consulta.dto.ts",
+      "mtimeMs": 1780630404616.1418,
+      "size": 655,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.controller.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.controller.ts",
+      "mtimeMs": 1780630611078.987,
+      "size": 1447,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/auth/interfaces/jwt-payload.interface.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/decorators/current-user.decorator.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/decorators/roles.decorator.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/guards/jwt-auth.guard.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/guards/roles.guard.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/pipes/zod-validation.pipe.ts",
+        "/home/styc/Vetec/techside-veterinary/src/recetas/dto/create-receta.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.module.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.module.ts",
+      "mtimeMs": 1780630623600.0996,
+      "size": 345,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.module.ts",
+        "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.controller.ts",
+        "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.service.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.service.ts",
+      "mtimeMs": 1780630522594.1934,
+      "size": 5998,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/auth/interfaces/jwt-payload.interface.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/recetas/dto/create-receta.dto.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.controller.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.controller.ts",
+      "mtimeMs": 1780630774328.4604,
+      "size": 1854,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/auth/interfaces/jwt-payload.interface.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/decorators/current-user.decorator.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/decorators/roles.decorator.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/guards/jwt-auth.guard.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/guards/roles.guard.ts",
+        "/home/styc/Vetec/techside-veterinary/src/common/pipes/zod-validation.pipe.ts",
+        "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/consultas/dto/create-consulta.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/consultas/dto/update-consulta.dto.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.service.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.service.ts",
+      "mtimeMs": 1780630746450.208,
+      "size": 6639,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/auth/interfaces/jwt-payload.interface.ts",
+        "/home/styc/Vetec/techside-veterinary/src/consultas/dto/create-consulta.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/consultas/dto/update-consulta.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.module.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.module.ts",
+      "mtimeMs": 1780630838157.039,
+      "size": 359,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.controller.ts",
+        "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.module.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.service.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.service.spec.ts",
+      "mtimeMs": 1780630971430.251,
+      "size": 2857,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/citas/helpers/folio-generator.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/citas/helpers/folio-generator.spec.ts",
+      "mtimeMs": 1780782422873.1326,
+      "size": 2283,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/citas/helpers/folio-generator.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/citas/helpers/folio-generator.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/citas/helpers/folio-generator.ts",
+      "mtimeMs": 1780782310599.7283,
+      "size": 1559,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/pagos/dto/create-pago.dto.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/pagos/dto/create-pago.dto.ts",
+      "mtimeMs": 1780782812038.0874,
+      "size": 252,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.controller.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.controller.ts",
+      "mtimeMs": 1780782944170.8809,
+      "size": 638,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/common/guards/jwt-auth.guard.ts",
+        "/home/styc/Vetec/techside-veterinary/src/pagos/dto/create-pago.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.service.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.service.ts",
+      "mtimeMs": 1780782830695.1965,
+      "size": 1558,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/pagos/dto/create-pago.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.module.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.module.ts",
+      "mtimeMs": 1780782995279.1997,
+      "size": 358,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.controller.ts",
+        "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.module.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.service.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.service.spec.ts",
+      "mtimeMs": 1780783276401.0413,
+      "size": 3638,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.service.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
+      ],
+      "lastSeq": 0
+    }
+  },
+  "symbols": {},
+  "reverseDeps": {
+    "/home/styc/Vetec/techside-veterinary/eslint.config.mjs": [],
+    "/home/styc/Vetec/techside-veterinary/prisma/seed.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/app.controller.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/app.controller.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/app.controller.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/app.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/app.module.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/main.ts",
+      "/home/styc/Vetec/techside-veterinary/test/app.e2e-spec.ts",
+      "/home/styc/Vetec/techside-veterinary/test/auth.e2e-spec.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/app.service.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/app.controller.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/app.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/app.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/archivos/archivos.module.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/app.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/archivos/archivos.service.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/archivos/archivos.service.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/archivos/archivos.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/archivos/archivos.service.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.ts",
+      "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.service.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.service.ts",
+      "/home/styc/Vetec/techside-veterinary/test/auth.e2e-spec.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/auth/auth.controller.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/auth/auth.controller.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.controller.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/auth/auth.module.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/app.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.controller.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.spec.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/auth/dto/login.dto.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/auth/dto/register.dto.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/auth/interfaces/jwt-payload.interface.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/strategies/jwt.strategy.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/strategies/jwt.strategy.ts",
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.ts",
+      "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.service.ts",
+      "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.service.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/auth/strategies/jwt.strategy.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/auth/strategies/jwt.strategy.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/strategies/jwt.strategy.spec.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.controller.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.controller.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.controller.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.module.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/app.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.service.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.service.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.controller.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.service.spec.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/citas/citas.controller.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/citas/citas.module.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/app.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.spec.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/citas/dto/cambiar-estado-cita.dto.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/citas/dto/create-cita.dto.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/citas/dto/disponibilidad-query.dto.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/citas/dto/update-cita.dto.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/citas/helpers/folio-generator.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/citas/helpers/folio-generator.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.ts",
+      "/home/styc/Vetec/techside-veterinary/src/citas/helpers/folio-generator.spec.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/common/decorators/current-user.decorator.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.controller.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/common/decorators/roles.decorator.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/common/guards/roles.guard.ts",
+      "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/test/auth.e2e-spec.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/common/filters/http-exception.filter.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/common/filters/http-exception.filter.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/common/filters/http-exception.filter.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/main.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/common/guards/jwt-auth.guard.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.controller.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.controller.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/test/auth.e2e-spec.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/common/guards/optional-jwt-auth.guard.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.controller.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.controller.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/common/guards/roles.guard.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/common/guards/roles.guard.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/common/guards/roles.guard.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/test/auth.e2e-spec.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/common/interceptors/sanitize.interceptor.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/common/interceptors/sanitize.interceptor.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/common/interceptors/sanitize.interceptor.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/main.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/common/pipes/zod-validation.pipe.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/common/pipes/zod-validation.pipe.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/common/pipes/zod-validation.pipe.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.controller.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/common/utils/normalize-phone.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/common/utils/normalize-phone.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/auth/dto/register.dto.ts",
+      "/home/styc/Vetec/techside-veterinary/src/common/utils/normalize-phone.spec.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/config/env.validation.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/config/env.validation.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/app.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/strategies/jwt.strategy.ts",
+      "/home/styc/Vetec/techside-veterinary/src/config/env.validation.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/usuarios/usuarios.service.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.controller.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.module.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/app.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.service.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/consultas/dto/create-consulta.dto.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.service.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/consultas/dto/update-consulta.dto.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.service.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/email/email.module.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/app.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/email/email.service.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/email/email.service.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.ts",
+      "/home/styc/Vetec/techside-veterinary/src/email/email.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/email/email.service.spec.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/main.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/mascotas/dto/actualizar-mascota.dto.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.service.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/mascotas/dto/crear-mascota.dto.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/mascotas/dto/actualizar-mascota.dto.ts",
+      "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.service.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.controller.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.controller.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.controller.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.module.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/app.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.service.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.service.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.controller.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.service.spec.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/medicos/dto/create-medico-asistencia.dto.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/medicos/dto/create-medico-horario.dto.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/medicos/dto/create-medico.dto.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/medicos/dto/update-medico-horario.dto.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/medicos/dto/update-medico.dto.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.controller.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.module.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/app.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.ts",
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.spec.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.controller.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.controller.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.controller.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.module.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/app.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.service.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.service.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.ts",
+      "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.controller.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.service.spec.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/pagos/dto/create-pago.dto.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.service.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.controller.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.module.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/app.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.service.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.service.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.service.spec.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/personas/personas.controller.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/personas/personas.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/personas/personas.module.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/app.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/personas/personas.service.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/personas/personas.service.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.ts",
+      "/home/styc/Vetec/techside-veterinary/src/personas/personas.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/personas/personas.service.spec.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.module.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/app.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.ts",
+      "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.service.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.service.ts",
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.ts",
+      "/home/styc/Vetec/techside-veterinary/src/citas/helpers/folio-generator.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/citas/helpers/folio-generator.ts",
+      "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.service.ts",
+      "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.service.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/mascotas/mascotas.service.ts",
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.ts",
+      "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.service.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/mx-divisiones/mx-divisiones.service.ts",
+      "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.service.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/pagos/pagos.service.ts",
+      "/home/styc/Vetec/techside-veterinary/src/personas/personas.service.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/personas/personas.service.ts",
+      "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.service.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.service.ts",
+      "/home/styc/Vetec/techside-veterinary/src/usuarios/usuarios.service.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/usuarios/usuarios.service.ts",
+      "/home/styc/Vetec/techside-veterinary/test/auth.e2e-spec.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/recetas/dto/create-receta.dto.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.service.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/recetas/dto/detalle-receta.dto.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/recetas/dto/create-receta.dto.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.controller.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.module.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/app.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.service.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.service.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.controller.ts",
+      "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/recetas/recetas.service.spec.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/usuarios/usuarios.module.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/app.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.module.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/usuarios/usuarios.service.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/usuarios/usuarios.service.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/auth/auth.service.ts",
+      "/home/styc/Vetec/techside-veterinary/src/usuarios/usuarios.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/usuarios/usuarios.service.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/test/auth.e2e-spec.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/test/app.e2e-spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/test/auth.e2e-spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/test/setup-e2e.ts": []
+  },
+  "cachedExports": [],
+  "projectRulesScan": {
+    "rules": [],
+    "hasCustomRules": false
+  },
+  "projectIndex": {
+    "entryCount": 4
+  },
+  "startupScan": {
+    "cwd": "/home/styc/Vetec/techside-veterinary",
+    "scanRoot": "/home/styc/Vetec/techside-veterinary",
+    "projectRoot": "/home/styc/Vetec/techside-veterinary",
+    "canWarmCaches": true,
+    "sourceFileCount": 96
+  },
+  "languageProfile": {
+    "present": {
+      "jsts": true,
+      "python": false,
+      "go": false,
+      "rust": false,
+      "cxx": false,
+      "cmake": false,
+      "fish": false,
+      "shell": false,
+      "json": false,
+      "markdown": false,
+      "css": false,
+      "yaml": false,
+      "sql": false,
+      "ruby": false,
+      "html": false,
+      "docker": false,
+      "php": false,
+      "powershell": false,
+      "prisma": true,
+      "csharp": false,
+      "fsharp": false,
+      "java": false,
+      "kotlin": false,
+      "swift": false,
+      "dart": false,
+      "lua": false,
+      "zig": false,
+      "haskell": false,
+      "elixir": false,
+      "gleam": false,
+      "ocaml": false,
+      "clojure": false,
+      "terraform": false,
+      "nix": false,
+      "toml": false
+    },
+    "configured": {
+      "jsts": true,
+      "prisma": true
+    },
+    "counts": {
+      "jsts": 97
+    },
+    "detectedKinds": [
+      "jsts",
+      "prisma"
+    ]
+  },
+  "conventions": {
+    "frameworks": [],
+    "testRunners": [],
+    "buildTools": [],
+    "agentDocs": []
+  }
+}

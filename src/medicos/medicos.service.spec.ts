@@ -2,11 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MedicosService } from './medicos.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { Rol, EstadoAsistencia } from '@prisma/client';
-import {
-  BadRequestException,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, ConflictException } from '@nestjs/common';
 
 describe('MedicosService', () => {
   let service: MedicosService;
@@ -21,6 +17,9 @@ describe('MedicosService', () => {
       delete: jest.fn(),
     },
     usuario: {
+      findUnique: jest.fn(),
+    },
+    consultorio: {
       findUnique: jest.fn(),
     },
     medicoHorario: {
@@ -102,12 +101,14 @@ describe('MedicosService', () => {
           diaSemana: 'lunes',
           horaInicio: '06:00',
           horaFin: '13:00',
+          consultorioId: 'c1',
         }),
       ).rejects.toThrow(BadRequestException);
     });
 
     it('debería crear horario válido entre semana', async () => {
       mockPrisma.medico.findUnique.mockResolvedValue({ id: 'm1' });
+      mockPrisma.consultorio.findUnique.mockResolvedValue({ id: 'c1' });
       mockPrisma.medicoHorario.findFirst.mockResolvedValue(null);
       mockPrisma.medicoHorario.findMany.mockResolvedValue([]);
       mockPrisma.medicoHorario.create.mockResolvedValue({
@@ -120,6 +121,7 @@ describe('MedicosService', () => {
         diaSemana: 'lunes',
         horaInicio: '09:00',
         horaFin: '14:00',
+        consultorioId: 'c1',
       });
       expect(result.id).toBe('h1');
     });
@@ -136,7 +138,7 @@ describe('MedicosService', () => {
       });
 
       const result = await service.registrarEntradaAutomatica('m1');
-      expect(result.id).toBe('a1');
+      expect(result!.id).toBe('a1');
       expect(mockPrisma.medicoAsistencia.create).not.toHaveBeenCalled();
     });
 
@@ -166,7 +168,7 @@ describe('MedicosService', () => {
       });
 
       const result = await service.registrarEntradaAutomatica('m1');
-      expect(result.estado).toBe(EstadoAsistencia.asistencia);
+      expect(result!.estado).toBe(EstadoAsistencia.asistencia);
       expect(mockPrisma.medicoAsistencia.create).toHaveBeenCalled();
     });
   });

@@ -1,0 +1,184 @@
+{
+  "success": true,
+  "clones": [
+    {
+      "fileA": "src/medicos/dto/create-medico-horario.dto.ts",
+      "startA": 36,
+      "fileB": "src/medicos/dto/update-medico-horario.dto.ts",
+      "startB": 51,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "src/consultas/dto/create-consulta.dto.ts",
+      "startA": 5,
+      "fileB": "src/consultas/dto/update-consulta.dto.ts",
+      "startB": 5,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "src/recetas/recetas.service.ts",
+      "startA": 171,
+      "fileB": "src/recetas/recetas.service.ts",
+      "startB": 134,
+      "lines": 35,
+      "tokens": 0
+    },
+    {
+      "fileA": "src/medicos/medicos.service.ts",
+      "startA": 199,
+      "fileB": "src/medicos/medicos.service.ts",
+      "startB": 128,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "src/medicos/medicos.service.ts",
+      "startA": 223,
+      "fileB": "src/medicos/medicos.service.ts",
+      "startB": 168,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "src/mascotas/mascotas.controller.ts",
+      "startA": 107,
+      "fileB": "src/mascotas/mascotas.controller.ts",
+      "startB": 56,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "src/mascotas/mascotas.controller.ts",
+      "startA": 115,
+      "fileB": "src/mascotas/mascotas.controller.ts",
+      "startB": 64,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "src/consultas/consultas.service.ts",
+      "startA": 31,
+      "fileB": "src/recetas/recetas.service.ts",
+      "startB": 28,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "src/consultas/consultas.service.ts",
+      "startA": 80,
+      "fileB": "src/recetas/recetas.service.ts",
+      "startB": 85,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "src/consultas/consultas.service.ts",
+      "startA": 101,
+      "fileB": "src/recetas/recetas.service.ts",
+      "startB": 102,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "src/consultas/consultas.service.ts",
+      "startA": 167,
+      "fileB": "src/consultas/consultas.service.ts",
+      "startB": 132,
+      "lines": 34,
+      "tokens": 0
+    },
+    {
+      "fileA": "src/consultas/consultas.service.ts",
+      "startA": 203,
+      "fileB": "src/consultas/consultas.service.ts",
+      "startB": 153,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "src/citas/citas.service.ts",
+      "startA": 207,
+      "fileB": "src/recetas/recetas.service.ts",
+      "startB": 33,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "src/citas/citas.service.ts",
+      "startA": 223,
+      "fileB": "src/citas/citas.service.ts",
+      "startB": 200,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "src/citas/citas.service.ts",
+      "startA": 298,
+      "fileB": "src/citas/citas.service.ts",
+      "startB": 200,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "src/citas/citas.service.ts",
+      "startA": 352,
+      "fileB": "src/recetas/recetas.service.ts",
+      "startB": 33,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "src/citas/citas.service.ts",
+      "startA": 474,
+      "fileB": "src/citas/citas.service.ts",
+      "startB": 444,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "src/citas/citas.service.ts",
+      "startA": 506,
+      "fileB": "src/citas/citas.service.ts",
+      "startB": 444,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "src/auth/auth.controller.ts",
+      "startA": 73,
+      "fileB": "src/mascotas/mascotas.controller.ts",
+      "startB": 64,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "test/auth.e2e-spec.ts",
+      "startA": 153,
+      "fileB": "test/auth.e2e-spec.ts",
+      "startB": 124,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "test/auth.e2e-spec.ts",
+      "startA": 167,
+      "fileB": "test/auth.e2e-spec.ts",
+      "startB": 148,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "test/auth.e2e-spec.ts",
+      "startA": 331,
+      "fileB": "test/auth.e2e-spec.ts",
+      "startB": 298,
+      "lines": 11,
+      "tokens": 0
+    }
+  ],
+  "duplicatedLines": 266,
+  "totalLines": 5636,
+  "percentage": 4.72
+}

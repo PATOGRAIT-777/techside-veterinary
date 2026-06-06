@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CitasService } from './citas.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { FolioGenerator } from './helpers/folio-generator';
 import { Rol, EstadoCita } from '@prisma/client';
 import {
   BadRequestException,
@@ -25,9 +26,11 @@ describe('CitasService', () => {
     },
     medico: {
       findFirst: jest.fn(),
+      findUnique: jest.fn(),
     },
     medicoHorario: {
       findMany: jest.fn(),
+      findFirst: jest.fn(),
     },
     sucursal: {
       findFirst: jest.fn(),
@@ -35,6 +38,13 @@ describe('CitasService', () => {
     consultorio: {
       findFirst: jest.fn(),
     },
+    pago: {
+      create: jest.fn(),
+    },
+    $transaction: jest.fn((ops: Promise<unknown>[]) => Promise.all(ops)),
+  };
+  const mockFolioGenerator = {
+    generate: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -42,6 +52,7 @@ describe('CitasService', () => {
       providers: [
         CitasService,
         { provide: PrismaService, useValue: mockPrisma },
+        { provide: FolioGenerator, useValue: mockFolioGenerator },
       ],
     }).compile();
 
@@ -62,7 +73,6 @@ describe('CitasService', () => {
       sucursalId: '550e8400-e29b-41d4-a716-446655440000',
       medicoId: '550e8400-e29b-41d4-a716-446655440001',
       mascotaId: '550e8400-e29b-41d4-a716-446655440002',
-      consultorioId: '550e8400-e29b-41d4-a716-446655440003',
       servicioId: '550e8400-e29b-41d4-a716-446655440004',
       fecha: '2026-12-31',
       horaInicio: '10:00',
@@ -106,7 +116,27 @@ describe('CitasService', () => {
       );
     });
 
-    it('debería crear una cita válida', async () => {
+    it('debería rechazar si el médico no tiene horario para este día', async () => {
+      const fechaFutura = new Date();
+      fechaFutura.setDate(fechaFutura.getDate() + 2);
+      const dtoValido = {
+        ...dto,
+        fecha: fechaFutura.toISOString().split('T')[0],
+      };
+
+      mockPrisma.mascota.findUnique.mockResolvedValue({
+        id: dto.mascotaId,
+        propietarioId: cliente.sub,
+      });
+      mockPrisma.cita.findMany.mockResolvedValue([]);
+      mockPrisma.medicoHorario.findFirst.mockResolvedValue(null);
+
+      await expect(service.create(dtoValido, cliente)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('debería crear una cita válida derivando consultorio desde horario', async () => {
       const fechaFutura = new Date();
       fechaFutura.setDate(fechaFutura.getDate() + 2);
       const dtoValido = {
@@ -120,15 +150,90 @@ describe('CitasService', () => {
       });
       mockPrisma.cita.findFirst.mockResolvedValue(null);
       mockPrisma.cita.findMany.mockResolvedValue([]);
+      mockPrisma.medicoHorario.findFirst.mockResolvedValue({
+        id: 'h1',
+        medicoId: dto.medicoId,
+        consultorioId: 'cons-1',
+      });
+      mockPrisma.medicoHorario.findMany.mockResolvedValue([]);
+      mockPrisma.medico.findUnique.mockResolvedValue({
+        id: dto.medicoId,
+        especialidadPrincipal: { precio: 1500.0 },
+      });
+      mockFolioGenerator.generate.mockResolvedValue('VET-20260606-0001');
       mockPrisma.cita.create.mockResolvedValue({
         id: 'cita-1',
         ...dtoValido,
-        estado: EstadoCita.pendiente,
+        estado: EstadoCita.pendiente_de_pago,
+      });
+      mockPrisma.pago.create.mockResolvedValue({
+        id: 'pago-1',
+        folioPago: 'VET-20260606-0001',
+        cantidad: 1500.0,
+        estado: 'pendiente',
       });
 
       const result = await service.create(dtoValido, cliente);
-      expect(result.estado).toBe(EstadoCita.pendiente);
+      expect(result.estado).toBe(EstadoCita.pendiente_de_pago);
       expect(mockPrisma.cita.create).toHaveBeenCalled();
+      // Verify consultorioId was NOT passed in create data (derived from horario)
+      const createCall = mockPrisma.cita.create.mock.calls[0] as unknown as [
+        {
+          data: Record<string, unknown>;
+        },
+      ];
+      expect(createCall[0].data).not.toHaveProperty('consultorioId');
+    });
+
+    it('should create Pago with estado pendiente and correct amount', async () => {
+      const fechaFutura = new Date();
+      fechaFutura.setDate(fechaFutura.getDate() + 2);
+      const dtoValido = {
+        ...dto,
+        fecha: fechaFutura.toISOString().split('T')[0],
+      };
+
+      mockPrisma.mascota.findUnique.mockResolvedValue({
+        id: dto.mascotaId,
+        propietarioId: cliente.sub,
+      });
+      mockPrisma.cita.findFirst.mockResolvedValue(null);
+      mockPrisma.cita.findMany.mockResolvedValue([]);
+      mockPrisma.medicoHorario.findFirst.mockResolvedValue({
+        id: 'h1',
+        medicoId: dto.medicoId,
+        consultorioId: 'cons-1',
+      });
+      mockPrisma.medicoHorario.findMany.mockResolvedValue([]);
+      mockPrisma.medico.findUnique.mockResolvedValue({
+        id: dto.medicoId,
+        especialidadPrincipal: { precio: 2000.0 },
+      });
+      mockFolioGenerator.generate.mockResolvedValue('VET-20260606-0002');
+      mockPrisma.cita.create.mockResolvedValue({
+        id: 'cita-1',
+        estado: EstadoCita.pendiente_de_pago,
+      });
+      mockPrisma.pago.create.mockResolvedValue({
+        id: 'pago-1',
+        folioPago: 'VET-20260606-0002',
+        cantidad: 2000.0,
+        estado: 'pendiente',
+      });
+
+      await service.create(dtoValido, cliente);
+
+      expect(mockPrisma.cita.create).toHaveBeenCalled();
+      const createCall = mockPrisma.cita.create.mock.calls[0] as unknown as [
+        { data: Record<string, unknown> },
+      ];
+      expect(createCall[0].data.pago).toEqual({
+        create: {
+          cantidad: 2000.0,
+          folioPago: 'VET-20260606-0002',
+          estado: 'pendiente',
+        },
+      });
     });
   });
 
