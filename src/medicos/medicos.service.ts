@@ -11,10 +11,14 @@ import { UpdateMedicoDto } from './dto/update-medico.dto';
 import { CreateMedicoHorarioDto } from './dto/create-medico-horario.dto';
 import { UpdateMedicoHorarioDto } from './dto/update-medico-horario.dto';
 import { CreateMedicoAsistenciaDto } from './dto/create-medico-asistencia.dto';
+import { AvailabilityCalculator } from '../citas/helpers/availability-calculator';
 
 @Injectable()
 export class MedicosService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly availability: AvailabilityCalculator,
+  ) {}
 
   // =================== Médicos ===================
 
@@ -63,6 +67,74 @@ export class MedicosService {
         horarios: true,
       },
     });
+  }
+
+  async findFiltered(query: { especialidadId?: string; sucursalId?: string }) {
+    const where: Record<string, unknown> = {};
+
+    if (query.especialidadId) {
+      where.especialidadPrincipalId = query.especialidadId;
+    }
+
+    const medicos = await this.prisma.medico.findMany({
+      where,
+      include: {
+        usuario: { include: { persona: true } },
+        sucursal: true,
+        especialidadPrincipal: true,
+      },
+    });
+
+    if (query.sucursalId) {
+      // Sort: matching sucursal first
+      return medicos.sort((a, b) => {
+        const aMatch = a.sucursalId === query.sucursalId ? -1 : 1;
+        const bMatch = b.sucursalId === query.sucursalId ? -1 : 1;
+        return aMatch - bMatch;
+      });
+    }
+
+    return medicos;
+  }
+
+  async disponibilidadDias(
+    medicoId: string,
+    desdeStr: string,
+    hastaStr: string,
+  ) {
+    const desde = this.parseDate(desdeStr);
+    const hasta = this.parseDate(hastaStr);
+    const ahora = new Date();
+
+    const minDesde = new Date(ahora.getTime() + 24 * 60 * 60 * 1000);
+    if (desde < minDesde) {
+      throw new BadRequestException(
+        'La fecha desde debe ser al menos 24 horas en el futuro',
+      );
+    }
+
+    const diffDias =
+      (hasta.getTime() - desde.getTime()) / (1000 * 60 * 60 * 24);
+    if (diffDias > 60) {
+      throw new BadRequestException(
+        'El rango máximo de consulta es de 60 días',
+      );
+    }
+
+    const maxHasta = new Date(ahora);
+    maxHasta.setMonth(maxHasta.getMonth() + 2);
+    if (hasta > maxHasta) {
+      throw new BadRequestException(
+        'No se puede consultar disponibilidad con más de 2 meses de anticipación',
+      );
+    }
+
+    return this.availability.computeDays(medicoId, desde, hasta);
+  }
+
+  async disponibilidadSlots(medicoId: string, fechaStr: string) {
+    const fecha = this.parseDate(fechaStr);
+    return this.availability.computeSlots(medicoId, fecha);
   }
 
   async findOne(id: string) {
@@ -426,6 +498,11 @@ export class MedicosService {
   }
 
   // =================== Helpers ===================
+
+  private parseDate(dateStr: string): Date {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return new Date(Date.UTC(year, month - 1, day));
+  }
 
   private parseTime(timeStr: string): Date {
     const [hora, minuto] = timeStr.split(':').map(Number);

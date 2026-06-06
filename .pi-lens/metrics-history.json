@@ -2203,8 +2203,8 @@
     },
     "src/citas/citas.controller.ts": {
       "latest": {
-        "commit": "e390396",
-        "timestamp": "2026-06-06T17:52:03.133Z",
+        "commit": "3ad376f",
+        "timestamp": "2026-06-06T22:23:11.430Z",
         "mi": 37.9,
         "cognitive": 0,
         "nesting": 2,
@@ -2232,20 +2232,30 @@
           "lines": 78,
           "maxCyclomatic": 1,
           "entropy": 5.16
+        },
+        {
+          "commit": "3ad376f",
+          "timestamp": "2026-06-06T22:23:11.430Z",
+          "mi": 37.9,
+          "cognitive": 0,
+          "nesting": 2,
+          "lines": 78,
+          "maxCyclomatic": 1,
+          "entropy": 5.16
         }
       ],
       "trend": "stable"
     },
     "src/citas/citas.service.spec.ts": {
       "latest": {
-        "commit": "e390396",
-        "timestamp": "2026-06-06T21:41:06.508Z",
-        "mi": 26.7,
+        "commit": "3ad376f",
+        "timestamp": "2026-06-06T22:49:34.298Z",
+        "mi": 22.5,
         "cognitive": 0,
         "nesting": 3,
-        "lines": 185,
-        "maxCyclomatic": 3,
-        "entropy": 6.01
+        "lines": 253,
+        "maxCyclomatic": 4,
+        "entropy": 6.17
       },
       "history": [
         {
@@ -2277,20 +2287,30 @@
           "lines": 185,
           "maxCyclomatic": 3,
           "entropy": 6.01
+        },
+        {
+          "commit": "3ad376f",
+          "timestamp": "2026-06-06T22:49:34.298Z",
+          "mi": 22.5,
+          "cognitive": 0,
+          "nesting": 3,
+          "lines": 253,
+          "maxCyclomatic": 4,
+          "entropy": 6.17
         }
       ],
-      "trend": "stable"
+      "trend": "regressing"
     },
     "src/medicos/medicos.service.ts": {
       "latest": {
-        "commit": "e390396",
-        "timestamp": "2026-06-06T17:52:10.949Z",
-        "mi": 20.5,
-        "cognitive": 105,
+        "commit": "3ad376f",
+        "timestamp": "2026-06-06T22:23:11.456Z",
+        "mi": 20.2,
+        "cognitive": 108,
         "nesting": 5,
-        "lines": 349,
+        "lines": 356,
         "maxCyclomatic": 18,
-        "entropy": 6.49
+        "entropy": 6.51
       },
       "history": [
         {
@@ -2312,20 +2332,30 @@
           "lines": 349,
           "maxCyclomatic": 18,
           "entropy": 6.49
+        },
+        {
+          "commit": "3ad376f",
+          "timestamp": "2026-06-06T22:23:11.456Z",
+          "mi": 20.2,
+          "cognitive": 108,
+          "nesting": 5,
+          "lines": 356,
+          "maxCyclomatic": 18,
+          "entropy": 6.51
         }
       ],
       "trend": "regressing"
     },
     "src/medicos/medicos.service.spec.ts": {
       "latest": {
-        "commit": "e390396",
-        "timestamp": "2026-06-06T19:16:07.597Z",
-        "mi": 28.5,
+        "commit": "3ad376f",
+        "timestamp": "2026-06-06T22:31:44.380Z",
+        "mi": 28.3,
         "cognitive": 0,
         "nesting": 3,
-        "lines": 154,
+        "lines": 156,
         "maxCyclomatic": 1,
-        "entropy": 5.47
+        "entropy": 5.48
       },
       "history": [
         {
@@ -2347,6 +2377,16 @@
           "lines": 154,
           "maxCyclomatic": 1,
           "entropy": 5.47
+        },
+        {
+          "commit": "3ad376f",
+          "timestamp": "2026-06-06T22:31:44.380Z",
+          "mi": 28.3,
+          "cognitive": 0,
+          "nesting": 3,
+          "lines": 156,
+          "maxCyclomatic": 1,
+          "entropy": 5.48
         }
       ],
       "trend": "stable"
@@ -2498,14 +2538,14 @@
     },
     "src/citas/citas.service.ts": {
       "latest": {
-        "commit": "e390396",
-        "timestamp": "2026-06-06T21:40:50.006Z",
-        "mi": 15.3,
+        "commit": "3ad376f",
+        "timestamp": "2026-06-06T22:23:11.419Z",
+        "mi": 15,
         "cognitive": 164,
         "nesting": 5,
-        "lines": 516,
+        "lines": 535,
         "maxCyclomatic": 37,
-        "entropy": 6.78
+        "entropy": 6.84
       },
       "history": [
         {
@@ -2527,20 +2567,30 @@
           "lines": 516,
           "maxCyclomatic": 37,
           "entropy": 6.78
+        },
+        {
+          "commit": "3ad376f",
+          "timestamp": "2026-06-06T22:23:11.419Z",
+          "mi": 15,
+          "cognitive": 164,
+          "nesting": 5,
+          "lines": 535,
+          "maxCyclomatic": 37,
+          "entropy": 6.84
         }
       ],
       "trend": "stable"
     },
     "src/citas/citas.module.ts": {
       "latest": {
-        "commit": "e390396",
-        "timestamp": "2026-06-06T17:52:03.166Z",
-        "mi": 64.4,
+        "commit": "3ad376f",
+        "timestamp": "2026-06-06T22:23:26.157Z",
+        "mi": 62.9,
         "cognitive": 0,
         "nesting": 1,
-        "lines": 11,
+        "lines": 12,
         "maxCyclomatic": 1,
-        "entropy": 3.64
+        "entropy": 3.66
       },
       "history": [
         {
@@ -2552,14 +2602,24 @@
           "lines": 11,
           "maxCyclomatic": 1,
           "entropy": 3.64
+        },
+        {
+          "commit": "3ad376f",
+          "timestamp": "2026-06-06T22:23:26.157Z",
+          "mi": 62.9,
+          "cognitive": 0,
+          "nesting": 1,
+          "lines": 12,
+          "maxCyclomatic": 1,
+          "entropy": 3.66
         }
       ],
       "trend": "stable"
     },
     "src/medicos/medicos.controller.ts": {
       "latest": {
-        "commit": "e390396",
-        "timestamp": "2026-06-06T17:52:10.935Z",
+        "commit": "3ad376f",
+        "timestamp": "2026-06-06T22:23:11.440Z",
         "mi": 35.4,
         "cognitive": 0,
         "nesting": 2,
@@ -2577,14 +2637,24 @@
           "lines": 107,
           "maxCyclomatic": 1,
           "entropy": 5.09
+        },
+        {
+          "commit": "3ad376f",
+          "timestamp": "2026-06-06T22:23:11.440Z",
+          "mi": 35.4,
+          "cognitive": 0,
+          "nesting": 2,
+          "lines": 107,
+          "maxCyclomatic": 1,
+          "entropy": 5.09
         }
       ],
       "trend": "stable"
     },
     "src/medicos/medicos.module.ts": {
       "latest": {
-        "commit": "e390396",
-        "timestamp": "2026-06-06T17:52:10.956Z",
+        "commit": "3ad376f",
+        "timestamp": "2026-06-06T22:35:34.926Z",
         "mi": 64.4,
         "cognitive": 0,
         "nesting": 1,
@@ -2596,6 +2666,16 @@
         {
           "commit": "e390396",
           "timestamp": "2026-06-06T17:52:10.956Z",
+          "mi": 64.4,
+          "cognitive": 0,
+          "nesting": 1,
+          "lines": 11,
+          "maxCyclomatic": 1,
+          "entropy": 3.64
+        },
+        {
+          "commit": "3ad376f",
+          "timestamp": "2026-06-06T22:35:34.926Z",
           "mi": 64.4,
           "cognitive": 0,
           "nesting": 1,
@@ -2783,8 +2863,8 @@
     },
     "src/citas/dto/create-cita.dto.ts": {
       "latest": {
-        "commit": "e390396",
-        "timestamp": "2026-06-06T21:40:50.016Z",
+        "commit": "3ad376f",
+        "timestamp": "2026-06-06T22:23:26.143Z",
         "mi": 55.8,
         "cognitive": 0,
         "nesting": 0,
@@ -2806,6 +2886,16 @@
         {
           "commit": "e390396",
           "timestamp": "2026-06-06T21:40:50.016Z",
+          "mi": 55.8,
+          "cognitive": 0,
+          "nesting": 0,
+          "lines": 18,
+          "maxCyclomatic": 1,
+          "entropy": 4.3
+        },
+        {
+          "commit": "3ad376f",
+          "timestamp": "2026-06-06T22:23:26.143Z",
           "mi": 55.8,
           "cognitive": 0,
           "nesting": 0,
@@ -2868,8 +2958,8 @@
     },
     "src/citas/dto/disponibilidad-query.dto.ts": {
       "latest": {
-        "commit": "e390396",
-        "timestamp": "2026-06-06T17:52:30.530Z",
+        "commit": "3ad376f",
+        "timestamp": "2026-06-06T22:23:26.150Z",
         "mi": 66.9,
         "cognitive": 0,
         "nesting": 0,
@@ -2881,6 +2971,16 @@
         {
           "commit": "e390396",
           "timestamp": "2026-06-06T17:52:30.530Z",
+          "mi": 66.9,
+          "cognitive": 0,
+          "nesting": 0,
+          "lines": 8,
+          "maxCyclomatic": 1,
+          "entropy": 4.15
+        },
+        {
+          "commit": "3ad376f",
+          "timestamp": "2026-06-06T22:23:26.150Z",
           "mi": 66.9,
           "cognitive": 0,
           "nesting": 0,
@@ -3140,7 +3240,57 @@
         }
       ],
       "trend": "stable"
+    },
+    "src/citas/helpers/availability-calculator.ts": {
+      "latest": {
+        "commit": "3ad376f",
+        "timestamp": "2026-06-06T22:27:13.416Z",
+        "mi": 31.4,
+        "cognitive": 21,
+        "nesting": 5,
+        "lines": 123,
+        "maxCyclomatic": 12,
+        "entropy": 6.33
+      },
+      "history": [
+        {
+          "commit": "3ad376f",
+          "timestamp": "2026-06-06T22:27:13.416Z",
+          "mi": 31.4,
+          "cognitive": 21,
+          "nesting": 5,
+          "lines": 123,
+          "maxCyclomatic": 12,
+          "entropy": 6.33
+        }
+      ],
+      "trend": "stable"
+    },
+    "src/medicos/dto/disponibilidad-dias-query.dto.ts": {
+      "latest": {
+        "commit": "3ad376f",
+        "timestamp": "2026-06-06T22:37:01.820Z",
+        "mi": 70.8,
+        "cognitive": 0,
+        "nesting": 0,
+        "lines": 6,
+        "maxCyclomatic": 1,
+        "entropy": 3.8
+      },
+      "history": [
+        {
+          "commit": "3ad376f",
+          "timestamp": "2026-06-06T22:37:01.820Z",
+          "mi": 70.8,
+          "cognitive": 0,
+          "nesting": 0,
+          "lines": 6,
+          "maxCyclomatic": 1,
+          "entropy": 3.8
+        }
+      ],
+      "trend": "stable"
     }
   },
-  "capturedAt": "2026-06-06T21:59:03.557Z"
+  "capturedAt": "2026-06-06T22:49:39.299Z"
 }

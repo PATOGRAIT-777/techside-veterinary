@@ -10,7 +10,6 @@ import { EstadoCita, EstadoPago, Rol } from '@prisma/client';
 import { CreateCitaDto } from './dto/create-cita.dto';
 import { UpdateCitaDto } from './dto/update-cita.dto';
 import { CambiarEstadoCitaDto } from './dto/cambiar-estado-cita.dto';
-import { DisponibilidadQueryDto } from './dto/disponibilidad-query.dto';
 import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 
 import { FolioGenerator } from './helpers/folio-generator';
@@ -31,14 +30,30 @@ export class CitasService {
     }
 
     // V-02: La mascota debe pertenecer al usuario (si es cliente)
+    // Admin puede especificar emailUsuario para crear cita en nombre de otro
     const mascota = await this.prisma.mascota.findUnique({
       where: { id: dto.mascotaId },
     });
     if (!mascota) {
       throw new NotFoundException('Mascota no encontrada');
     }
-    if (usuario.rol === Rol.cliente && mascota.propietarioId !== usuario.sub) {
-      throw new ForbiddenException('La mascota no pertenece al usuario');
+
+    if (usuario.rol === Rol.cliente) {
+      if (mascota.propietarioId !== usuario.sub) {
+        throw new ForbiddenException('La mascota no pertenece al usuario');
+      }
+    } else if (usuario.rol === Rol.admin && dto.emailUsuario) {
+      const usuarioTarget = await this.prisma.usuario.findUnique({
+        where: { email: dto.emailUsuario },
+      });
+      if (!usuarioTarget) {
+        throw new NotFoundException('Usuario no encontrado');
+      }
+      if (mascota.propietarioId !== usuarioTarget.id) {
+        throw new ForbiddenException(
+          'La mascota no pertenece al usuario indicado',
+        );
+      }
     }
 
     // Parsear fecha y hora
@@ -363,6 +378,7 @@ export class CitasService {
 
     // Validar transiciones de estado
     const transicionesPermitidas: Record<EstadoCita, EstadoCita[]> = {
+      [EstadoCita.pendiente_de_pago]: [],
       [EstadoCita.pendiente]: [EstadoCita.en_curso, EstadoCita.cancelada],
       [EstadoCita.en_curso]: [
         EstadoCita.completada,
@@ -400,66 +416,6 @@ export class CitasService {
       where: { id },
       data: { estado: dto.estado },
     });
-  }
-
-  async disponibilidad(query: DisponibilidadQueryDto) {
-    const fecha = new Date(query.fecha + 'T00:00:00');
-    const diaSemana = fecha.getDay(); // 0=domingo, 1=lunes, ...
-
-    // Obtener horarios del médico para ese día
-    const horarios = await this.prisma.medicoHorario.findMany({
-      where: {
-        medicoId: query.medicoId,
-        diaSemana: this.numToDiaSemana(diaSemana),
-      },
-    });
-
-    if (horarios.length === 0) {
-      return { slots: [] };
-    }
-
-    // Obtener citas existentes del médico en esa fecha
-    const citas = await this.prisma.cita.findMany({
-      where: {
-        medicoId: query.medicoId,
-        fecha,
-        estado: { not: EstadoCita.cancelada },
-      },
-    });
-
-    // Generar slots de 1 hora
-    const slots: {
-      horaInicio: string;
-      horaFin: string;
-      disponible: boolean;
-    }[] = [];
-
-    for (const horario of horarios) {
-      const hInicio = this.timeToMinutes(horario.horaInicio);
-      const hFin = this.timeToMinutes(horario.horaFin);
-
-      for (let min = hInicio; min < hFin; min += 60) {
-        const slotInicio = new Date(1970, 0, 1, Math.floor(min / 60), min % 60);
-        const slotFin = new Date(slotInicio.getTime() + 60 * 60 * 1000);
-
-        // Verificar si el slot se traslapa con alguna cita
-        const ocupado = citas.some((c) => {
-          const cInicio = this.timeToMinutes(c.horaInicio);
-          const cFin = this.timeToMinutes(c.horaFin);
-          const sInicio = min;
-          const sFin = min + 60;
-          return sInicio < cFin && sFin > cInicio;
-        });
-
-        slots.push({
-          horaInicio: this.formatTime(slotInicio),
-          horaFin: this.formatTime(slotFin),
-          disponible: !ocupado,
-        });
-      }
-    }
-
-    return { slots };
   }
 
   // =================== Validaciones privadas ===================

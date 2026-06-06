@@ -1,7 +1,7 @@
 {
   "version": 1,
   "projectRoot": "/home/styc/Vetec/techside-veterinary",
-  "generatedAt": "2026-06-06T22:14:31.239Z",
+  "generatedAt": "2026-06-06T22:50:43.152Z",
   "seq": 232,
   "files": {
     "/home/styc/Vetec/techside-veterinary/eslint.config.mjs": {
@@ -708,7 +708,6 @@
         "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.ts",
         "/home/styc/Vetec/techside-veterinary/src/citas/dto/cambiar-estado-cita.dto.ts",
         "/home/styc/Vetec/techside-veterinary/src/citas/dto/create-cita.dto.ts",
-        "/home/styc/Vetec/techside-veterinary/src/citas/dto/disponibilidad-query.dto.ts",
         "/home/styc/Vetec/techside-veterinary/src/citas/dto/update-cita.dto.ts",
         "/home/styc/Vetec/techside-veterinary/src/common/decorators/current-user.decorator.ts",
         "/home/styc/Vetec/techside-veterinary/src/common/decorators/roles.decorator.ts",
@@ -738,7 +737,6 @@
         "/home/styc/Vetec/techside-veterinary/src/auth/interfaces/jwt-payload.interface.ts",
         "/home/styc/Vetec/techside-veterinary/src/citas/dto/cambiar-estado-cita.dto.ts",
         "/home/styc/Vetec/techside-veterinary/src/citas/dto/create-cita.dto.ts",
-        "/home/styc/Vetec/techside-veterinary/src/citas/dto/disponibilidad-query.dto.ts",
         "/home/styc/Vetec/techside-veterinary/src/citas/dto/update-cita.dto.ts",
         "/home/styc/Vetec/techside-veterinary/src/citas/helpers/folio-generator.ts",
         "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
@@ -803,6 +801,9 @@
         "/home/styc/Vetec/techside-veterinary/src/medicos/dto/create-medico-asistencia.dto.ts",
         "/home/styc/Vetec/techside-veterinary/src/medicos/dto/create-medico-horario.dto.ts",
         "/home/styc/Vetec/techside-veterinary/src/medicos/dto/create-medico.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/medicos/dto/disponibilidad-dias-query.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/medicos/dto/disponibilidad-slots-query.dto.ts",
+        "/home/styc/Vetec/techside-veterinary/src/medicos/dto/filter-medicos-query.dto.ts",
         "/home/styc/Vetec/techside-veterinary/src/medicos/dto/update-medico-horario.dto.ts",
         "/home/styc/Vetec/techside-veterinary/src/medicos/dto/update-medico.dto.ts",
         "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.ts"
@@ -814,6 +815,7 @@
       "mtimeMs": 1780629702600.1914,
       "size": 10328,
       "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/citas/helpers/availability-calculator.ts",
         "/home/styc/Vetec/techside-veterinary/src/medicos/dto/create-medico-asistencia.dto.ts",
         "/home/styc/Vetec/techside-veterinary/src/medicos/dto/create-medico-horario.dto.ts",
         "/home/styc/Vetec/techside-veterinary/src/medicos/dto/create-medico.dto.ts",
@@ -828,6 +830,7 @@
       "mtimeMs": 1780629784925.8462,
       "size": 374,
       "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/citas/helpers/availability-calculator.ts",
         "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.controller.ts",
         "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.ts",
         "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.module.ts"
@@ -839,6 +842,7 @@
       "mtimeMs": 1780630109857.5618,
       "size": 5173,
       "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/citas/helpers/availability-calculator.ts",
         "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.ts",
         "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
       ],
@@ -1029,6 +1033,46 @@
         "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
       ],
       "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/citas/helpers/availability-calculator.spec.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/citas/helpers/availability-calculator.spec.ts",
+      "mtimeMs": 1780784654120.796,
+      "size": 5595,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/citas/helpers/availability-calculator.ts",
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/citas/helpers/availability-calculator.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/citas/helpers/availability-calculator.ts",
+      "mtimeMs": 1780784833415.7812,
+      "size": 3800,
+      "imports": [
+        "/home/styc/Vetec/techside-veterinary/src/prisma/prisma.service.ts"
+      ],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/medicos/dto/filter-medicos-query.dto.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/medicos/dto/filter-medicos-query.dto.ts",
+      "mtimeMs": 1780785178560.4001,
+      "size": 246,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/medicos/dto/disponibilidad-dias-query.dto.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/medicos/dto/disponibilidad-dias-query.dto.ts",
+      "mtimeMs": 1780785421820.5576,
+      "size": 273,
+      "imports": [],
+      "lastSeq": 0
+    },
+    "/home/styc/Vetec/techside-veterinary/src/medicos/dto/disponibilidad-slots-query.dto.ts": {
+      "path": "/home/styc/Vetec/techside-veterinary/src/medicos/dto/disponibilidad-slots-query.dto.ts",
+      "mtimeMs": 1780785440891.8718,
+      "size": 226,
+      "imports": [],
+      "lastSeq": 0
     }
   },
   "symbols": {},
@@ -1139,13 +1183,16 @@
       "/home/styc/Vetec/techside-veterinary/src/citas/citas.controller.ts",
       "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.ts"
     ],
-    "/home/styc/Vetec/techside-veterinary/src/citas/dto/disponibilidad-query.dto.ts": [
-      "/home/styc/Vetec/techside-veterinary/src/citas/citas.controller.ts",
-      "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.ts"
-    ],
     "/home/styc/Vetec/techside-veterinary/src/citas/dto/update-cita.dto.ts": [
       "/home/styc/Vetec/techside-veterinary/src/citas/citas.controller.ts",
       "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/citas/helpers/availability-calculator.spec.ts": [],
+    "/home/styc/Vetec/techside-veterinary/src/citas/helpers/availability-calculator.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/citas/helpers/availability-calculator.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.module.ts",
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.ts"
     ],
     "/home/styc/Vetec/techside-veterinary/src/citas/helpers/folio-generator.spec.ts": [],
     "/home/styc/Vetec/techside-veterinary/src/citas/helpers/folio-generator.ts": [
@@ -1292,6 +1339,15 @@
       "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.controller.ts",
       "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.ts"
     ],
+    "/home/styc/Vetec/techside-veterinary/src/medicos/dto/disponibilidad-dias-query.dto.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.controller.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/medicos/dto/disponibilidad-slots-query.dto.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.controller.ts"
+    ],
+    "/home/styc/Vetec/techside-veterinary/src/medicos/dto/filter-medicos-query.dto.ts": [
+      "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.controller.ts"
+    ],
     "/home/styc/Vetec/techside-veterinary/src/medicos/dto/update-medico-horario.dto.ts": [
       "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.controller.ts",
       "/home/styc/Vetec/techside-veterinary/src/medicos/medicos.service.ts"
@@ -1381,6 +1437,8 @@
       "/home/styc/Vetec/techside-veterinary/src/catalogos/catalogos.service.ts",
       "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.spec.ts",
       "/home/styc/Vetec/techside-veterinary/src/citas/citas.service.ts",
+      "/home/styc/Vetec/techside-veterinary/src/citas/helpers/availability-calculator.spec.ts",
+      "/home/styc/Vetec/techside-veterinary/src/citas/helpers/availability-calculator.ts",
       "/home/styc/Vetec/techside-veterinary/src/citas/helpers/folio-generator.spec.ts",
       "/home/styc/Vetec/techside-veterinary/src/citas/helpers/folio-generator.ts",
       "/home/styc/Vetec/techside-veterinary/src/consultas/consultas.service.ts",

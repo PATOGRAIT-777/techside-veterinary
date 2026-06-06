@@ -70,9 +70,22 @@
       "name": "express",
       "file": "src/common/decorators/current-user.decorator.ts",
       "line": 2
+    },
+    {
+      "type": "export",
+      "name": "SlotDisponibilidad",
+      "file": "src/citas/helpers/availability-calculator.ts",
+      "line": 10
     }
   ],
-  "unusedExports": [],
+  "unusedExports": [
+    {
+      "type": "export",
+      "name": "SlotDisponibilidad",
+      "file": "src/citas/helpers/availability-calculator.ts",
+      "line": 10
+    }
+  ],
   "unusedFiles": [
     {
       "type": "file",
@@ -149,5 +162,5 @@
       "line": 2
     }
   ],
-  "summary": "Found 12 issues"
+  "summary": "Found 13 issues"
 }

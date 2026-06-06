@@ -1,6 +1,6 @@
 {
-  "signature": "src/citas/helpers/folio-generator.spec.ts::🕸️ Impact cascade from edited file:\nRisk: high fanout\n📐 Cascade errors in 2 neighbor file(s) — fix before finishing turn:\n<diagnostics file=\"src/citas/citas.service.ts\" reason=\"fallback\">\n  line 9, col 22 rule=cascade:2305: Module '\"@prisma/client\"' has no exported member 'EstadoPago'.\n  line 139, col 55 rule=cascade:2339: Property 'precio' does not exist on type '{ id: string; nombre: string; descripcion: string | null; \n  line 154, col 28 rule=cascade:2339: Property 'pendiente_de_pago' does not exist on type '{ pendiente: \"pendiente\"; en_curso: \"en_curso\";\n  line 156, col 9 rule=cascade:2353: Object literal may only specify known properties, and 'pago' does not exist in type 'Without<CitaCre\n  line 169, col 9 rule=cascade:2353: Object literal may only specify known properties, and 'pago' does not exist in type 'CitaInclude<Def\n</diagnostics>\n<diagnostics file=\"src/citas/citas.service.spec.ts\" reason=\"fallback\">\n  line 167, col 28 rule=cascade:2339: Property 'pendiente_de_pago' does\n... (truncated)",
-  "sessionId": "lens-mq2vn4nv-41638dcc",
-  "projectSeqStart": 284,
-  "projectSeqEnd": 285
+  "signature": "src/citas/dto/create-cita.dto.ts::ℹ️ Advisory — no action required this turn:\nCode-quality warnings introduced/touched this turn: 3 across 1 file(s).\nTop rules: typescript:6385×3\nDetails written to .pi-lens/cache/code-quality-warnings.json\nNo action required unless you are already refactoring these areas.",
+  "sessionId": "lens-mq2x5fqd-14321c4a",
+  "projectSeqStart": 310,
+  "projectSeqEnd": 311
 }

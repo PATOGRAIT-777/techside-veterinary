@@ -3,6 +3,7 @@ import { MedicosService } from './medicos.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { Rol, EstadoAsistencia } from '@prisma/client';
 import { BadRequestException, ConflictException } from '@nestjs/common';
+import { AvailabilityCalculator } from '../citas/helpers/availability-calculator';
 
 describe('MedicosService', () => {
   let service: MedicosService;
@@ -42,6 +43,7 @@ describe('MedicosService', () => {
       providers: [
         MedicosService,
         { provide: PrismaService, useValue: mockPrisma },
+        AvailabilityCalculator,
       ],
     }).compile();
 
@@ -124,6 +126,112 @@ describe('MedicosService', () => {
         consultorioId: 'c1',
       });
       expect(result.id).toBe('h1');
+    });
+  });
+
+  describe('findFiltered', () => {
+    it('should return doctors filtered by specialty with branch priority', async () => {
+      const mockMedicos = [
+        {
+          id: 'med-2',
+          especialidadPrincipalId: 'esp-1',
+          sucursalId: 'suc-2',
+          nombre: 'Dr. B',
+        },
+        {
+          id: 'med-1',
+          especialidadPrincipalId: 'esp-1',
+          sucursalId: 'suc-1',
+          nombre: 'Dr. A',
+        },
+      ];
+      mockPrisma.medico.findMany.mockResolvedValue(mockMedicos);
+
+      const result = await service.findFiltered({
+        especialidadId: 'esp-1',
+        sucursalId: 'suc-1',
+      });
+
+      expect(result[0].id).toBe('med-1'); // sucursal match first
+      expect(result[1].id).toBe('med-2');
+      expect(mockPrisma.medico.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { especialidadPrincipalId: 'esp-1' },
+        }),
+      );
+    });
+
+    it('should return all doctors when no filters provided', async () => {
+      const mockMedicos = [
+        { id: 'med-1', nombre: 'Dr. A' },
+        { id: 'med-2', nombre: 'Dr. B' },
+      ];
+      mockPrisma.medico.findMany.mockResolvedValue(mockMedicos);
+
+      const result = await service.findFiltered({});
+
+      expect(result).toHaveLength(2);
+      expect(mockPrisma.medico.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: {} }),
+      );
+    });
+  });
+
+  describe('disponibilidadDias', () => {
+    it('should validate date range and delegate to calculator', async () => {
+      const calculatorSpy = jest
+        .spyOn(service['availability'], 'computeDays')
+        .mockResolvedValue([{ fecha: '2026-06-08', disponible: true }]);
+
+      const result = await service.disponibilidadDias(
+        'med-1',
+        '2026-06-08',
+        '2026-06-08',
+      );
+
+      expect(result).toEqual([{ fecha: '2026-06-08', disponible: true }]);
+      expect(calculatorSpy).toHaveBeenCalledWith(
+        'med-1',
+        new Date('2026-06-08'),
+        new Date('2026-06-08'),
+      );
+    });
+
+    it('should reject range exceeding 60 days', async () => {
+      await expect(
+        service.disponibilidadDias('med-1', '2026-06-01', '2026-08-01'),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should reject hasta beyond 2 months', async () => {
+      const desde = new Date();
+      desde.setDate(desde.getDate() + 1);
+      const hasta = new Date();
+      hasta.setMonth(hasta.getMonth() + 3);
+      const desdeStr = desde.toISOString().split('T')[0];
+      const hastaStr = hasta.toISOString().split('T')[0];
+
+      await expect(
+        service.disponibilidadDias('med-1', desdeStr, hastaStr),
+      ).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('disponibilidadSlots', () => {
+    it('should delegate to calculator', async () => {
+      const calculatorSpy = jest
+        .spyOn(service['availability'], 'computeSlots')
+        .mockResolvedValue({
+          slots: [{ horaInicio: '09:00', horaFin: '10:00', disponible: true }],
+        });
+
+      const result = await service.disponibilidadSlots('med-1', '2026-06-08');
+
+      expect(result.slots).toHaveLength(1);
+      expect(calculatorSpy).toHaveBeenCalledWith(
+        'med-1',
+        new Date('2026-06-08'),
+      );
     });
   });
 

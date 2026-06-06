@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const CreateCitaDto = z.object({
+  emailUsuario: z.string().email().optional(),
   sucursalId: z.string().uuid({ message: 'La sucursal es obligatoria' }),
   medicoId: z.string().uuid({ message: 'El médico es obligatorio' }),
   mascotaId: z.string().uuid({ message: 'La mascota es obligatoria' }),

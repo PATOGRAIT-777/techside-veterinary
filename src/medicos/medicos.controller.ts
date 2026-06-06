@@ -19,6 +19,9 @@ import { UpdateMedicoDto } from './dto/update-medico.dto';
 import { CreateMedicoHorarioDto } from './dto/create-medico-horario.dto';
 import { UpdateMedicoHorarioDto } from './dto/update-medico-horario.dto';
 import { CreateMedicoAsistenciaDto } from './dto/create-medico-asistencia.dto';
+import { DisponibilidadDiasQueryDto } from './dto/disponibilidad-dias-query.dto';
+import { DisponibilidadSlotsQueryDto } from './dto/disponibilidad-slots-query.dto';
+import { FilterMedicosQueryDto } from './dto/filter-medicos-query.dto';
 
 @Controller('api/v1/medicos')
 @UseGuards(JwtAuthGuard)
@@ -34,8 +37,11 @@ export class MedicosController {
   }
 
   @Get()
-  findAll() {
-    return this.medicosService.findAll();
+  findAll(
+    @Query(new ZodValidationPipe(FilterMedicosQueryDto))
+    query: FilterMedicosQueryDto,
+  ) {
+    return this.medicosService.findFiltered(query);
   }
 
   @Get(':id')
@@ -102,6 +108,24 @@ export class MedicosController {
     dto: CreateMedicoAsistenciaDto,
   ) {
     return this.medicosService.registrarAsistenciaManual(id, dto);
+  }
+
+  @Get(':id/disponibilidad-dias')
+  disponibilidadDias(
+    @Param('id') id: string,
+    @Query(new ZodValidationPipe(DisponibilidadDiasQueryDto))
+    query: DisponibilidadDiasQueryDto,
+  ) {
+    return this.medicosService.disponibilidadDias(id, query.desde, query.hasta);
+  }
+
+  @Get(':id/disponibilidad-slots')
+  disponibilidadSlots(
+    @Param('id') id: string,
+    @Query(new ZodValidationPipe(DisponibilidadSlotsQueryDto))
+    query: DisponibilidadSlotsQueryDto,
+  ) {
+    return this.medicosService.disponibilidadSlots(id, query.fecha);
   }
 
   @Get(':id/asistencias')
