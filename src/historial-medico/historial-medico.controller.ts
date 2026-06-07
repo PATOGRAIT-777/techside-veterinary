@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Query, Res, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Param,
+  Query,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import type { Response } from 'express';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -33,12 +41,23 @@ export class HistorialMedicoController {
     @Query() query: Record<string, string>,
     @CurrentUser() usuario: JwtPayload,
   ) {
-    const parsed = citasPasadasQuerySchema.parse(query);
+    const parsed = citasPasadasQuerySchema.safeParse(query);
+    if (!parsed.success) {
+      throw new BadRequestException({
+        statusCode: 400,
+        message: 'Validation failed',
+        error: 'Bad Request',
+        details: parsed.error.issues.map((issue) => ({
+          path: issue.path,
+          message: issue.message,
+        })),
+      });
+    }
     return this.historialService.getCitasPasadas(
       mascotaId,
       usuario,
-      parsed.cursor,
-      parsed.limit,
+      parsed.data.cursor,
+      parsed.data.limit,
     );
   }
 

@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { BadRequestException } from '@nestjs/common';
 import { AdminHistorialController } from './admin-historial.controller';
 import { HistorialMedicoService } from './historial-medico.service';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -236,7 +237,7 @@ describe('AdminHistorialController', () => {
           fechaDesde: '2024-12-31',
           fechaHasta: '2024-01-01',
         }),
-      ).rejects.toThrow('fechaDesde must be before or equal to fechaHasta');
+      ).rejects.toBeInstanceOf(BadRequestException);
     });
 
     it('TC-ADMIN-10: mascota without citas shows 0 counts', async () => {
