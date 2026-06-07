@@ -104,9 +104,16 @@ export class MedicosService {
   ) {
     const desde = this.parseDate(desdeStr);
     const hasta = this.parseDate(hastaStr);
-    const ahora = new Date();
 
-    const minDesde = new Date(ahora.getTime() + 24 * 60 * 60 * 1000);
+    // Usar UTC consistentemente: la fecha límite es mañana a medianoche UTC
+    const ahora = new Date();
+    const minDesde = new Date(
+      Date.UTC(
+        ahora.getUTCFullYear(),
+        ahora.getUTCMonth(),
+        ahora.getUTCDate() + 1,
+      ),
+    );
     if (desde < minDesde) {
       throw new BadRequestException(
         'La fecha desde debe ser al menos 24 horas en el futuro',

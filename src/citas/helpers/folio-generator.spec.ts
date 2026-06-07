@@ -39,14 +39,12 @@ describe('FolioGenerator', () => {
   });
 
   it('should reset counter at midnight (different day)', async () => {
-    // Mock that respects the startsWith filter
+    // Mock that respects the startsWith filter using local date like the implementation
     mockPrisma.pago.findFirst.mockImplementation(
       (args: { where?: { folioPago?: { startsWith?: string } } }) => {
         const prefix = args?.where?.folioPago?.startsWith;
-        const todayPrefix = new Date()
-          .toISOString()
-          .slice(0, 10)
-          .replace(/-/g, '');
+        const today = new Date();
+        const todayPrefix = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
         if (prefix?.includes(todayPrefix)) {
           return Promise.resolve(null);
         }

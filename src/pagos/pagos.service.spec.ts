@@ -1,11 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PagosService } from './pagos.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { CitaEstadoHistorialService } from '../citas/cita-estado-historial.service';
 import { EstadoPago, EstadoCita } from '@prisma/client';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 
 describe('PagosService', () => {
   let service: PagosService;
+  const mockHistorialService = {
+    registrarCambio: jest.fn(),
+  };
   let mockPrisma: {
     pago: {
       findUnique: jest.Mock;
@@ -33,6 +37,7 @@ describe('PagosService', () => {
       providers: [
         PagosService,
         { provide: PrismaService, useValue: mockPrisma },
+        { provide: CitaEstadoHistorialService, useValue: mockHistorialService },
       ],
     }).compile();
 
@@ -69,6 +74,13 @@ describe('PagosService', () => {
       expect(result.estado).toBe(EstadoPago.pagada);
       expect(mockPrisma.pago.update).toHaveBeenCalled();
       expect(mockPrisma.cita.update).toHaveBeenCalled();
+      expect(mockHistorialService.registrarCambio).toHaveBeenCalledWith(
+        'cita-1',
+        EstadoCita.pendiente_de_pago,
+        EstadoCita.pendiente,
+        null,
+        null,
+      );
     });
 
     it('should reject paying an already paid folio', async () => {

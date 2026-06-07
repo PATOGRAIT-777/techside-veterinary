@@ -13,12 +13,14 @@ import { CambiarEstadoCitaDto } from './dto/cambiar-estado-cita.dto';
 import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 
 import { FolioGenerator } from './helpers/folio-generator';
+import { CitaEstadoHistorialService } from './cita-estado-historial.service';
 
 @Injectable()
 export class CitasService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly folioGenerator: FolioGenerator,
+    private readonly historialService: CitaEstadoHistorialService,
   ) {}
 
   async create(dto: CreateCitaDto, usuario: JwtPayload) {
@@ -184,6 +186,15 @@ export class CitasService {
         pago: true,
       },
     });
+
+    // Registrar cambio de estado inicial en audit log
+    await this.historialService.registrarCambio(
+      cita.id,
+      null,
+      EstadoCita.pendiente_de_pago,
+      usuario.sub,
+      null,
+    );
 
     return cita;
   }
@@ -353,8 +364,9 @@ export class CitasService {
       }
     }
 
-    // Solo se puede cancelar si está pendiente o en curso
+    // Solo se puede cancelar si está pendiente_de_pago, pendiente o en curso
     if (
+      cita.estado !== EstadoCita.pendiente_de_pago &&
       cita.estado !== EstadoCita.pendiente &&
       cita.estado !== EstadoCita.en_curso
     ) {
@@ -363,10 +375,27 @@ export class CitasService {
       );
     }
 
-    return this.prisma.cita.update({
+    const updated = await this.prisma.cita.update({
       where: { id },
       data: { estado: EstadoCita.cancelada },
     });
+
+    if (cita.estado === EstadoCita.pendiente_de_pago) {
+      await this.prisma.pago.update({
+        where: { citaId: id },
+        data: { estado: EstadoPago.cancelada },
+      });
+    }
+
+    await this.historialService.registrarCambio(
+      id,
+      cita.estado,
+      EstadoCita.cancelada,
+      usuario.sub,
+      null,
+    );
+
+    return updated;
   }
 
   async cambiarEstado(
@@ -380,11 +409,7 @@ export class CitasService {
     const transicionesPermitidas: Record<EstadoCita, EstadoCita[]> = {
       [EstadoCita.pendiente_de_pago]: [],
       [EstadoCita.pendiente]: [EstadoCita.en_curso, EstadoCita.cancelada],
-      [EstadoCita.en_curso]: [
-        EstadoCita.completada,
-        EstadoCita.inasistencia,
-        EstadoCita.cancelada,
-      ],
+      [EstadoCita.en_curso]: [EstadoCita.inasistencia, EstadoCita.cancelada],
       [EstadoCita.inasistencia]: [],
       [EstadoCita.completada]: [],
       [EstadoCita.cancelada]: [],
@@ -412,10 +437,38 @@ export class CitasService {
       );
     }
 
-    return this.prisma.cita.update({
+    // Guarda de tiempo para inasistencia: no se puede marcar antes de horaInicio
+    if (dto.estado === EstadoCita.inasistencia) {
+      const ahora = new Date();
+      const fechaHoraInicio = new Date(
+        cita.fecha.getFullYear(),
+        cita.fecha.getMonth(),
+        cita.fecha.getDate(),
+        cita.horaInicio.getHours(),
+        cita.horaInicio.getMinutes(),
+      );
+      if (ahora < fechaHoraInicio) {
+        throw new BadRequestException(
+          'No se puede marcar inasistencia antes de la hora de inicio de la cita',
+        );
+      }
+    }
+
+    const updated = await this.prisma.cita.update({
       where: { id },
       data: { estado: dto.estado },
     });
+
+    // Registrar transición en audit log
+    await this.historialService.registrarCambio(
+      id,
+      cita.estado,
+      dto.estado,
+      usuario.sub,
+      null,
+    );
+
+    return updated;
   }
 
   // =================== Validaciones privadas ===================

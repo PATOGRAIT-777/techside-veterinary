@@ -6,10 +6,14 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { EstadoCita, EstadoPago } from '@prisma/client';
 import { CreatePagoDto } from './dto/create-pago.dto';
+import { CitaEstadoHistorialService } from '../citas/cita-estado-historial.service';
 
 @Injectable()
 export class PagosService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly historialService: CitaEstadoHistorialService,
+  ) {}
 
   async create(dto: CreatePagoDto) {
     const pago = await this.prisma.pago.findUnique({
@@ -43,6 +47,15 @@ export class PagosService {
         data: { estado: EstadoCita.pendiente },
       }),
     ]);
+
+    // Registrar transición de estado en audit log
+    await this.historialService.registrarCambio(
+      pago.citaId,
+      EstadoCita.pendiente_de_pago,
+      EstadoCita.pendiente,
+      null,
+      null,
+    );
 
     return updatedPago;
   }

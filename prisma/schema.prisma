@@ -410,6 +410,7 @@ model Cita {
   receta         Receta?
   consulta       Consulta?
   pago           Pago?
+  historial      CitaEstadoHistorial[]
 
   @@index([sucursalId])
   @@index([medicoId])
@@ -483,4 +484,20 @@ model Consulta {
   cita                   Cita    @relation(fields: [citaId], references: [id], onDelete: Cascade)
 
   @@map("consultas")
+}
+
+model CitaEstadoHistorial {
+  id             String    @id @default(uuid()) @db.Uuid
+  citaId         String    @map("cita_id") @db.Uuid
+  estadoAnterior String?   @map("estado_anterior") @db.VarChar(30)
+  estadoNuevo    String    @map("estado_nuevo") @db.VarChar(30)
+  usuarioId      String?   @map("usuario_id") @db.Uuid
+  razon          String?   @db.Text
+  fechaCambio    DateTime  @default(now()) @map("fecha_cambio")
+
+  cita           Cita      @relation(fields: [citaId], references: [id], onDelete: Cascade)
+
+  @@index([citaId])
+  @@index([fechaCambio])
+  @@map("cita_estado_historial")
 }

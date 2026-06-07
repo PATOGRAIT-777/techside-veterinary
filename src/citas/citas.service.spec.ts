@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CitasService } from './citas.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { FolioGenerator } from './helpers/folio-generator';
+import { CitaEstadoHistorialService } from './cita-estado-historial.service';
 import { Rol, EstadoCita } from '@prisma/client';
 import {
   BadRequestException,
@@ -43,11 +44,15 @@ describe('CitasService', () => {
     },
     pago: {
       create: jest.fn(),
+      update: jest.fn(),
     },
     $transaction: jest.fn((ops: Promise<unknown>[]) => Promise.all(ops)),
   };
   const mockFolioGenerator = {
     generate: jest.fn(),
+  };
+  const mockHistorialService = {
+    registrarCambio: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -56,6 +61,7 @@ describe('CitasService', () => {
         CitasService,
         { provide: PrismaService, useValue: mockPrisma },
         { provide: FolioGenerator, useValue: mockFolioGenerator },
+        { provide: CitaEstadoHistorialService, useValue: mockHistorialService },
       ],
     }).compile();
 
@@ -322,10 +328,100 @@ describe('CitasService', () => {
         },
       });
     });
+
+    it('should write initial audit row on cita creation', async () => {
+      const fechaFutura = new Date();
+      fechaFutura.setDate(fechaFutura.getDate() + 2);
+      const dtoValido = {
+        ...dto,
+        fecha: fechaFutura.toISOString().split('T')[0],
+      };
+
+      mockPrisma.mascota.findUnique.mockResolvedValue({
+        id: dto.mascotaId,
+        propietarioId: cliente.sub,
+      });
+      mockPrisma.cita.findFirst.mockResolvedValue(null);
+      mockPrisma.cita.findMany.mockResolvedValue([]);
+      mockPrisma.medicoHorario.findFirst.mockResolvedValue({
+        id: 'h1',
+        medicoId: dto.medicoId,
+        consultorioId: 'cons-1',
+      });
+      mockPrisma.medicoHorario.findMany.mockResolvedValue([]);
+      mockPrisma.medico.findUnique.mockResolvedValue({
+        id: dto.medicoId,
+        especialidadPrincipal: { precio: 1500.0 },
+      });
+      mockFolioGenerator.generate.mockResolvedValue('VET-20260606-0004');
+      mockPrisma.cita.create.mockResolvedValue({
+        id: 'cita-1',
+        estado: EstadoCita.pendiente_de_pago,
+      });
+
+      await service.create(dtoValido, cliente);
+
+      expect(mockHistorialService.registrarCambio).toHaveBeenCalledWith(
+        'cita-1',
+        null,
+        EstadoCita.pendiente_de_pago,
+        cliente.sub,
+        null,
+      );
+    });
+  });
+
+  describe('remove', () => {
+    const admin = { sub: 'admin-1', email: 'admin@test.com', rol: Rol.admin };
+
+    it('should cancel unpaid cita and mark Pago as cancelada', async () => {
+      mockPrisma.cita.findUnique.mockResolvedValue({
+        id: 'cita-1',
+        estado: EstadoCita.pendiente_de_pago,
+        medicoId: 'med-1',
+        mascotaId: 'masc-1',
+      });
+      mockPrisma.cita.update.mockResolvedValue({
+        id: 'cita-1',
+        estado: EstadoCita.cancelada,
+      });
+
+      const result = await service.remove('cita-1', admin);
+
+      expect(result.estado).toBe(EstadoCita.cancelada);
+      expect(mockPrisma.pago.update).toHaveBeenCalledWith({
+        where: { citaId: 'cita-1' },
+        data: { estado: 'cancelada' },
+      });
+      expect(mockHistorialService.registrarCambio).toHaveBeenCalledWith(
+        'cita-1',
+        EstadoCita.pendiente_de_pago,
+        EstadoCita.cancelada,
+        admin.sub,
+        null,
+      );
+    });
   });
 
   describe('cambiarEstado', () => {
     const admin = { sub: 'admin-1', email: 'admin@test.com', rol: Rol.admin };
+    const medicoUser = {
+      sub: 'user-med-1',
+      email: 'med@test.com',
+      rol: Rol.medico,
+    };
+    const baseCita = {
+      id: 'cita-1',
+      estado: EstadoCita.pendiente,
+      medicoId: 'med-1',
+      mascotaId: 'masc-1',
+      fecha: new Date(),
+      horaInicio: new Date(1970, 0, 1, 14, 0),
+    };
+
+    beforeEach(() => {
+      jest.useRealTimers();
+    });
 
     it('debería rechazar transición inválida', async () => {
       mockPrisma.cita.findUnique.mockResolvedValue({
@@ -333,6 +429,8 @@ describe('CitasService', () => {
         estado: EstadoCita.completada,
         medicoId: 'med-1',
         mascotaId: 'masc-1',
+        fecha: new Date(),
+        horaInicio: new Date(1970, 0, 1, 10, 0),
       });
 
       await expect(
@@ -346,10 +444,7 @@ describe('CitasService', () => {
 
     it('debería permitir pendiente → en_curso', async () => {
       mockPrisma.cita.findUnique.mockResolvedValue({
-        id: 'cita-1',
-        estado: EstadoCita.pendiente,
-        medicoId: 'med-1',
-        mascotaId: 'masc-1',
+        ...baseCita,
       });
       mockPrisma.cita.update.mockResolvedValue({
         id: 'cita-1',
@@ -362,6 +457,57 @@ describe('CitasService', () => {
         admin,
       );
       expect(result.estado).toBe(EstadoCita.en_curso);
+      expect(mockHistorialService.registrarCambio).toHaveBeenCalledWith(
+        'cita-1',
+        EstadoCita.pendiente,
+        EstadoCita.en_curso,
+        admin.sub,
+        null,
+      );
+    });
+
+    it('debería rechazar inasistencia antes de horaInicio', async () => {
+      const fechaHoy = new Date();
+      const horaFutura = new Date(1970, 0, 1, 23, 59);
+      mockPrisma.cita.findUnique.mockResolvedValue({
+        id: 'cita-1',
+        estado: EstadoCita.en_curso,
+        medicoId: 'med-1',
+        mascotaId: 'masc-1',
+        fecha: fechaHoy,
+        horaInicio: horaFutura,
+      });
+
+      await expect(
+        service.cambiarEstado(
+          'cita-1',
+          { estado: EstadoCita.inasistencia },
+          admin,
+        ),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('debería rechazar médico no asignado marcando inasistencia', async () => {
+      mockPrisma.cita.findUnique.mockResolvedValue({
+        id: 'cita-1',
+        estado: EstadoCita.en_curso,
+        medicoId: 'med-1',
+        mascotaId: 'masc-1',
+        fecha: new Date(),
+        horaInicio: new Date(1970, 0, 1, 0, 0),
+      });
+      mockPrisma.medico.findFirst.mockResolvedValue({
+        id: 'med-2',
+        usuarioId: medicoUser.sub,
+      });
+
+      await expect(
+        service.cambiarEstado(
+          'cita-1',
+          { estado: EstadoCita.inasistencia },
+          medicoUser,
+        ),
+      ).rejects.toThrow(ForbiddenException);
     });
   });
 });
