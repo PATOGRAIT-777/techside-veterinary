@@ -632,6 +632,335 @@ Marca la hora de salida para el día actual.
 
 ---
 
+## 📖 Historial Médico
+
+### Ver resumen del historial
+
+#### `GET /mascotas/:id/historial`
+
+**Auth:** Requiere JWT
+
+- **Cliente:** ve solo sus mascotas
+- **Médico:** ve mascotas con las que tiene citas completadas o pendientes
+- **Admin:** ve todas las mascotas
+
+**Response — Cliente:**
+```json
+{
+  "mascota": {
+    "id": "uuid",
+    "nombre": "Firulais",
+    "raza": "Labrador Retriever",
+    "color": "Marrón",
+    "fechaNacimiento": "2020-05-15T00:00:00.000Z",
+    "sexo": "Macho",
+    "esterilizado": true,
+    "ruac": "RUAC-12345",
+    "microchip": "985112345678901",
+    "fotoPerfilUrl": "https://cdn.vetec.local/mascotas/fido.jpg",
+    "carnetVacunacionUrl": "https://cdn.vetec.local/mascotas/carnet-fido.pdf",
+    "observaciones": "Nervioso con extraños",
+    "alergias": [
+      { "nombre": "Polen", "notas": "Estacional" }
+    ]
+  },
+  "agregados": {
+    "frecuenciaCardiacaPromedio": 105,
+    "ultimaVisita": "2026-05-20T00:00:00.000Z",
+    "proximaVisita": "2026-06-10T00:00:00.000Z"
+  },
+  "proximasCitas": [
+    {
+      "id": "uuid",
+      "estado": "pendiente",
+      "especialidad": "Medicina Interna",
+      "medico": "Dr. Juan Pérez",
+      "fecha": "2026-06-10T00:00:00.000Z",
+      "horaInicio": "10:00",
+      "estadoPago": "pendiente"
+    }
+  ],
+  "ultimasCitas": [
+    {
+      "id": "uuid",
+      "estado": "completada",
+      "especialidad": "Medicina Interna",
+      "medico": "Dr. Juan Pérez",
+      "fecha": "2026-05-20T00:00:00.000Z",
+      "horaInicio": "10:00"
+    }
+  ],
+  "pesoActual": 22.5,
+  "pesoHistorial": [
+    { "fecha": "2026-05-20T00:00:00.000Z", "peso": 22.5 },
+    { "fecha": "2026-04-15T00:00:00.000Z", "peso": 22.0 }
+  ]
+}
+```
+
+**Response — Médico / Admin (campos adicionales):**
+```json
+{
+  "mascota": {
+    "comportamiento": "Nervioso",
+    "requiereBozal": false
+  },
+  "propietario": {
+    "nombreCompleto": "Ana López",
+    "telefono": "55512345678",
+    "email": "ana@example.com"
+  }
+}
+```
+
+**Notas:**
+- `pesoHistorial` está limitado a los últimos 20 registros en el resumen.
+- `pesoActual` se deriva de la última consulta con peso registrado.
+- `frecuenciaCardiacaPromedio` es el promedio de todas las consultas de la mascota.
+- Cliente **NO ve** `estadoGeneral` ni `notasEvolucion` en consultas anidadas.
+- Mascota sin citas devuelve arrays vacíos y `null` en campos agregados.
+
+---
+
+### Ver citas próximas
+
+#### `GET /mascotas/:id/historial/citas-proximas`
+
+**Auth:** Requiere JWT (mismas reglas que arriba)
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": "uuid",
+      "estado": "pendiente",
+      "especialidad": "Medicina Interna",
+      "medico": "Dr. Juan Pérez",
+      "fecha": "2026-06-10T00:00:00.000Z",
+      "horaInicio": "10:00",
+      "horaFin": "11:00",
+      "sucursal": "Vetec Centro",
+      "motivo": "Control de peso",
+      "estadoPago": "pendiente"
+    }
+  ]
+}
+```
+
+**Notas:**
+- Solo incluye citas con estado `pendiente`, `pendiente_de_pago` o `en_curso`.
+- Solo citas con fecha ≥ hoy.
+- Ordenadas por `fecha ASC, horaInicio ASC`.
+- Incluye `estadoPago` de la cita.
+
+---
+
+### Ver historial de citas pasadas
+
+#### `GET /mascotas/:id/historial/citas-pasadas?cursor={cursor}&limit={limit}`
+
+**Auth:** Requiere JWT (mismas reglas que arriba)
+
+**Query params:**
+
+| Param | Tipo | Default | Descripción |
+|-------|------|---------|-------------|
+| `cursor` | string (base64) | — | Cursor para paginación |
+| `limit` | integer | 20 | Tamaño de página (máx 100) |
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": "uuid",
+      "estado": "completada",
+      "especialidad": "Medicina Interna",
+      "medico": "Dr. Juan Pérez",
+      "fecha": "2026-05-20T00:00:00.000Z",
+      "horaInicio": "10:00"
+    }
+  ],
+  "meta": {
+    "nextCursor": "eyJmZWNoYSI6IjIwMjYtMDUtMTk...",
+    "limit": 20,
+    "hasMore": true
+  }
+}
+```
+
+**Notas:**
+- Paginación **cursor-based**. El `nextCursor` se pasa en el siguiente request.
+- Ordenadas por `fecha DESC, horaInicio DESC`.
+- Incluye todos los estados de cita (completada, inasistencia, cancelada, pendiente, etc.).
+- `hasMore: true` indica que hay más páginas.
+
+---
+
+### Ver detalle de una cita
+
+#### `GET /mascotas/:id/historial/citas/:citaId`
+
+**Auth:** Requiere JWT
+
+**Response — Cliente:**
+```json
+{
+  "id": "uuid",
+  "estado": "completada",
+  "especialidad": "Medicina Interna",
+  "medico": "Dr. Juan Pérez",
+  "fecha": "2026-05-20T00:00:00.000Z",
+  "horaInicio": "10:00",
+  "horaFin": "11:00",
+  "sucursal": "Vetec Centro",
+  "motivo": "Control de peso",
+  "receta": {
+    "diagnostico": "Sobrepeso leve",
+    "observaciones": "Recomendar dieta",
+    "fechaReceta": "2026-05-20T00:00:00.000Z",
+    "detalles": [
+      {
+        "medicamento": "Metformina",
+        "dosis": "250mg",
+        "frecuencia": "Cada 12 horas",
+        "duracion": "30 días",
+        "viaAdministracion": "Oral",
+        "instrucciones": "Con comida"
+      }
+    ]
+  },
+  "consulta": {
+    "peso": 22.5,
+    "temperatura": 38.5,
+    "frecuenciaCardiaca": 105,
+    "frecuenciaRespiratoria": 28,
+    "presionArterial": "120/80"
+  },
+  "pago": {
+    "folioPago": "VET-20260520-0001",
+    "cantidad": 350.00,
+    "estado": "pagada",
+    "fechaPago": "2026-05-20T00:00:00.000Z"
+  }
+}
+```
+
+**Response — Médico / Admin (campos adicionales en consulta):**
+```json
+{
+  "consulta": {
+    "estadoGeneral": "Bueno",
+    "notasEvolucion": "Paciente estable, seguimiento en 30 días"
+  }
+}
+```
+
+**Notas:**
+- Si la cita no tiene receta: `receta: null`
+- Si la cita no tiene consulta: `consulta: null`
+- Si la cita no tiene pago: `pago: null`
+- Cliente **NO ve** `estadoGeneral` ni `notasEvolucion`.
+
+---
+
+### Ver historial de peso
+
+#### `GET /mascotas/:id/historial/peso`
+
+**Auth:** Requiere JWT (mismas reglas que arriba)
+
+**Response:**
+```json
+{
+  "data": [
+    { "fecha": "2025-01-15T00:00:00.000Z", "peso": 20.0 },
+    { "fecha": "2025-06-10T00:00:00.000Z", "peso": 21.5 },
+    { "fecha": "2026-01-20T00:00:00.000Z", "peso": 22.0 },
+    { "fecha": "2026-05-20T00:00:00.000Z", "peso": 22.5 }
+  ]
+}
+```
+
+**Notas:**
+- Serie completa ordenada cronológicamente (`fecha ASC`).
+- Fuente: `Consulta.peso` de todas las citas de la mascota donde `peso IS NOT NULL`.
+- Si no hay datos: `{ "data": [] }`.
+
+---
+
+### Descargar historial en PDF
+
+#### `GET /mascotas/:id/historial/pdf`
+
+**Auth:** Requiere JWT (mismas reglas que arriba)
+
+**Response:**
+- `Content-Type: application/pdf`
+- `Content-Disposition: attachment; filename="historial-firulais-2026-06-07.pdf"`
+
+**Contenido del PDF:**
+1. **Página 1**: Portada con datos del paciente, propietario (médico/admin), resumen clínico y alergias.
+2. **Página 2**: Tabla de peso histórico.
+3. **Página 3**: Tabla de todas las citas.
+4. **Página 4+**: Consultas detalladas con recetas (una por cita completada).
+5. **Última página**: Imagen del carnet de vacunación (si existe).
+
+**Notas:**
+- Fechas en español (`es-MX`): "15 de mayo de 2026".
+- Campos nulos se renderizan como "No registrado".
+
+---
+
+### Dashboard admin — Listar mascotas
+
+#### `GET /admin/historial-mascotas`
+
+**Auth:** Requiere JWT (**solo admin**)
+
+**Query params:**
+
+| Param | Tipo | Requerido | Descripción |
+|-------|------|-----------|-------------|
+| `mascotaId` | UUID | ❌ | Filtrar por mascota específica |
+| `usuarioId` | UUID | ❌ | Filtrar por propietario |
+| `medicoId` | UUID | ❌ | Filtrar por médico que atendió |
+| `fechaDesde` | string (YYYY-MM-DD) | ❌ | Inicio del rango de fechas |
+| `fechaHasta` | string (YYYY-MM-DD) | ❌ | Fin del rango de fechas |
+| `cursor` | string (base64) | ❌ | Paginación cursor-based |
+| `limit` | integer | ❌ | Tamaño de página (default 20, max 100) |
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "mascotaId": "uuid",
+      "mascotaNombre": "Firulais",
+      "propietarioNombre": "Ana López",
+      "propietarioEmail": "ana@example.com",
+      "ultimaCitaFecha": "2026-05-20T00:00:00.000Z",
+      "totalCitas": 5,
+      "totalCitasCompletadas": 3
+    }
+  ],
+  "meta": {
+    "nextCursor": "eyJub21icmUiOiJGaXJ1bGFpcyIsImlkIjoiLi4uIn0",
+    "limit": 20,
+    "hasMore": true
+  }
+}
+```
+
+**Notas:**
+- Filtros combinables con AND.
+- `fechaDesde` debe ser ≤ `fechaHasta`.
+- Paginación cursor-based (orden: `nombre ASC, id ASC`).
+- Mascotas sin citas aparecen con contadores en 0.
+
+---
+
 ## ⚠️ Códigos de Error
 
 | Código | Significado | Cuándo ocurre |
@@ -670,6 +999,13 @@ Marca la hora de salida para el día actual.
 | `POST /api/v1/consultas` | ❌ | ✅ (suya) | ✅ |
 | `POST /api/v1/medicos` | ❌ | ❌ | ✅ |
 | `POST /api/v1/medicos/:id/horarios` | ❌ | ❌ | ✅ |
+| `GET /mascotas/:id/historial` | ✅ (suya) | ✅ (relación) | ✅ |
+| `GET /mascotas/:id/historial/citas-proximas` | ✅ (suya) | ✅ (relación) | ✅ |
+| `GET /mascotas/:id/historial/citas-pasadas` | ✅ (suya) | ✅ (relación) | ✅ |
+| `GET /mascotas/:id/historial/citas/:citaId` | ✅ (suya) | ✅ (suya) | ✅ |
+| `GET /mascotas/:id/historial/peso` | ✅ (suya) | ✅ (relación) | ✅ |
+| `GET /mascotas/:id/historial/pdf` | ✅ (suya) | ✅ (relación) | ✅ |
+| `GET /admin/historial-mascotas` | ❌ | ❌ | ✅ |
 
 ---
 
@@ -726,13 +1062,24 @@ POST /api/v1/consultas          → Registrar datos clínicos
 POST /api/v1/recetas            → Generar receta (completa la cita)
 ```
 
-### 3. Ver historial
+### 3. Ver historial médico
 ```
-GET /api/v1/citas               → Listar citas
-GET /api/v1/recetas/cita/:id    → Ver receta de una cita
-GET /api/v1/consultas/cita/:id  → Ver consulta de una cita
+GET /mascotas/:id/historial                       → Resumen completo
+GET /mascotas/:id/historial/citas-proximas        → Próximas citas
+GET /mascotas/:id/historial/citas-pasadas         → Historial paginado
+GET /mascotas/:id/historial/citas/:citaId         → Detalle de una cita
+GET /mascotas/:id/historial/peso                  → Serie de peso
+GET /mascotas/:id/historial/pdf                   → Descargar PDF
+```
+
+### 4. Dashboard admin
+```
+GET /admin/historial-mascotas                     → Listar todas las mascotas
+GET /admin/historial-mascotas?medicoId=X          → Filtrar por médico
+GET /admin/historial-mascotas?fechaDesde=A&fechaHasta=B
+                                                  → Filtrar por rango de fechas
 ```
 
 ---
 
-*Documentación generada el 2026-06-05. Para actualizaciones, revisar los controllers en `src/`. *
+*Documentación actualizada el 2026-06-07. Para cambios recientes, revisar los controllers en `src/`.*
