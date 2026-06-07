@@ -4,14 +4,21 @@ import { PrismaService } from '../../prisma/prisma.service';
 describe('FolioGenerator', () => {
   let generator: FolioGenerator;
   let mockPrisma: { pago: { findFirst: jest.Mock } };
+  const FROZEN_DATE = new Date(2026, 5, 6, 12, 0, 0); // 2026-06-06 12:00 local
 
   beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(FROZEN_DATE);
     mockPrisma = {
       pago: {
         findFirst: jest.fn(),
       },
     };
     generator = new FolioGenerator(mockPrisma as unknown as PrismaService);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   it('should be defined', () => {
@@ -23,9 +30,7 @@ describe('FolioGenerator', () => {
 
     const folio = await generator.generate();
 
-    const today = new Date();
-    const prefix = `VET-${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
-    expect(folio).toBe(`${prefix}-0001`);
+    expect(folio).toBe('VET-20260606-0001');
   });
 
   it('should generate sequential folios per day', async () => {
@@ -39,13 +44,10 @@ describe('FolioGenerator', () => {
   });
 
   it('should reset counter at midnight (different day)', async () => {
-    // Mock that respects the startsWith filter using local date like the implementation
     mockPrisma.pago.findFirst.mockImplementation(
       (args: { where?: { folioPago?: { startsWith?: string } } }) => {
         const prefix = args?.where?.folioPago?.startsWith;
-        const today = new Date();
-        const todayPrefix = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
-        if (prefix?.includes(todayPrefix)) {
+        if (prefix?.includes('20260606')) {
           return Promise.resolve(null);
         }
         return Promise.resolve({ folioPago: 'VET-20260605-0007' });
@@ -54,9 +56,7 @@ describe('FolioGenerator', () => {
 
     const folio = await generator.generate();
 
-    const today = new Date();
-    const prefix = `VET-${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
-    expect(folio).toBe(`${prefix}-0001`);
+    expect(folio).toBe('VET-20260606-0001');
   });
 
   it('should retry on unique constraint collision (P2002)', async () => {
@@ -68,7 +68,6 @@ describe('FolioGenerator', () => {
       });
     });
 
-    // Mock a collision on first attempt, success on second
     const mockTx = {
       pago: {
         create: jest
