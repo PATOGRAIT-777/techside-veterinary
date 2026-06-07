@@ -1,0 +1,33 @@
+/* Branding overrides */
+.topbar {
+  background-color: #1a73e8 !important;
+  padding: 8px 0;
+}
+
+.topbar .topbar-wrapper img {
+  display: none;
+}
+
+.topbar .topbar-wrapper {
+  background-image: url('/swagger-logo.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: left center;
+  width: 220px;
+  height: 40px;
+}
+
+/* General theme tweaks */
+.swagger-ui .info .title {
+  color: #1a73e8;
+}
+
+.swagger-ui .btn.authorize {
+  background-color: #1a73e8;
+  border-color: #1a73e8;
+  color: #fff;
+}
+
+.swagger-ui .btn.authorize svg {
+  fill: #fff;
+}
