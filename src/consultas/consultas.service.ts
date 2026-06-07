@@ -8,10 +8,14 @@ import { EstadoCita, Rol } from '@prisma/client';
 import { CreateConsultaDto } from './dto/create-consulta.dto';
 import { UpdateConsultaDto } from './dto/update-consulta.dto';
 import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
+import { CitaCompletionService } from '../citas/cita-completion.service';
 
 @Injectable()
 export class ConsultasService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly citaCompletionService: CitaCompletionService,
+  ) {}
 
   async create(dto: CreateConsultaDto, usuario: JwtPayload) {
     // Verificar que la cita existe y está en curso o completada
@@ -58,7 +62,7 @@ export class ConsultasService {
       );
     }
 
-    return this.prisma.consulta.create({
+    const consulta = await this.prisma.consulta.create({
       data: {
         citaId: dto.citaId,
         peso: dto.peso,
@@ -78,6 +82,11 @@ export class ConsultasService {
         },
       },
     });
+
+    // Side-effect: completar cita si ya existe receta
+    await this.citaCompletionService.checkAndComplete(dto.citaId);
+
+    return consulta;
   }
 
   async findAll(usuario: JwtPayload) {

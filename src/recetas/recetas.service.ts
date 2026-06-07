@@ -7,10 +7,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import { EstadoCita, Rol } from '@prisma/client';
 import { CreateRecetaDto } from './dto/create-receta.dto';
 import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
+import { CitaCompletionService } from '../citas/cita-completion.service';
 
 @Injectable()
 export class RecetasService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly citaCompletionService: CitaCompletionService,
+  ) {}
 
   async create(dto: CreateRecetaDto, usuario: JwtPayload) {
     // Buscar la cita
@@ -51,7 +55,7 @@ export class RecetasService {
       throw new ForbiddenException('Esta cita ya tiene una receta generada');
     }
 
-    // Transacción: crear receta + detalles + completar cita
+    // Transacción: crear receta + detalles
     const receta = await this.prisma.$transaction(async (tx) => {
       const nuevaReceta = await tx.receta.create({
         data: {
@@ -74,13 +78,11 @@ export class RecetasService {
         include: { detalles: true },
       });
 
-      await tx.cita.update({
-        where: { id: dto.citaId },
-        data: { estado: EstadoCita.completada },
-      });
-
       return nuevaReceta;
     });
+
+    // Side-effect: completar cita si ya existe consulta
+    await this.citaCompletionService.checkAndComplete(dto.citaId);
 
     return receta;
   }

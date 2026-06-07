@@ -4,7 +4,7 @@ export const UpdateCitaDto = z
   .object({
     sucursalId: z.string().uuid().optional(),
     medicoId: z.string().uuid().optional(),
-    consultorioId: z.string().uuid().optional(),
+
     servicioId: z.string().uuid().optional(),
     fecha: z
       .string()

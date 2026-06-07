@@ -59,3 +59,11 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 *.md
 # Local Pi runtime state
 .atl/
+
+# Pi agent state and OpenSpec artifacts
+.pi/
+.pi-lens/
+openspec/
+
+# Local database exports
+database/

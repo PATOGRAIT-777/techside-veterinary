@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
 export const CreateCitaDto = z.object({
+  emailUsuario: z.string().email().optional(),
   sucursalId: z.string().uuid({ message: 'La sucursal es obligatoria' }),
   medicoId: z.string().uuid({ message: 'El médico es obligatorio' }),
   mascotaId: z.string().uuid({ message: 'La mascota es obligatoria' }),
-  consultorioId: z.string().uuid({ message: 'El consultorio es obligatorio' }),
   servicioId: z.string().uuid({ message: 'El servicio es obligatorio' }),
   fecha: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, {
     message: 'La fecha debe tener formato YYYY-MM-DD',

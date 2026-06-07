@@ -6,16 +6,24 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { EstadoCita, Rol } from '@prisma/client';
+import { EstadoCita, EstadoPago, Rol } from '@prisma/client';
 import { CreateCitaDto } from './dto/create-cita.dto';
 import { UpdateCitaDto } from './dto/update-cita.dto';
 import { CambiarEstadoCitaDto } from './dto/cambiar-estado-cita.dto';
-import { DisponibilidadQueryDto } from './dto/disponibilidad-query.dto';
 import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
+
+import { FolioGenerator } from './helpers/folio-generator';
+import { CitaEstadoHistorialService } from './cita-estado-historial.service';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class CitasService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly folioGenerator: FolioGenerator,
+    private readonly historialService: CitaEstadoHistorialService,
+    private readonly emailService: EmailService,
+  ) {}
 
   async create(dto: CreateCitaDto, usuario: JwtPayload) {
     // V-01: Solo cliente o admin pueden crear
@@ -26,39 +34,49 @@ export class CitasService {
     }
 
     // V-02: La mascota debe pertenecer al usuario (si es cliente)
+    // Admin puede especificar emailUsuario para crear cita en nombre de otro
     const mascota = await this.prisma.mascota.findUnique({
       where: { id: dto.mascotaId },
     });
     if (!mascota) {
       throw new NotFoundException('Mascota no encontrada');
     }
-    if (usuario.rol === Rol.cliente && mascota.propietarioId !== usuario.sub) {
-      throw new ForbiddenException('La mascota no pertenece al usuario');
+
+    let usuarioTargetEmail: string | null = null;
+
+    if (usuario.rol === Rol.cliente) {
+      if (mascota.propietarioId !== usuario.sub) {
+        throw new ForbiddenException('La mascota no pertenece al usuario');
+      }
+    } else if (usuario.rol === Rol.admin && dto.emailUsuario) {
+      const usuarioTarget = await this.prisma.usuario.findUnique({
+        where: { email: dto.emailUsuario },
+      });
+      if (!usuarioTarget) {
+        throw new NotFoundException('Usuario no encontrado');
+      }
+      if (mascota.propietarioId !== usuarioTarget.id) {
+        throw new ForbiddenException(
+          'La mascota no pertenece al usuario indicado',
+        );
+      }
+      usuarioTargetEmail = usuarioTarget.email;
     }
 
     // Parsear fecha y hora
     const fechaCita = new Date(dto.fecha + 'T00:00:00');
-    const [horaStr, minStr] = dto.horaInicio.split(':');
+    const [horaParte, minParte] = dto.horaInicio.split(':');
     const horaInicio = new Date(
       1970,
       0,
       1,
-      parseInt(horaStr),
-      parseInt(minStr),
+      parseInt(horaParte),
+      parseInt(minParte),
     );
     const horaFin = new Date(horaInicio.getTime() + 60 * 60 * 1000); // +1h
 
-    // V-03: Anticipación mínima de 24 horas
-    const ahora = new Date();
-    const diffHoras =
-      (fechaCita.getTime() - ahora.getTime()) / (1000 * 60 * 60);
-    if (diffHoras < 24) {
-      throw new BadRequestException(
-        'Las citas deben agendarse con al menos 24 horas de anticipación',
-      );
-    }
-
     // V-04: Verificar que fecha sea futura
+    const ahora = new Date();
     const fechaHoraCita = new Date(
       fechaCita.getFullYear(),
       fechaCita.getMonth(),
@@ -69,6 +87,24 @@ export class CitasService {
     if (fechaHoraCita <= ahora) {
       throw new BadRequestException(
         'La fecha y hora de la cita deben ser futuras',
+      );
+    }
+
+    // V-03: Anticipación mínima de 24 horas
+    const diffHoras =
+      (fechaHoraCita.getTime() - ahora.getTime()) / (1000 * 60 * 60);
+    if (diffHoras < 24) {
+      throw new BadRequestException(
+        'Las citas deben agendarse con al menos 24 horas de anticipación',
+      );
+    }
+
+    // V-03b: Máximo 2 meses de anticipación
+    const maxFecha = new Date(ahora);
+    maxFecha.setMonth(maxFecha.getMonth() + 2);
+    if (fechaHoraCita > maxFecha) {
+      throw new BadRequestException(
+        'No se puede agendar con más de 2 meses de anticipación',
       );
     }
 
@@ -95,9 +131,15 @@ export class CitasService {
       horaFin,
     );
 
-    // V-07: No traslape consultorio
+    // V-07: Derivar consultorio desde el horario del médico
+    const consultorioId = await this.obtenerConsultorioDesdeHorario(
+      dto.medicoId,
+      fechaCita,
+    );
+
+    // V-08: No traslape consultorio
     await this.validarTraslapeConsultorio(
-      dto.consultorioId,
+      consultorioId,
       fechaCita,
       horaInicio,
       horaFin,
@@ -120,27 +162,84 @@ export class CitasService {
       horaInicio,
     );
 
-    return this.prisma.cita.create({
+    // Obtener datos del médico y su especialidad/precio
+    const medicoData = await this.prisma.medico.findUnique({
+      where: { id: dto.medicoId },
+      include: {
+        especialidadPrincipal: true,
+        usuario: { select: { persona: true } },
+      },
+    });
+    const precio = medicoData?.especialidadPrincipal?.precio ?? 0;
+
+    // Generar folio de pago
+    const folioPago = await this.folioGenerator.generate();
+
+    // Crear cita + pago en transacción
+    const cita = await this.prisma.cita.create({
       data: {
         sucursalId: dto.sucursalId,
         medicoId: dto.medicoId,
         mascotaId: dto.mascotaId,
-        consultorioId: dto.consultorioId,
         servicioId: dto.servicioId,
         fecha: fechaCita,
         horaInicio,
         horaFin,
-        estado: EstadoCita.pendiente,
+        estado: EstadoCita.pendiente_de_pago,
         motivo: dto.motivo,
+        pago: {
+          create: {
+            folioPago,
+            cantidad: precio,
+            estado: EstadoPago.pendiente,
+          },
+        },
       },
       include: {
         sucursal: true,
-        medico: true,
+        medico: { include: { usuario: { select: { persona: true } } } },
         mascota: true,
-        consultorio: true,
         servicio: true,
+        pago: true,
       },
     });
+
+    // Registrar cambio de estado inicial en audit log
+    await this.historialService.registrarCambio(
+      cita.id,
+      null,
+      EstadoCita.pendiente_de_pago,
+      usuario.sub,
+      null,
+    );
+
+    // Enviar email de confirmación al dueño
+    const destinatario =
+      usuario.rol === Rol.admin && dto.emailUsuario
+        ? (usuarioTargetEmail ?? '')
+        : ((
+            await this.prisma.usuario.findUnique({
+              where: { id: mascota.propietarioId },
+            })
+          )?.email ?? '');
+
+    const nombreMedico =
+      medicoData?.usuario?.persona?.nombreCompleto ?? 'No disponible';
+
+    const consultorioData = await this.prisma.consultorio.findUnique({
+      where: { id: consultorioId },
+    });
+
+    const fechaStr = fechaCita.toISOString().split('T')[0];
+    const horaEmailStr = `${String(horaInicio.getHours()).padStart(2, '0')}:${String(horaInicio.getMinutes()).padStart(2, '0')}`;
+
+    this.emailService.send(
+      destinatario,
+      'Confirmación de cita',
+      `Confirmación de cita\n\nFecha: ${fechaStr}\nHora: ${horaEmailStr}\nMédico: ${nombreMedico}\nConsultorio: ${consultorioData?.nombre ?? 'No disponible'}\nFolio de pago: ${folioPago}\nCantidad: ${precio.toFixed(2)}`,
+    );
+
+    return cita;
   }
 
   async findAll(usuario: JwtPayload) {
@@ -172,7 +271,6 @@ export class CitasService {
         sucursal: true,
         medico: { include: { usuario: { select: { persona: true } } } },
         mascota: true,
-        consultorio: true,
         servicio: true,
       },
       orderBy: [{ fecha: 'asc' }, { horaInicio: 'asc' }],
@@ -186,7 +284,6 @@ export class CitasService {
         sucursal: true,
         medico: { include: { usuario: { select: { persona: true } } } },
         mascota: true,
-        consultorio: true,
         servicio: true,
         receta: { include: { detalles: true } },
         consulta: true,
@@ -246,7 +343,6 @@ export class CitasService {
 
     if (dto.sucursalId) data.sucursalId = dto.sucursalId;
     if (dto.medicoId) data.medicoId = dto.medicoId;
-    if (dto.consultorioId) data.consultorioId = dto.consultorioId;
     if (dto.servicioId) data.servicioId = dto.servicioId;
     if (dto.motivo !== undefined) data.motivo = dto.motivo;
 
@@ -263,15 +359,21 @@ export class CitasService {
       data.horaFin = horaFin;
 
       // Revalidar traslapes si cambió fecha u hora
+      const effectiveMedicoId = dto.medicoId || cita.medicoId;
+      const consultorioId = await this.obtenerConsultorioDesdeHorario(
+        effectiveMedicoId,
+        fechaCita,
+      );
+
       await this.validarTraslapeMedico(
-        dto.medicoId || cita.medicoId,
+        effectiveMedicoId,
         fechaCita,
         horaInicio,
         horaFin,
         id,
       );
       await this.validarTraslapeConsultorio(
-        dto.consultorioId || cita.consultorioId,
+        consultorioId,
         fechaCita,
         horaInicio,
         horaFin,
@@ -286,7 +388,6 @@ export class CitasService {
         sucursal: true,
         medico: true,
         mascota: true,
-        consultorio: true,
         servicio: true,
       },
     });
@@ -306,8 +407,9 @@ export class CitasService {
       }
     }
 
-    // Solo se puede cancelar si está pendiente o en curso
+    // Solo se puede cancelar si está pendiente_de_pago, pendiente o en curso
     if (
+      cita.estado !== EstadoCita.pendiente_de_pago &&
       cita.estado !== EstadoCita.pendiente &&
       cita.estado !== EstadoCita.en_curso
     ) {
@@ -316,10 +418,27 @@ export class CitasService {
       );
     }
 
-    return this.prisma.cita.update({
+    const updated = await this.prisma.cita.update({
       where: { id },
       data: { estado: EstadoCita.cancelada },
     });
+
+    if (cita.estado === EstadoCita.pendiente_de_pago) {
+      await this.prisma.pago.update({
+        where: { citaId: id },
+        data: { estado: EstadoPago.cancelada },
+      });
+    }
+
+    await this.historialService.registrarCambio(
+      id,
+      cita.estado,
+      EstadoCita.cancelada,
+      usuario.sub,
+      null,
+    );
+
+    return updated;
   }
 
   async cambiarEstado(
@@ -331,12 +450,9 @@ export class CitasService {
 
     // Validar transiciones de estado
     const transicionesPermitidas: Record<EstadoCita, EstadoCita[]> = {
+      [EstadoCita.pendiente_de_pago]: [],
       [EstadoCita.pendiente]: [EstadoCita.en_curso, EstadoCita.cancelada],
-      [EstadoCita.en_curso]: [
-        EstadoCita.completada,
-        EstadoCita.inasistencia,
-        EstadoCita.cancelada,
-      ],
+      [EstadoCita.en_curso]: [EstadoCita.inasistencia, EstadoCita.cancelada],
       [EstadoCita.inasistencia]: [],
       [EstadoCita.completada]: [],
       [EstadoCita.cancelada]: [],
@@ -364,70 +480,38 @@ export class CitasService {
       );
     }
 
-    return this.prisma.cita.update({
-      where: { id },
-      data: { estado: dto.estado },
-    });
-  }
-
-  async disponibilidad(query: DisponibilidadQueryDto) {
-    const fecha = new Date(query.fecha + 'T00:00:00');
-    const diaSemana = fecha.getDay(); // 0=domingo, 1=lunes, ...
-
-    // Obtener horarios del médico para ese día
-    const horarios = await this.prisma.medicoHorario.findMany({
-      where: {
-        medicoId: query.medicoId,
-        diaSemana: this.numToDiaSemana(diaSemana),
-      },
-    });
-
-    if (horarios.length === 0) {
-      return { slots: [] };
-    }
-
-    // Obtener citas existentes del médico en esa fecha
-    const citas = await this.prisma.cita.findMany({
-      where: {
-        medicoId: query.medicoId,
-        fecha,
-        estado: { not: EstadoCita.cancelada },
-      },
-    });
-
-    // Generar slots de 1 hora
-    const slots: {
-      horaInicio: string;
-      horaFin: string;
-      disponible: boolean;
-    }[] = [];
-
-    for (const horario of horarios) {
-      const hInicio = this.timeToMinutes(horario.horaInicio);
-      const hFin = this.timeToMinutes(horario.horaFin);
-
-      for (let min = hInicio; min < hFin; min += 60) {
-        const slotInicio = new Date(1970, 0, 1, Math.floor(min / 60), min % 60);
-        const slotFin = new Date(slotInicio.getTime() + 60 * 60 * 1000);
-
-        // Verificar si el slot se traslapa con alguna cita
-        const ocupado = citas.some((c) => {
-          const cInicio = this.timeToMinutes(c.horaInicio);
-          const cFin = this.timeToMinutes(c.horaFin);
-          const sInicio = min;
-          const sFin = min + 60;
-          return sInicio < cFin && sFin > cInicio;
-        });
-
-        slots.push({
-          horaInicio: this.formatTime(slotInicio),
-          horaFin: this.formatTime(slotFin),
-          disponible: !ocupado,
-        });
+    // Guarda de tiempo para inasistencia: no se puede marcar antes de horaInicio
+    if (dto.estado === EstadoCita.inasistencia) {
+      const ahora = new Date();
+      const fechaHoraInicio = new Date(
+        cita.fecha.getFullYear(),
+        cita.fecha.getMonth(),
+        cita.fecha.getDate(),
+        cita.horaInicio.getHours(),
+        cita.horaInicio.getMinutes(),
+      );
+      if (ahora < fechaHoraInicio) {
+        throw new BadRequestException(
+          'No se puede marcar inasistencia antes de la hora de inicio de la cita',
+        );
       }
     }
 
-    return { slots };
+    const updated = await this.prisma.cita.update({
+      where: { id },
+      data: { estado: dto.estado },
+    });
+
+    // Registrar transición en audit log
+    await this.historialService.registrarCambio(
+      id,
+      cita.estado,
+      dto.estado,
+      usuario.sub,
+      null,
+    );
+
+    return updated;
   }
 
   // =================== Validaciones privadas ===================
@@ -469,9 +553,22 @@ export class CitasService {
     horaFin: Date,
     excludeId?: string,
   ) {
-    const citas = await this.prisma.cita.findMany({
+    // Buscar todos los médicos que usan este consultorio en este día
+    const diaSemana = this.numToDiaSemana(fecha.getDay());
+    const horarios = await this.prisma.medicoHorario.findMany({
       where: {
         consultorioId,
+        diaSemana,
+      },
+      select: { medicoId: true },
+    });
+
+    const medicoIds = [...new Set(horarios.map((h) => h.medicoId))];
+    if (medicoIds.length === 0) return;
+
+    const citas = await this.prisma.cita.findMany({
+      where: {
+        medicoId: { in: medicoIds },
         fecha,
         estado: { not: EstadoCita.cancelada },
         ...(excludeId ? { id: { not: excludeId } } : {}),
@@ -490,6 +587,22 @@ export class CitasService {
         );
       }
     }
+  }
+
+  private async obtenerConsultorioDesdeHorario(
+    medicoId: string,
+    fecha: Date,
+  ): Promise<string> {
+    const diaSemana = this.numToDiaSemana(fecha.getDay());
+    const horario = await this.prisma.medicoHorario.findFirst({
+      where: { medicoId, diaSemana },
+    });
+    if (!horario) {
+      throw new BadRequestException(
+        'El médico no tiene horario configurado para este día',
+      );
+    }
+    return horario.consultorioId;
   }
 
   private async validarTraslapePaciente(

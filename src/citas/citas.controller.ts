@@ -6,7 +6,6 @@ import {
   Delete,
   Body,
   Param,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CitasService } from './citas.service';
@@ -18,7 +17,6 @@ import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { CreateCitaDto } from './dto/create-cita.dto';
 import { UpdateCitaDto } from './dto/update-cita.dto';
 import { CambiarEstadoCitaDto } from './dto/cambiar-estado-cita.dto';
-import { DisponibilidadQueryDto } from './dto/disponibilidad-query.dto';
 import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 
 @Controller('api/v1/citas')
@@ -39,14 +37,6 @@ export class CitasController {
   @Get()
   findAll(@CurrentUser() usuario: JwtPayload) {
     return this.citasService.findAll(usuario);
-  }
-
-  @Get('disponibilidad')
-  disponibilidad(
-    @Query(new ZodValidationPipe(DisponibilidadQueryDto))
-    query: DisponibilidadQueryDto,
-  ) {
-    return this.citasService.disponibilidad(query);
   }
 
   @Get(':id')
