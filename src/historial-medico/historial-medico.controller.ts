@@ -1,4 +1,5 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Query, Res, UseGuards } from '@nestjs/common';
+import type { Response } from 'express';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
@@ -56,5 +57,22 @@ export class HistorialMedicoController {
     @CurrentUser() usuario: JwtPayload,
   ) {
     return this.historialService.getPesoHistorial(mascotaId, usuario);
+  }
+
+  @Get('pdf')
+  async getPdf(
+    @Param('mascotaId') mascotaId: string,
+    @CurrentUser() usuario: JwtPayload,
+    @Res() res: Response,
+  ) {
+    const pdfBuffer = await this.historialService.generatePdf(
+      mascotaId,
+      usuario,
+    );
+    const filename = `historial-${mascotaId.slice(0, 8)}-${new Date().toISOString().split('T')[0]}.pdf`;
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(pdfBuffer);
   }
 }

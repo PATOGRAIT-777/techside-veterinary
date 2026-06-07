@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HistorialMedicoService } from './historial-medico.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { PdfGeneratorService } from './pdf/pdf-generator.service';
 import { EstadoCita, EstadoPago, Rol } from '@prisma/client';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 
@@ -31,11 +32,16 @@ describe('HistorialMedicoService', () => {
   const medico = { sub: 'u2', email: 'medico@test.com', rol: Rol.medico };
   const admin = { sub: 'u3', email: 'admin@test.com', rol: Rol.admin };
 
+  const mockPdfGenerator = {
+    generateHistorialPdf: jest.fn().mockResolvedValue(Buffer.from('fake-pdf')),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         HistorialMedicoService,
         { provide: PrismaService, useValue: mockPrisma },
+        { provide: PdfGeneratorService, useValue: mockPdfGenerator },
       ],
     }).compile();
 

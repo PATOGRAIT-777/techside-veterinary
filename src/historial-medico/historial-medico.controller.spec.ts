@@ -4,8 +4,6 @@ import { HistorialMedicoService } from './historial-medico.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { EstadoCita, EstadoPago, Rol } from '@prisma/client';
 
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-
 describe('HistorialMedicoController', () => {
   let controller: HistorialMedicoController;
 
@@ -15,6 +13,7 @@ describe('HistorialMedicoController', () => {
     getCitasPasadas: jest.fn(),
     getCitaDetalle: jest.fn(),
     getPesoHistorial: jest.fn(),
+    generatePdf: jest.fn(),
   };
 
   const mockJwtGuard = { canActivate: jest.fn(() => true) };
@@ -143,6 +142,33 @@ describe('HistorialMedicoController', () => {
 
       expect(mockService.getPesoHistorial).toHaveBeenCalledWith('m1', cliente);
       expect(result.data).toHaveLength(1);
+    });
+  });
+
+  describe('GET /mascotas/:mascotaId/historial/pdf', () => {
+    it('debe devolver un PDF con headers correctos', async () => {
+      const fakeBuffer = Buffer.from('fake-pdf-data');
+      mockService.generatePdf.mockResolvedValue(fakeBuffer);
+
+      const res = {
+        setHeader: jest.fn(),
+        send: jest.fn(),
+      } as unknown as import('express').Response;
+
+      await controller.getPdf('m1', cliente, res);
+
+      expect(mockService.generatePdf).toHaveBeenCalledWith('m1', cliente);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(res.setHeader).toHaveBeenCalledWith(
+        'Content-Type',
+        'application/pdf',
+      );
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(res.setHeader).toHaveBeenCalledWith(
+        'Content-Disposition',
+        expect.stringContaining('attachment; filename='),
+      );
+      expect(res.send).toHaveBeenCalledWith(fakeBuffer);
     });
   });
 });

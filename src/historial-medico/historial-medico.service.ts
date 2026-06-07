@@ -12,10 +12,14 @@ import { CitaDetalleDto } from './dto/cita-detalle.dto';
 import { PesoHistorialItemDto } from './dto/peso-historial.dto';
 import { PaginatedCitasDto } from './dto/paginated-citas.dto';
 import { decodeCursor, encodeCursor } from './helpers/cursor-helpers';
+import { PdfGeneratorService } from './pdf/pdf-generator.service';
 
 @Injectable()
 export class HistorialMedicoService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly pdfService: PdfGeneratorService,
+  ) {}
 
   // ── Validación de acceso ──
 
@@ -363,6 +367,115 @@ export class HistorialMedicoService {
         peso: parseFloat(c.peso!.toString()),
       })),
     };
+  }
+
+  async generatePdf(mascotaId: string, usuario: JwtPayload): Promise<Buffer> {
+    await this.validarAcceso(mascotaId, usuario);
+
+    const resumen = await this.getResumen(mascotaId, usuario);
+    const pesoCompleto = await this.getPesoHistorialCompleto(mascotaId);
+    const citasCompletas = await this.getAllCitasForPdf(mascotaId, usuario);
+
+    return this.pdfService.generateHistorialPdf(
+      resumen,
+      citasCompletas,
+      pesoCompleto,
+    );
+  }
+
+  private async getPesoHistorialCompleto(
+    mascotaId: string,
+  ): Promise<PesoHistorialItemDto[]> {
+    const consultas = await this.prisma.consulta.findMany({
+      where: {
+        cita: { mascotaId },
+        peso: { not: null },
+      },
+      orderBy: { cita: { fecha: 'asc' } },
+      include: { cita: { select: { fecha: true } } },
+    });
+
+    return consultas.map((c) => ({
+      fecha: c.cita.fecha,
+      peso: parseFloat(c.peso!.toString()),
+    }));
+  }
+
+  private async getAllCitasForPdf(
+    mascotaId: string,
+    usuario: JwtPayload,
+  ): Promise<CitaDetalleDto[]> {
+    const citas = await this.prisma.cita.findMany({
+      where: { mascotaId },
+      orderBy: [{ fecha: 'desc' }, { horaInicio: 'desc' }],
+      include: {
+        medico: {
+          include: {
+            especialidadPrincipal: true,
+            usuario: { include: { persona: true } },
+          },
+        },
+        sucursal: true,
+        receta: { include: { detalles: true } },
+        consulta: true,
+        pago: true,
+      },
+    });
+
+    const esMedicoOAdmin =
+      usuario.rol === Rol.medico || usuario.rol === Rol.admin;
+
+    return citas.map((cita) => ({
+      id: cita.id,
+      estado: cita.estado,
+      especialidad: cita.medico.especialidadPrincipal?.nombre ?? 'General',
+      medico: cita.medico.usuario.persona.nombreCompleto,
+      fecha: cita.fecha,
+      horaInicio: this.formatTime(cita.horaInicio),
+      horaFin: this.formatTime(cita.horaFin),
+      sucursal: cita.sucursal?.nombre ?? '',
+      motivo: cita.motivo,
+      receta: cita.receta
+        ? {
+            diagnostico: cita.receta.diagnostico,
+            observaciones: cita.receta.observaciones,
+            fechaReceta: cita.receta.fechaReceta,
+            detalles: cita.receta.detalles.map((d) => ({
+              medicamento: d.medicamento,
+              dosis: d.dosis,
+              frecuencia: d.frecuencia,
+              duracion: d.duracion,
+              viaAdministracion: d.viaAdministracion,
+              instrucciones: d.instrucciones,
+            })),
+          }
+        : null,
+      consulta: cita.consulta
+        ? {
+            peso: cita.consulta.peso
+              ? parseFloat(cita.consulta.peso.toString())
+              : null,
+            temperatura: cita.consulta.temperatura
+              ? parseFloat(cita.consulta.temperatura.toString())
+              : null,
+            frecuenciaCardiaca: cita.consulta.frecuenciaCardiaca,
+            frecuenciaRespiratoria: cita.consulta.frecuenciaRespiratoria,
+            presionArterial: cita.consulta.presionArterial,
+            ...(esMedicoOAdmin && {
+              estadoGeneral: cita.consulta.estadoGeneral,
+              notasEvolucion: cita.consulta.notasEvolucion,
+            }),
+          }
+        : null,
+      pago: cita.pago
+        ? {
+            folioPago: cita.pago.folioPago,
+            cantidad: parseFloat(cita.pago.cantidad.toString()),
+            estado: cita.pago.estado,
+            fechaPago: cita.pago.fechaPago,
+          }
+        : null,
+    }));
   }
 
   // ── Helpers privados ──
