@@ -14,6 +14,7 @@ import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 
 import { FolioGenerator } from './helpers/folio-generator';
 import { CitaEstadoHistorialService } from './cita-estado-historial.service';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class CitasService {
@@ -21,6 +22,7 @@ export class CitasService {
     private readonly prisma: PrismaService,
     private readonly folioGenerator: FolioGenerator,
     private readonly historialService: CitaEstadoHistorialService,
+    private readonly emailService: EmailService,
   ) {}
 
   async create(dto: CreateCitaDto, usuario: JwtPayload) {
@@ -40,6 +42,8 @@ export class CitasService {
       throw new NotFoundException('Mascota no encontrada');
     }
 
+    let usuarioTargetEmail: string | null = null;
+
     if (usuario.rol === Rol.cliente) {
       if (mascota.propietarioId !== usuario.sub) {
         throw new ForbiddenException('La mascota no pertenece al usuario');
@@ -56,17 +60,18 @@ export class CitasService {
           'La mascota no pertenece al usuario indicado',
         );
       }
+      usuarioTargetEmail = usuarioTarget.email;
     }
 
     // Parsear fecha y hora
     const fechaCita = new Date(dto.fecha + 'T00:00:00');
-    const [horaStr, minStr] = dto.horaInicio.split(':');
+    const [horaParte, minParte] = dto.horaInicio.split(':');
     const horaInicio = new Date(
       1970,
       0,
       1,
-      parseInt(horaStr),
-      parseInt(minStr),
+      parseInt(horaParte),
+      parseInt(minParte),
     );
     const horaFin = new Date(horaInicio.getTime() + 60 * 60 * 1000); // +1h
 
@@ -148,10 +153,13 @@ export class CitasService {
       horaInicio,
     );
 
-    // Obtener precio de la especialidad del médico
+    // Obtener datos del médico y su especialidad/precio
     const medicoData = await this.prisma.medico.findUnique({
       where: { id: dto.medicoId },
-      include: { especialidadPrincipal: true },
+      include: {
+        especialidadPrincipal: true,
+        usuario: { select: { persona: true } },
+      },
     });
     const precio = medicoData?.especialidadPrincipal?.precio ?? 0;
 
@@ -180,7 +188,7 @@ export class CitasService {
       },
       include: {
         sucursal: true,
-        medico: true,
+        medico: { include: { usuario: { select: { persona: true } } } },
         mascota: true,
         servicio: true,
         pago: true,
@@ -194,6 +202,32 @@ export class CitasService {
       EstadoCita.pendiente_de_pago,
       usuario.sub,
       null,
+    );
+
+    // Enviar email de confirmación al dueño
+    const destinatario =
+      usuario.rol === Rol.admin && dto.emailUsuario
+        ? (usuarioTargetEmail ?? '')
+        : ((
+            await this.prisma.usuario.findUnique({
+              where: { id: mascota.propietarioId },
+            })
+          )?.email ?? '');
+
+    const nombreMedico =
+      medicoData?.usuario?.persona?.nombreCompleto ?? 'No disponible';
+
+    const consultorioData = await this.prisma.consultorio.findUnique({
+      where: { id: consultorioId },
+    });
+
+    const fechaStr = fechaCita.toISOString().split('T')[0];
+    const horaEmailStr = `${String(horaInicio.getHours()).padStart(2, '0')}:${String(horaInicio.getMinutes()).padStart(2, '0')}`;
+
+    this.emailService.send(
+      destinatario,
+      'Confirmación de cita',
+      `Confirmación de cita\n\nFecha: ${fechaStr}\nHora: ${horaEmailStr}\nMédico: ${nombreMedico}\nConsultorio: ${consultorioData?.nombre ?? 'No disponible'}\nFolio de pago: ${folioPago}\nCantidad: ${precio.toFixed(2)}`,
     );
 
     return cita;

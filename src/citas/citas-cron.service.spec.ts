@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CitasCronService, computePaymentDeadline } from './citas-cron.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CitaEstadoHistorialService } from './cita-estado-historial.service';
+import { EmailService } from '../email/email.service';
 import { EstadoCita, EstadoPago } from '@prisma/client';
 
 describe('CitasCronService', () => {
@@ -15,10 +16,16 @@ describe('CitasCronService', () => {
     pago: {
       update: jest.fn(),
     },
+    medico: {
+      findUnique: jest.fn(),
+    },
   };
 
   const mockHistorial = {
     registrarCambio: jest.fn(),
+  };
+  const mockEmailService = {
+    send: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -27,6 +34,7 @@ describe('CitasCronService', () => {
         CitasCronService,
         { provide: PrismaService, useValue: mockPrisma },
         { provide: CitaEstadoHistorialService, useValue: mockHistorial },
+        { provide: EmailService, useValue: mockEmailService },
       ],
     }).compile();
 
@@ -101,6 +109,14 @@ describe('CitasCronService', () => {
           fecha,
           horaInicio,
           pago: { estado: EstadoPago.pendiente },
+          mascota: {
+            id: 'm1',
+            nombre: 'Firulais',
+            propietario: {
+              id: 'user-1',
+              email: 'dueno@test.com',
+            },
+          },
         },
       ]);
       mockPrisma.cita.update.mockResolvedValue({
@@ -109,6 +125,12 @@ describe('CitasCronService', () => {
       });
 
       await service.handleAutoCancelUnpaid();
+
+      expect(mockEmailService.send).toHaveBeenCalledWith(
+        'dueno@test.com',
+        'Cita cancelada por falta de pago',
+        expect.stringContaining('Firulais'),
+      );
 
       expect(mockPrisma.cita.update).toHaveBeenCalledWith({
         where: { id: 'c1' },

@@ -3,6 +3,7 @@ import { CitasService } from './citas.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { FolioGenerator } from './helpers/folio-generator';
 import { CitaEstadoHistorialService } from './cita-estado-historial.service';
+import { EmailService } from '../email/email.service';
 import { Rol, EstadoCita } from '@prisma/client';
 import {
   BadRequestException,
@@ -38,6 +39,7 @@ describe('CitasService', () => {
     },
     consultorio: {
       findFirst: jest.fn(),
+      findUnique: jest.fn(),
     },
     usuario: {
       findUnique: jest.fn(),
@@ -54,6 +56,9 @@ describe('CitasService', () => {
   const mockHistorialService = {
     registrarCambio: jest.fn(),
   };
+  const mockEmailService = {
+    send: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -62,6 +67,7 @@ describe('CitasService', () => {
         { provide: PrismaService, useValue: mockPrisma },
         { provide: FolioGenerator, useValue: mockFolioGenerator },
         { provide: CitaEstadoHistorialService, useValue: mockHistorialService },
+        { provide: EmailService, useValue: mockEmailService },
       ],
     }).compile();
 
@@ -181,6 +187,14 @@ describe('CitasService', () => {
         cantidad: 1500.0,
         estado: 'pendiente',
       });
+      mockPrisma.usuario.findUnique.mockResolvedValue({
+        id: cliente.sub,
+        email: cliente.email,
+      });
+      mockPrisma.consultorio.findUnique.mockResolvedValue({
+        id: 'cons-1',
+        nombre: 'Consultorio A',
+      });
 
       const result = await service.create(dtoValido, cliente);
       expect(result.estado).toBe(EstadoCita.pendiente_de_pago);
@@ -192,6 +206,11 @@ describe('CitasService', () => {
         },
       ];
       expect(createCall[0].data).not.toHaveProperty('consultorioId');
+      expect(mockEmailService.send).toHaveBeenCalledWith(
+        cliente.email,
+        'Confirmación de cita',
+        expect.stringContaining('VET-20260606-0001'),
+      );
     });
 
     it('should allow admin booking with emailUsuario', async () => {
@@ -229,12 +248,21 @@ describe('CitasService', () => {
         id: 'cita-1',
         estado: EstadoCita.pendiente_de_pago,
       });
+      mockPrisma.consultorio.findUnique.mockResolvedValue({
+        id: 'cons-1',
+        nombre: 'Consultorio A',
+      });
 
       const result = await service.create(dtoAdmin, admin);
       expect(result.estado).toBe(EstadoCita.pendiente_de_pago);
       expect(mockPrisma.usuario.findUnique).toHaveBeenCalledWith({
         where: { email: 'juan@test.com' },
       });
+      expect(mockEmailService.send).toHaveBeenCalledWith(
+        'juan@test.com',
+        'Confirmación de cita',
+        expect.stringContaining('VET-20260606-0003'),
+      );
     });
 
     it('should return 404 for unknown emailUsuario', async () => {

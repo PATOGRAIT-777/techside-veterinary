@@ -3,6 +3,7 @@ import { Cron } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service';
 import { EstadoCita, EstadoPago } from '@prisma/client';
 import { CitaEstadoHistorialService } from './cita-estado-historial.service';
+import { EmailService } from '../email/email.service';
 
 export function computePaymentDeadline(
   createdAt: Date,
@@ -37,6 +38,7 @@ export class CitasCronService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly historialService: CitaEstadoHistorialService,
+    private readonly emailService: EmailService,
   ) {}
 
   @Cron('*/5 * * * *')
@@ -85,7 +87,10 @@ export class CitasCronService {
           estado: EstadoCita.pendiente_de_pago,
           pago: { estado: EstadoPago.pendiente },
         },
-        include: { pago: true },
+        include: {
+          pago: true,
+          mascota: { include: { propietario: true } },
+        },
       });
 
       let cancelledCount = 0;
@@ -112,6 +117,24 @@ export class CitasCronService {
           null,
           'Pago no recibido antes del plazo',
         );
+
+        const fechaStr = cita.fecha.toISOString().split('T')[0];
+        const horaStr = `${String(cita.horaInicio.getHours()).padStart(2, '0')}:${String(cita.horaInicio.getMinutes()).padStart(2, '0')}`;
+        const medico = await this.prisma.medico.findUnique({
+          where: { id: cita.medicoId },
+          include: { usuario: { select: { persona: true } } },
+        });
+        const nombreMedico =
+          medico?.usuario?.persona?.nombreCompleto ?? 'No disponible';
+
+        if (cita.mascota?.propietario?.email) {
+          this.emailService.send(
+            cita.mascota.propietario.email,
+            'Cita cancelada por falta de pago',
+            `Cita cancelada por falta de pago\n\nMascota: ${cita.mascota.nombre}\nFecha: ${fechaStr}\nHora: ${horaStr}\nMédico: ${nombreMedico}\nFolio de pago: ${cita.pago?.folioPago ?? 'No disponible'}`,
+          );
+        }
+
         cancelledCount++;
       }
 
