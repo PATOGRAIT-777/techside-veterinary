@@ -4,6 +4,10 @@ CREATE TYPE "EstadoPago" AS ENUM ('pendiente', 'pagada', 'cancelada');
 -- AlterEnum
 ALTER TYPE "EstadoCita" ADD VALUE 'pendiente_de_pago';
 
+-- Commit required: PostgreSQL does not allow using a newly added enum value
+-- in the same transaction. The ALTER TYPE must be committed first.
+COMMIT;
+
 -- AlterTable
 ALTER TABLE "citas" ALTER COLUMN "estado" SET DEFAULT 'pendiente_de_pago';
 
