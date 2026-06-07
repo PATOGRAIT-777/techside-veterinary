@@ -1,31 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { RecetasService } from './recetas.service';
+import { ConsultasService } from './consultas.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CitaCompletionService } from '../citas/cita-completion.service';
 import { EstadoCita, Rol } from '@prisma/client';
 import { ForbiddenException } from '@nestjs/common';
 
-type MockFn = jest.Mock;
+describe('ConsultasService', () => {
+  let service: ConsultasService;
 
-interface MockPrisma {
-  cita: { findUnique: MockFn; update: MockFn };
-  receta: { create: MockFn; findMany: MockFn; findUnique: MockFn };
-  medico: { findFirst: MockFn };
-  mascota: { findMany: MockFn; findUnique: MockFn };
-  $transaction: MockFn;
-}
-
-describe('RecetasService', () => {
-  let service: RecetasService;
-
-  const mockPrisma: MockPrisma = {
-    cita: { findUnique: jest.fn(), update: jest.fn() },
-    receta: { create: jest.fn(), findMany: jest.fn(), findUnique: jest.fn() },
+  const mockPrisma = {
+    cita: { findUnique: jest.fn() },
+    consulta: { create: jest.fn(), findUnique: jest.fn() },
     medico: { findFirst: jest.fn() },
-    mascota: { findMany: jest.fn(), findUnique: jest.fn() },
-    $transaction: jest.fn((callback: (tx: MockPrisma) => unknown) =>
-      callback(mockPrisma),
-    ),
+    mascota: { findUnique: jest.fn() },
   };
 
   const mockCompletion = { checkAndComplete: jest.fn() };
@@ -33,13 +20,13 @@ describe('RecetasService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        RecetasService,
+        ConsultasService,
         { provide: PrismaService, useValue: mockPrisma },
         { provide: CitaCompletionService, useValue: mockCompletion },
       ],
     }).compile();
 
-    service = module.get<RecetasService>(RecetasService);
+    service = module.get<ConsultasService>(ConsultasService);
     jest.clearAllMocks();
   });
 
@@ -52,16 +39,13 @@ describe('RecetasService', () => {
 
     const dto = {
       citaId: 'cita-1',
-      diagnostico: 'Diagnóstico de prueba',
-      detalles: [
-        {
-          medicamento: 'Amoxicilina',
-          dosis: '500mg',
-          frecuencia: 'Cada 8 horas',
-          duracion: '7 días',
-          viaAdministracion: 'Oral',
-        },
-      ],
+      peso: 5.5,
+      temperatura: 38.5,
+      frecuenciaCardiaca: 120,
+      frecuenciaRespiratoria: 30,
+      presionArterial: '120/80',
+      estadoGeneral: 'Bueno',
+      notasEvolucion: 'Evolución favorable',
     };
 
     it('debería rechazar si la cita no está en curso', async () => {
@@ -77,23 +61,37 @@ describe('RecetasService', () => {
       );
     });
 
-    it('debería crear receta y llamar checkAndComplete', async () => {
+    it('debería crear consulta y llamar checkAndComplete', async () => {
       mockPrisma.cita.findUnique.mockResolvedValue({
         id: 'cita-1',
         estado: EstadoCita.en_curso,
         medicoId: 'med-1',
         mascotaId: 'masc-1',
       });
-      mockPrisma.receta.findUnique.mockResolvedValue(null);
-      mockPrisma.receta.create.mockResolvedValue({
-        id: 'rec-1',
+      mockPrisma.consulta.findUnique.mockResolvedValue(null);
+      mockPrisma.consulta.create.mockResolvedValue({
+        id: 'cons-1',
         citaId: 'cita-1',
-        diagnostico: dto.diagnostico,
+        peso: dto.peso,
       });
 
       const result = await service.create(dto, admin);
-      expect(result.diagnostico).toBe(dto.diagnostico);
+      expect(result.peso).toBe(dto.peso);
       expect(mockCompletion.checkAndComplete).toHaveBeenCalledWith('cita-1');
+    });
+
+    it('debería rechazar si ya existe consulta para la cita', async () => {
+      mockPrisma.cita.findUnique.mockResolvedValue({
+        id: 'cita-1',
+        estado: EstadoCita.en_curso,
+        medicoId: 'med-1',
+        mascotaId: 'masc-1',
+      });
+      mockPrisma.consulta.findUnique.mockResolvedValue({ id: 'cons-1' });
+
+      await expect(service.create(dto, admin)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
   });
 });

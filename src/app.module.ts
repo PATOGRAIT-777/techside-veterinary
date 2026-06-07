@@ -1,6 +1,7 @@
 import { Module, Provider } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { envSchema } from './config/env.validation';
 import { PrismaModule } from './prisma/prisma.module';
@@ -31,6 +32,7 @@ const throttlerGuardProvider: Provider = {
       isGlobal: true,
       validate: (env) => envSchema.parse(env),
     }),
+    ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
       {
         name: 'default',
