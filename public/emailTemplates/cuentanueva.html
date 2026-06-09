@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Verificar mi cuenta - VETEC</title>
+<style type="text/css">
+    /* Reset & Email Clients Base */
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+    body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #F5F0E8; }
+    a[x-apple-data-detectors] { color: inherit !important; text-decoration: none !important; font-size: inherit !important; font-family: inherit !important; font-weight: inherit !important; line-height: inherit !important; }
+    
+    /* Typography */
+    body, td, th { font-family: 'Source Sans 3', Arial, sans-serif; font-size: 16px; line-height: 24px; color: #3B3028; }
+    h1, h2, h3, h4, h5, h6 { font-family: 'Source Serif 4', Georgia, serif; margin: 0; }
+    
+    /* Layout Details */
+    .container { width: 100%; max-width: 600px; margin: 0 auto; }
+    .card { background-color: #EDE8DB; border: 1px solid #C5D5BC; border-radius: 12px; }
+    .header-bg { background-color: #3E5C3E; border-top-left-radius: 11px; border-top-right-radius: 11px; }
+    
+    /* Utilities */
+    .text-center { text-align: center; }
+    .m-0 { margin: 0; }
+    .p-stack-lg { padding: 32px; }
+    .p-stack-md { padding: 24px; }
+    .p-stack-sm { padding: 16px; }
+    
+    /* Buttons */
+    .btn-primary { 
+      background-color: #5A7A5A; 
+      color: #F5F0E8 !important; 
+      text-decoration: none; 
+      padding: 12px 24px; 
+      border-radius: 12px; 
+      display: inline-block; 
+      font-weight: bold;
+      text-align: center;
+      /* Subtle box shadow representation via border for email clients */
+      border-bottom: 3px solid #3E5C3E;
+    }
+    
+    /* Responsive */
+    @media screen and (max-width: 600px) {
+      .container { width: 100% !important; max-width: 100% !important; }
+      .p-stack-lg { padding: 24px !important; }
+      .p-stack-md { padding: 16px !important; }
+    }
+  </style>
+<!-- Fallback Web Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600&amp;family=Source+Serif+4:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+</head>
+<body style="background-color: #F5F0E8; margin: 0; padding: 0; -webkit-text-size-adjust: none; text-size-adjust: none;">
+<!-- Hidden Preheader Text -->
+<div style="display: none; max-height: 0px; overflow: hidden;">
+  Bienvenido a VETEC. Por favor verifica tu cuenta para comenzar.
+  ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ 
+</div>
+<table border="0" cellpadding="0" cellspacing="0" style="background-color: #F5F0E8; padding: 20px 0;" width="100%">
+<tbody><tr>
+<td align="center" style="padding: 24px 10px;">
+<!-- Main Container Card -->
+<table border="0" cellpadding="0" cellspacing="0" class="container card" style="max-width: 600px; width: 100%; background-color: #EDE8DB; border: 1px solid #C5D5BC; border-radius: 12px; border-collapse: separate;">
+<!-- Header -->
+<tbody><tr>
+<td align="center" class="header-bg p-stack-lg" style="background-color: #3E5C3E; border-top-left-radius: 11px; border-top-right-radius: 11px; padding: 32px;">
+<h1 style="color: #F5F0E8; font-family: 'Source Serif 4', Georgia, serif; font-size: 32px; font-weight: 700; margin: 0; letter-spacing: 0.05em;">VETEC</h1>
+</td>
+</tr>
+<!-- Content Area -->
+<tr>
+<td class="p-stack-md" style="padding: 32px 24px; background-color: #EDE8DB; border-bottom-left-radius: 11px; border-bottom-right-radius: 11px;">
+<!-- Salutation -->
+<p style="font-family: 'Source Sans 3', Arial, sans-serif; font-size: 18px; color: #231a13; margin: 0 0 16px 0; font-weight: 600;">
+              Hola, {{.UserName}}
+            </p>
+<!-- Message -->
+<p style="font-family: 'Source Sans 3', Arial, sans-serif; font-size: 16px; line-height: 24px; color: #3B3028; margin: 0 0 32px 0;">
+              Gracias por unirte a nosotros. Se ha creado una nueva cuenta para ti en <strong>{{.ClinicName}}</strong>. Para completar tu registro y asegurar tu cuenta, por favor verifica tu dirección de correo electrónico haciendo clic en el botón de abajo.
+            </p>
+<!-- CTA Button -->
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr>
+<td align="center" style="padding-bottom: 24px;">
+<a class="btn-primary" href="{{.VerificationURL}}" style="background-color: #5A7A5A; border-bottom: 3px solid #3E5C3E; color: #F5F0E8; text-decoration: none; padding: 14px 32px; border-radius: 12px; display: inline-block; font-family: 'Source Sans 3', Arial, sans-serif; font-size: 16px; font-weight: 600;">
+                    Verificar mi cuenta
+                  </a>
+</td>
+</tr>
+</tbody></table>
+<!-- Expiration Notice -->
+<p style="font-family: 'Source Sans 3', Arial, sans-serif; font-size: 14px; color: #5A7A5A; margin: 0 0 24px 0; text-align: center; font-weight: 600;">
+              ⏳ Este enlace expirará en 24 horas.
+            </p>
+<!-- Divider -->
+<table border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 24px;" width="100%">
+<tbody><tr>
+<td style="border-top: 1px solid #C5D5BC; font-size: 1px; line-height: 1px;"> </td>
+</tr>
+</tbody></table>
+<!-- Plain Text URL -->
+<p style="font-family: 'Source Sans 3', Arial, sans-serif; font-size: 12px; line-height: 18px; color: #424841; margin: 0 0 16px 0;">
+              Si el botón no funciona, copia y pega el siguiente enlace en tu navegador:<br/>
+<a href="{{.VerificationURL}}" style="color: #426143; text-decoration: underline; word-break: break-all;">{{.VerificationURL}}</a>
+</p>
+<!-- Safety Notice -->
+<div style="background-color: #d6e8cf; border-radius: 8px; padding: 16px; margin-top: 16px;">
+<p style="font-family: 'Source Sans 3', Arial, sans-serif; font-size: 12px; line-height: 18px; color: #3c4b39; margin: 0;">
+<strong>Aviso de seguridad:</strong> Este correo contiene información de acceso a tu cuenta. No compartas el contenido de este mensaje, incluyendo enlaces y códigos, con ninguna persona. VETEC nunca te pedirá tu contraseña por correo electrónico.
+              </p>
+</div>
+</td>
+</tr>
+</tbody></table>
+<!-- Footer -->
+<table border="0" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; margin-top: 24px;" width="100%">
+<tbody><tr>
+<td align="center" style="padding: 0 20px;">
+<p style="font-family: 'Source Sans 3', Arial, sans-serif; font-size: 12px; line-height: 16px; color: #737970; margin: 0;">
+              © {{.Year}} Clínica Veterinaria VETEC. All rights reserved.
+            </p>
+</td>
+</tr>
+</tbody></table>
+</td>
+</tr>
+</tbody></table>
+</body></html>

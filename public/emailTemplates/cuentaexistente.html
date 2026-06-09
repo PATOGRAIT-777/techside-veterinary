@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cuenta Existente - VETEC</title>
+<style type="text/css">
+    /* Reset & Base Styles */
+    body, p, h1, h2, h3, h4, h5, h6 { margin: 0; padding: 0; }
+    img { border: 0; line-height: 100%; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; }
+    table { border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    table td { border-collapse: collapse; }
+    a { color: #5A7A5A; text-decoration: none; }
+    
+    /* Variables & Themes via Inline CSS approximations */
+    body {
+      background-color: #F5F0E8; /* Warm Cream */
+      font-family: 'Source Sans 3', Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -webkit-text-size-adjust: none;
+      width: 100% !important;
+      height: 100%;
+      color: #3B3028; /* Soft Dark Brown */
+    }
+
+    /* Responsive Utilities */
+    @media only screen and (max-width: 600px) {
+      .container { width: 100% !important; padding-left: 20px !important; padding-right: 20px !important; }
+      .header-pad { padding: 24px 20px !important; }
+      .content-pad { padding: 24px 20px !important; }
+    }
+  </style>
+
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/></head>
+<body style="margin: 0; padding: 0; background-color: #F5F0E8; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
+<!-- Main Background Table -->
+<table bgcolor="#F5F0E8" border="0" cellpadding="0" cellspacing="0" style="table-layout: fixed;" width="100%">
+<tbody><tr>
+<td align="center" style="padding: 40px 0;" valign="top">
+<!-- Container Table (600px Max Width) -->
+<table align="center" bgcolor="#EDE8DB" border="0" cellpadding="0" cellspacing="0" class="container" style="border: 1px solid #C5D5BC; border-radius: 12px; overflow: hidden; background-color: #EDE8DB; max-width: 600px;" width="600">
+<!-- Header -->
+<tbody><tr>
+<td align="center" bgcolor="#3E5C3E" class="header-pad" style="background-color: #3E5C3E; padding: 32px 24px;">
+<h1 style="margin: 0; font-family: 'Source Serif 4', Georgia, serif; font-size: 32px; font-weight: 700; color: #F5F0E8; letter-spacing: 1px;">VETEC</h1>
+</td>
+</tr>
+<!-- Content Body -->
+<tr>
+<td align="left" class="content-pad" style="padding: 32px 24px; font-family: 'Source Sans 3', Arial, sans-serif; font-size: 16px; line-height: 24px; color: #3B3028;">
+<!-- Message Paragraph -->
+<p style="margin: 0 0 24px 0; font-size: 16px; line-height: 24px; color: #231a13;">
+                Recibimos una solicitud para crear una cuenta con este correo. Sin embargo, ya existe una cuenta activa asociada a esta dirección en <strong>{{.ClinicName}}</strong>.
+              </p>
+<!-- Primary CTA Button -->
+<table border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 16px;" width="100%">
+<tbody><tr>
+<td align="center">
+<table border="0" cellpadding="0" cellspacing="0">
+<tbody><tr>
+<td align="center" bgcolor="#5A7A5A" style="background-color: #5A7A5A; border-radius: 12px; box-shadow: 0 4px 10px rgba(62, 92, 62, 0.15);">
+<a href="{{.LoginURL}}" style="display: inline-block; padding: 14px 32px; font-family: 'Source Sans 3', Arial, sans-serif; font-size: 16px; font-weight: 600; color: #F5F0E8; text-decoration: none; border-radius: 12px; border: 1px solid #5A7A5A;" target="_blank">
+                            Iniciar sesión
+                          </a>
+</td>
+</tr>
+</tbody></table>
+</td>
+</tr>
+</tbody></table>
+<!-- Plain Text Link Fallback -->
+<table border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 32px;" width="100%">
+<tbody><tr>
+<td align="center" style="font-family: 'Source Sans 3', Arial, sans-serif; font-size: 12px; line-height: 18px; color: #424841; word-break: break-all;">
+<a href="{{.LoginURL}}" style="color: #476647; text-decoration: underline;">{{.LoginURL}}</a>
+</td>
+</tr>
+</tbody></table>
+<!-- Separator -->
+<table border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 24px;" width="100%">
+<tbody><tr>
+<td bgcolor="#C5D5BC" height="1" style="font-size: 0; line-height: 0; background-color: #C5D5BC;"> </td>
+</tr>
+</tbody></table>
+<!-- Safety Notice -->
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr>
+<td align="left" style="font-family: 'Source Sans 3', Arial, sans-serif; font-size: 12px; line-height: 16px; color: #424841;">
+<strong>Aviso de seguridad:</strong> Este correo contiene información de acceso a tu cuenta. No compartas el contenido de este mensaje, incluyendo enlaces y códigos, con ninguna persona. VETEC nunca te pedirá tu contraseña por correo electrónico.
+                  </td>
+</tr>
+</tbody></table>
+</td>
+</tr>
+</tbody></table>
+<!-- Footer -->
+<table align="center" border="0" cellpadding="0" cellspacing="0" class="container" style="max-width: 600px; margin-top: 24px;" width="600">
+<tbody><tr>
+<td align="center" style="padding: 0 24px; font-family: 'Source Sans 3', Arial, sans-serif; font-size: 12px; line-height: 16px; color: #737970;">
+              © {{.Year}} Clínica Veterinaria VETEC. All rights reserved.
+            </td>
+</tr>
+<tr>
+<td align="center" style="padding: 16px 24px 0 24px; font-family: 'Source Sans 3', Arial, sans-serif; font-size: 12px; line-height: 16px; color: #737970;">
+<a href="#" style="color: #476647; text-decoration: underline; margin: 0 8px;">Privacy Notice (Section 4.4)</a> | 
+              <a href="#" style="color: #476647; text-decoration: underline; margin: 0 8px;">Contact Info</a> | 
+              <a href="#" style="color: #476647; text-decoration: underline; margin: 0 8px;">Unsubscribe</a>
+</td>
+</tr>
+</tbody></table>
+</td>
+</tr>
+</tbody></table>
+</body></html>
