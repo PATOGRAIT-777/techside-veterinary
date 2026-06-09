@@ -76,4 +76,19 @@ export class EmailService {
 
     this.logger.log(`Account-exists email sent to ${to}`);
   }
+
+  /**
+   * Legacy generic send method for backwards compatibility
+   * with existing consumers (citas-cron, citas services).
+   */
+  async send(to: string, subject: string, body: string): Promise<void> {
+    const resend = this.getResendClient();
+    await resend.emails.send({
+      from: 'VETEC <onboarding@resend.dev>',
+      to,
+      subject,
+      html: `<pre style="font-family:sans-serif;white-space:pre-wrap">${body}</pre>`,
+    });
+    this.logger.log(`Legacy email sent to ${to}: ${subject}`);
+  }
 }
