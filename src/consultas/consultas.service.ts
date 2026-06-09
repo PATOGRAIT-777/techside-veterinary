@@ -9,6 +9,7 @@ import { CreateConsultaDto } from './dto/create-consulta.dto';
 import { UpdateConsultaDto } from './dto/update-consulta.dto';
 import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 import { CitaCompletionService } from '../citas/cita-completion.service';
+import { consultaInclude, mapConsultaToResponse } from './consultas.mapper';
 
 @Injectable()
 export class ConsultasService {
@@ -73,20 +74,13 @@ export class ConsultasService {
         estadoGeneral: dto.estadoGeneral,
         notasEvolucion: dto.notasEvolucion,
       },
-      include: {
-        cita: {
-          include: {
-            mascota: true,
-            medico: { include: { usuario: { select: { persona: true } } } },
-          },
-        },
-      },
+      include: consultaInclude,
     });
 
     // Side-effect: completar cita si ya existe receta
     await this.citaCompletionService.checkAndComplete(dto.citaId);
 
-    return consulta;
+    return mapConsultaToResponse(consulta);
   }
 
   async findAll(usuario: JwtPayload) {
@@ -122,31 +116,19 @@ export class ConsultasService {
       where.citaId = { in: citaIds };
     }
 
-    return this.prisma.consulta.findMany({
+    const consultas = await this.prisma.consulta.findMany({
       where,
-      include: {
-        cita: {
-          include: {
-            mascota: true,
-            medico: { include: { usuario: { select: { persona: true } } } },
-          },
-        },
-      },
+      include: consultaInclude,
       orderBy: { cita: { fecha: 'desc' } },
     });
+
+    return consultas.map(mapConsultaToResponse);
   }
 
   async findOne(id: string, usuario: JwtPayload) {
     const consulta = await this.prisma.consulta.findUnique({
       where: { id },
-      include: {
-        cita: {
-          include: {
-            mascota: true,
-            medico: { include: { usuario: { select: { persona: true } } } },
-          },
-        },
-      },
+      include: consultaInclude,
     });
     if (!consulta) {
       throw new NotFoundException('Consulta no encontrada');
@@ -168,20 +150,13 @@ export class ConsultasService {
       }
     }
 
-    return consulta;
+    return mapConsultaToResponse(consulta);
   }
 
   async findByCita(citaId: string, usuario: JwtPayload) {
     const consulta = await this.prisma.consulta.findUnique({
       where: { citaId },
-      include: {
-        cita: {
-          include: {
-            mascota: true,
-            medico: { include: { usuario: { select: { persona: true } } } },
-          },
-        },
-      },
+      include: consultaInclude,
     });
     if (!consulta) {
       throw new NotFoundException('Consulta no encontrada');
@@ -203,11 +178,11 @@ export class ConsultasService {
       }
     }
 
-    return consulta;
+    return mapConsultaToResponse(consulta);
   }
 
   async update(id: string, dto: UpdateConsultaDto, usuario: JwtPayload) {
-    const consulta = await this.findOne(id, usuario);
+    const consulta = await this.findOneRaw(id, usuario);
 
     if (usuario.rol === Rol.medico) {
       const medico = await this.prisma.medico.findFirst({
@@ -220,9 +195,19 @@ export class ConsultasService {
       }
     }
 
-    return this.prisma.consulta.update({
+    const updated = await this.prisma.consulta.update({
       where: { id },
       data: dto,
+      include: consultaInclude,
+    });
+
+    return mapConsultaToResponse(updated);
+  }
+
+  // Helper privado para acceso interno que necesita campos crudos (medicoId, mascotaId)
+  private async findOneRaw(id: string, usuario: JwtPayload) {
+    const consulta = await this.prisma.consulta.findUnique({
+      where: { id },
       include: {
         cita: {
           include: {
@@ -232,5 +217,26 @@ export class ConsultasService {
         },
       },
     });
+    if (!consulta) {
+      throw new NotFoundException('Consulta no encontrada');
+    }
+
+    if (usuario.rol === Rol.cliente) {
+      const mascota = await this.prisma.mascota.findUnique({
+        where: { id: consulta.cita.mascotaId },
+      });
+      if (mascota?.propietarioId !== usuario.sub) {
+        throw new ForbiddenException('No tiene permiso para ver esta consulta');
+      }
+    } else if (usuario.rol === Rol.medico) {
+      const medico = await this.prisma.medico.findFirst({
+        where: { usuarioId: usuario.sub },
+      });
+      if (medico?.id !== consulta.cita.medicoId) {
+        throw new ForbiddenException('No tiene permiso para ver esta consulta');
+      }
+    }
+
+    return consulta;
   }
 }
