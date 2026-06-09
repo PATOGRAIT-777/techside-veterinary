@@ -2,6 +2,7 @@ import {
   Injectable,
   UnauthorizedException,
   BadRequestException,
+  Inject,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -15,6 +16,9 @@ import { MedicosService } from '../medicos/medicos.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { generateSecureToken } from '../common/utils/generate-token';
+
+const BULL_QUEUE_TOKEN = 'BullQueue_email-queue';
 
 @Injectable()
 export class AuthService {
@@ -27,6 +31,10 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly medicosService: MedicosService,
+    @Inject(BULL_QUEUE_TOKEN)
+    private readonly emailQueue: {
+      add: (name: string, data: unknown, opts?: unknown) => Promise<unknown>;
+    },
   ) {}
 
   async login(dto: LoginDto): Promise<{
@@ -93,11 +101,28 @@ export class AuthService {
       dto.telefono,
     );
 
-    if (existingByEmail || existingByPhone) {
-      this.emailService.send(
-        dto.email,
-        'Cuenta existente',
-        'Ya tienes una cuenta. Inicia Sesión',
+    if (
+      existingByEmail?.status === 'activo' ||
+      existingByPhone?.status === 'activo'
+    ) {
+      await this._enqueueAccountExistsEmail(dto.email);
+      return { message: 'Te enviamos un correo para continuar...' };
+    }
+
+    if (existingByEmail?.status === 'pendiente') {
+      await this._handlePendingResend(
+        existingByEmail as typeof existingByEmail & {
+          persona: { nombreCompleto: string };
+        },
+      );
+      return { message: 'Te enviamos un correo para continuar...' };
+    }
+
+    if (existingByPhone?.status === 'pendiente') {
+      await this._handlePendingResend(
+        existingByPhone as typeof existingByPhone & {
+          persona: { nombreCompleto: string };
+        },
       );
       return { message: 'Te enviamos un correo para continuar...' };
     }
@@ -125,10 +150,13 @@ export class AuthService {
     savedPaths.push(identityPath);
 
     // 4. Open Prisma transaction
+    let persona: { id: string; nombreCompleto: string };
+    let usuario: { id: string };
+
     try {
-      await this.prisma.$transaction(async (tx) => {
+      const result = await this.prisma.$transaction(async (tx) => {
         // Create Persona
-        const persona = await tx.persona.create({
+        const p = await tx.persona.create({
           data: {
             nombreCompleto: dto.nombreCompleto,
             telefono: dto.telefono,
@@ -145,14 +173,14 @@ export class AuthService {
           dto.password,
         );
 
-        const usuario = await tx.usuario.create({
+        const u = await tx.usuario.create({
           data: {
             email: dto.email,
             telefono: dto.telefono,
             passwordHash: hashedPassword,
             rol: dto.rol,
             status: 'pendiente',
-            personaId: persona.id,
+            personaId: p.id,
           },
         });
 
@@ -177,15 +205,18 @@ export class AuthService {
 
         // Link archivo IDs to persona
         await tx.persona.update({
-          where: { id: persona.id },
+          where: { id: p.id },
           data: {
             proofAddressId: addressArchivo.id,
             proofIdId: identityArchivo.id,
           },
         });
 
-        return { persona, usuario };
+        return { persona: p, usuario: u };
       });
+
+      persona = result.persona;
+      usuario = result.usuario;
     } catch (error) {
       // 5. On transaction failure: delete saved files, rethrow
       for (const path of savedPaths) {
@@ -194,14 +225,76 @@ export class AuthService {
       throw error;
     }
 
-    // 6. Send activation email
-    this.emailService.send(
+    // 6. Create verification token and enqueue email
+    await this._createVerificationTokenAndEnqueue(
+      usuario.id,
       dto.email,
-      'Activa tu cuenta',
-      'Haz clic aquí para activar tu cuenta',
+      persona.nombreCompleto,
     );
 
     // 7. Return generic message
     return { message: 'Te enviamos un correo para continuar...' };
+  }
+
+  private async _createVerificationTokenAndEnqueue(
+    usuarioId: string,
+    email: string,
+    userName: string,
+  ): Promise<void> {
+    const token = generateSecureToken();
+    const expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000); // 2 hours
+
+    await this.prisma.emailVerificationToken.create({
+      data: {
+        usuarioId,
+        token,
+        expiresAt,
+      },
+    });
+
+    await this.emailQueue.add(
+      'send-verification',
+      { to: email, userName, token },
+      {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 2000,
+        },
+      },
+    );
+  }
+
+  private async _handlePendingResend(usuario: {
+    id: string;
+    email: string;
+    persona: { nombreCompleto: string };
+  }): Promise<void> {
+    await this.prisma.emailVerificationToken.deleteMany({
+      where: {
+        usuarioId: usuario.id,
+        usedAt: null,
+      },
+    });
+
+    await this._createVerificationTokenAndEnqueue(
+      usuario.id,
+      usuario.email,
+      usuario.persona.nombreCompleto,
+    );
+  }
+
+  private async _enqueueAccountExistsEmail(email: string): Promise<void> {
+    await this.emailQueue.add(
+      'send-account-exists',
+      { to: email },
+      {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 2000,
+        },
+      },
+    );
   }
 }
