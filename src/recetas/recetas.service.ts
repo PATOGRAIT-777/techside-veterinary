@@ -8,6 +8,7 @@ import { EstadoCita, Rol } from '@prisma/client';
 import { CreateRecetaDto } from './dto/create-receta.dto';
 import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 import { CitaCompletionService } from '../citas/cita-completion.service';
+import { recetaInclude, mapRecetaToResponse } from './recetas.mapper';
 
 @Injectable()
 export class RecetasService {
@@ -75,7 +76,7 @@ export class RecetasService {
             })),
           },
         },
-        include: { detalles: true },
+        include: recetaInclude,
       });
 
       return nuevaReceta;
@@ -84,7 +85,7 @@ export class RecetasService {
     // Side-effect: completar cita si ya existe consulta
     await this.citaCompletionService.checkAndComplete(dto.citaId);
 
-    return receta;
+    return mapRecetaToResponse(receta);
   }
 
   async findAll(usuario: JwtPayload) {
@@ -116,33 +117,18 @@ export class RecetasService {
       where.citaId = { in: citaIds };
     }
 
-    return this.prisma.receta.findMany({
+    const recetas = await this.prisma.receta.findMany({
       where,
-      include: {
-        detalles: true,
-        cita: {
-          include: {
-            mascota: true,
-            medico: { include: { usuario: { select: { persona: true } } } },
-          },
-        },
-      },
+      include: recetaInclude,
       orderBy: { fechaReceta: 'desc' },
     });
+    return recetas.map(mapRecetaToResponse);
   }
 
   async findOne(id: string, usuario: JwtPayload) {
     const receta = await this.prisma.receta.findUnique({
       where: { id },
-      include: {
-        detalles: true,
-        cita: {
-          include: {
-            mascota: true,
-            medico: { include: { usuario: { select: { persona: true } } } },
-          },
-        },
-      },
+      include: recetaInclude,
     });
     if (!receta) {
       throw new NotFoundException('Receta no encontrada');
@@ -165,21 +151,13 @@ export class RecetasService {
       }
     }
 
-    return receta;
+    return mapRecetaToResponse(receta);
   }
 
   async findByCita(citaId: string, usuario: JwtPayload) {
     const receta = await this.prisma.receta.findUnique({
       where: { citaId },
-      include: {
-        detalles: true,
-        cita: {
-          include: {
-            mascota: true,
-            medico: { include: { usuario: { select: { persona: true } } } },
-          },
-        },
-      },
+      include: recetaInclude,
     });
     if (!receta) {
       throw new NotFoundException('Receta no encontrada');
@@ -202,6 +180,6 @@ export class RecetasService {
       }
     }
 
-    return receta;
+    return mapRecetaToResponse(receta);
   }
 }
