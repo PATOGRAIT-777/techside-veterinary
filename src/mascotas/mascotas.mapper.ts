@@ -22,13 +22,13 @@ export type MascotaWithRelations = Prisma.MascotaGetPayload<{
 }>;
 
 function toRelacion<T extends { id: string; nombre: string }>(
-  obj: T | null,
+  obj: T | null | undefined,
 ): MascotaRelacionDto | null {
   return obj ? { id: obj.id, nombre: obj.nombre } : null;
 }
 
 function toArchivoResumen<T extends { id: string; url: string }>(
-  obj: T | null,
+  obj: T | null | undefined,
 ): ArchivoResumenDto | null {
   return obj ? { id: obj.id, url: obj.url } : null;
 }
@@ -36,6 +36,12 @@ function toArchivoResumen<T extends { id: string; url: string }>(
 export function mapMascotaToResponse(
   mascota: MascotaWithRelations,
 ): MascotaResponseDto {
+  const alergias = (mascota.alergias ?? []) as Array<{
+    mascotaId: string;
+    notas: string | null;
+    alergia: { id: string; nombre: string } | null;
+  }>;
+
   return {
     id: mascota.id,
     propietarioId: mascota.propietarioId,
@@ -45,23 +51,23 @@ export function mapMascotaToResponse(
     tipoPelo: toRelacion(mascota.tipoPelo),
     patronPelo: toRelacion(mascota.patronPelo),
     comportamiento: toRelacion(mascota.comportamiento),
-    fechaNacimiento: mascota.fechaNacimiento,
-    sexo: mascota.sexo,
+    fechaNacimiento: mascota.fechaNacimiento ?? null,
+    sexo: mascota.sexo ?? null,
     peso: mascota.peso ? mascota.peso.toString() : null,
-    esterilizado: mascota.esterilizado,
-    ruac: mascota.ruac,
-    microchip: mascota.microchip,
-    tatuaje: mascota.tatuaje,
+    esterilizado: mascota.esterilizado ?? false,
+    ruac: mascota.ruac ?? null,
+    microchip: mascota.microchip ?? null,
+    tatuaje: mascota.tatuaje ?? null,
     fotoPerfil: toArchivoResumen(mascota.fotoPerfil),
     carnetVacunacion: toArchivoResumen(mascota.carnetVacunacion),
-    observaciones: mascota.observaciones,
+    observaciones: mascota.observaciones ?? null,
     createdAt: mascota.createdAt,
     updatedAt: mascota.updatedAt,
-    alergias: mascota.alergias.map(
+    alergias: alergias.map(
       (a): AlergiaResponseDto => ({
         mascotaId: a.mascotaId,
         alergia: toRelacion(a.alergia)!,
-        notas: a.notas,
+        notas: a.notas ?? null,
       }),
     ),
   };
