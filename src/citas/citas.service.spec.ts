@@ -62,6 +62,60 @@ describe('CitasService', () => {
     send: jest.fn(),
   };
 
+  const enrichedMascota = {
+    id: 'masc-1',
+    nombre: 'Fido',
+    propietarioId: 'usr-1',
+    raza: { id: 'raz-1', nombre: 'Golden' },
+    color: { id: 'col-1', nombre: 'Dorado' },
+    tipoPelo: { id: 'tp-1', nombre: 'Largo' },
+    patronPelo: { id: 'pp-1', nombre: 'Sólido' },
+    comportamiento: { id: 'comp-1', nombre: 'Amigable' },
+    fotoPerfil: { id: 'foto-1', url: '/fido.jpg' },
+    carnetVacunacion: { id: 'carnet-1', url: '/carnet.pdf' },
+    alergias: [],
+  };
+
+  const enrichedMedico = {
+    id: 'med-1',
+    usuario: { persona: { id: 'per-1', nombreCompleto: 'Dra. Ana López' } },
+    especialidadPrincipal: { id: 'esp-1', nombre: 'Cirugía' },
+  };
+
+  const enrichedSucursal = {
+    id: 'suc-1',
+    nombre: 'Sucursal Centro',
+  };
+
+  const enrichedServicio = {
+    id: 'srv-1',
+    nombre: 'Consulta general',
+  };
+
+  const enrichedPago = {
+    id: 'pago-1',
+    folioPago: 'VET-20260606-0001',
+    cantidad: 1500.0,
+    estado: 'pendiente',
+    fechaPago: null,
+  };
+
+  const enrichedCita = {
+    id: 'cita-1',
+    fecha: new Date('2026-12-31T00:00:00.000Z'),
+    horaInicio: new Date(1970, 0, 1, 10, 0),
+    horaFin: new Date(1970, 0, 1, 11, 0),
+    estado: EstadoCita.pendiente_de_pago,
+    motivo: 'Consulta general',
+    sucursal: enrichedSucursal,
+    medico: enrichedMedico,
+    mascota: enrichedMascota,
+    servicio: enrichedServicio,
+    pago: enrichedPago,
+    receta: null,
+    consulta: null,
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -184,11 +238,7 @@ describe('CitasService', () => {
         especialidadPrincipal: { precio: 1500.0 },
       });
       mockFolioGenerator.generate.mockResolvedValue('VET-20260606-0001');
-      mockPrisma.cita.create.mockResolvedValue({
-        id: 'cita-1',
-        ...dtoValido,
-        estado: EstadoCita.pendiente_de_pago,
-      });
+      mockPrisma.cita.create.mockResolvedValue(enrichedCita);
       mockPrisma.pago.create.mockResolvedValue({
         id: 'pago-1',
         folioPago: 'VET-20260606-0001',
@@ -206,6 +256,28 @@ describe('CitasService', () => {
 
       const result = await service.create(dtoValido, cliente);
       expect(result.estado).toBe(EstadoCita.pendiente_de_pago);
+      expect((result as any).mascota.raza).toEqual({
+        id: 'raz-1',
+        nombre: 'Golden',
+      });
+      expect((result as any).mascota).not.toHaveProperty('propietarioId');
+      expect((result as any).mascota).not.toHaveProperty('observaciones');
+      expect((result as any).medico).toEqual({
+        id: 'med-1',
+        nombreCompleto: 'Dra. Ana López',
+        especialidad: 'Cirugía',
+      });
+      expect((result as any).sucursal).toEqual({
+        id: 'suc-1',
+        nombre: 'Sucursal Centro',
+      });
+      expect((result as any).pago).toEqual({
+        id: 'pago-1',
+        folioPago: 'VET-20260606-0001',
+        cantidad: '1500',
+        estado: 'pendiente',
+        fechaPago: null,
+      });
       expect(mockPrisma.cita.create).toHaveBeenCalled();
       // Verify consultorioId was NOT passed in create data (derived from horario)
       const createCall = mockPrisma.cita.create.mock.calls[0] as unknown as [
@@ -252,10 +324,7 @@ describe('CitasService', () => {
         especialidadPrincipal: { precio: 1500.0 },
       });
       mockFolioGenerator.generate.mockResolvedValue('VET-20260606-0003');
-      mockPrisma.cita.create.mockResolvedValue({
-        id: 'cita-1',
-        estado: EstadoCita.pendiente_de_pago,
-      });
+      mockPrisma.cita.create.mockResolvedValue(enrichedCita);
       mockPrisma.consultorio.findUnique.mockResolvedValue({
         id: 'cons-1',
         nombre: 'Consultorio A',
@@ -263,6 +332,14 @@ describe('CitasService', () => {
 
       const result = await service.create(dtoAdmin, admin);
       expect(result.estado).toBe(EstadoCita.pendiente_de_pago);
+      expect((result as any).mascota.raza).toEqual({
+        id: 'raz-1',
+        nombre: 'Golden',
+      });
+      expect((result as any).medico.nombreCompleto).toBe('Dra. Ana López');
+      expect((result as any).sucursal.nombre).toBe('Sucursal Centro');
+      expect((result as any).pago).toBeDefined();
+      expect((result as any).pago.cantidad).toBe('1500');
       expect(mockPrisma.usuario.findUnique).toHaveBeenCalledWith({
         where: { email: 'juan@test.com' },
       });
@@ -339,10 +416,7 @@ describe('CitasService', () => {
         especialidadPrincipal: { precio: 2000.0 },
       });
       mockFolioGenerator.generate.mockResolvedValue('VET-20260606-0002');
-      mockPrisma.cita.create.mockResolvedValue({
-        id: 'cita-1',
-        estado: EstadoCita.pendiente_de_pago,
-      });
+      mockPrisma.cita.create.mockResolvedValue(enrichedCita);
       mockPrisma.pago.create.mockResolvedValue({
         id: 'pago-1',
         folioPago: 'VET-20260606-0002',
@@ -350,7 +424,7 @@ describe('CitasService', () => {
         estado: 'pendiente',
       });
 
-      await service.create(dtoValido, cliente);
+      const result = await service.create(dtoValido, cliente);
 
       expect(mockPrisma.cita.create).toHaveBeenCalled();
       const createCall = mockPrisma.cita.create.mock.calls[0] as unknown as [
@@ -363,6 +437,7 @@ describe('CitasService', () => {
           estado: 'pendiente',
         },
       });
+      expect((result as any).mascota).not.toHaveProperty('propietarioId');
     });
 
     it('should write initial audit row on cita creation', async () => {
@@ -390,12 +465,9 @@ describe('CitasService', () => {
         especialidadPrincipal: { precio: 1500.0 },
       });
       mockFolioGenerator.generate.mockResolvedValue('VET-20260606-0004');
-      mockPrisma.cita.create.mockResolvedValue({
-        id: 'cita-1',
-        estado: EstadoCita.pendiente_de_pago,
-      });
+      mockPrisma.cita.create.mockResolvedValue(enrichedCita);
 
-      await service.create(dtoValido, cliente);
+      const result = await service.create(dtoValido, cliente);
 
       expect(mockHistorialService.registrarCambio).toHaveBeenCalledWith(
         'cita-1',
@@ -403,6 +475,66 @@ describe('CitasService', () => {
         EstadoCita.pendiente_de_pago,
         cliente.sub,
         null,
+      );
+      expect((result as any).medico.nombreCompleto).toBe('Dra. Ana López');
+    });
+  });
+
+  describe('findAll', () => {
+    const admin = { sub: 'admin-1', email: 'admin@test.com', rol: Rol.admin };
+
+    it('should return enriched citas for admin', async () => {
+      mockPrisma.cita.findMany.mockResolvedValue([enrichedCita]);
+
+      const result = await service.findAll(admin);
+
+      expect(result).toHaveLength(1);
+      expect((result[0] as any).mascota.raza.nombre).toBe('Golden');
+      expect((result[0] as any).mascota).not.toHaveProperty('propietarioId');
+      expect((result[0] as any).medico.nombreCompleto).toBe('Dra. Ana López');
+      expect((result[0] as any).sucursal.nombre).toBe('Sucursal Centro');
+      expect(mockPrisma.cita.findMany).toHaveBeenCalled();
+    });
+
+    it('should return empty array for medico without citas', async () => {
+      const medicoUser = {
+        sub: 'user-med-1',
+        email: 'med@test.com',
+        rol: Rol.medico,
+      };
+      mockPrisma.medico.findFirst.mockResolvedValue(null);
+
+      const result = await service.findAll(medicoUser);
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('findOne', () => {
+    const admin = { sub: 'admin-1', email: 'admin@test.com', rol: Rol.admin };
+
+    it('should return enriched cita with receta and consulta', async () => {
+      mockPrisma.cita.findUnique.mockResolvedValue({
+        ...enrichedCita,
+        receta: { id: 'rec-1', detalles: [] },
+        consulta: { id: 'cons-1' },
+      });
+
+      const result = await service.findOne('cita-1', admin);
+
+      expect((result as any).mascota.raza.nombre).toBe('Golden');
+      expect((result as any).mascota).not.toHaveProperty('propietarioId');
+      expect((result as any).medico.nombreCompleto).toBe('Dra. Ana López');
+      expect((result as any).sucursal.nombre).toBe('Sucursal Centro');
+      expect((result as any).receta).toEqual({ id: 'rec-1' });
+      expect((result as any).consulta).toEqual({ id: 'cons-1' });
+    });
+
+    it('should throw NotFoundException for missing cita', async () => {
+      mockPrisma.cita.findUnique.mockResolvedValue(null);
+
+      await expect(service.findOne('cita-1', admin)).rejects.toThrow(
+        NotFoundException,
       );
     });
   });
@@ -418,13 +550,15 @@ describe('CitasService', () => {
         mascotaId: 'masc-1',
       });
       mockPrisma.cita.update.mockResolvedValue({
-        id: 'cita-1',
+        ...enrichedCita,
         estado: EstadoCita.cancelada,
       });
 
       const result = await service.remove('cita-1', admin);
 
       expect(result.estado).toBe(EstadoCita.cancelada);
+      expect((result as any).mascota).not.toHaveProperty('propietarioId');
+      expect((result as any).medico.nombreCompleto).toBe('Dra. Ana López');
       expect(mockPrisma.pago.update).toHaveBeenCalledWith({
         where: { citaId: 'cita-1' },
         data: { estado: 'cancelada' },
@@ -483,7 +617,7 @@ describe('CitasService', () => {
         ...baseCita,
       });
       mockPrisma.cita.update.mockResolvedValue({
-        id: 'cita-1',
+        ...enrichedCita,
         estado: EstadoCita.en_curso,
       });
 
@@ -493,6 +627,8 @@ describe('CitasService', () => {
         admin,
       );
       expect(result.estado).toBe(EstadoCita.en_curso);
+      expect((result as any).mascota.raza.nombre).toBe('Golden');
+      expect((result as any).medico.nombreCompleto).toBe('Dra. Ana López');
       expect(mockHistorialService.registrarCambio).toHaveBeenCalledWith(
         'cita-1',
         EstadoCita.pendiente,
@@ -592,7 +728,7 @@ describe('CitasService', () => {
         horaInicio: new Date(1970, 0, 1, 0, 0),
       });
       mockPrisma.cita.update.mockResolvedValue({
-        id: 'cita-1',
+        ...enrichedCita,
         estado: EstadoCita.cancelada,
       });
 
@@ -602,6 +738,7 @@ describe('CitasService', () => {
         admin,
       );
       expect(result.estado).toBe(EstadoCita.cancelada);
+      expect((result as any).sucursal.nombre).toBe('Sucursal Centro');
     });
   });
 
@@ -629,12 +766,13 @@ describe('CitasService', () => {
         mascotaId: 'masc-1',
       });
       mockPrisma.cita.update.mockResolvedValue({
-        id: 'cita-1',
+        ...enrichedCita,
         estado: EstadoCita.cancelada,
       });
 
       const result = await service.remove('cita-1', admin);
       expect(result.estado).toBe(EstadoCita.cancelada);
+      expect((result as any).mascota).not.toHaveProperty('propietarioId');
       expect(mockPrisma.pago.update).not.toHaveBeenCalled();
     });
 
@@ -646,12 +784,13 @@ describe('CitasService', () => {
         mascotaId: 'masc-1',
       });
       mockPrisma.cita.update.mockResolvedValue({
-        id: 'cita-1',
+        ...enrichedCita,
         estado: EstadoCita.cancelada,
       });
 
       const result = await service.remove('cita-1', admin);
       expect(result.estado).toBe(EstadoCita.cancelada);
+      expect((result as any).medico.especialidad).toBe('Cirugía');
       expect(mockPrisma.pago.update).not.toHaveBeenCalled();
     });
   });
@@ -673,7 +812,7 @@ describe('CitasService', () => {
         propietarioId: admin.sub,
       });
       mockPrisma.cita.update.mockResolvedValue({
-        id: 'cita-1',
+        ...enrichedCita,
         motivo: 'Nuevo motivo',
       });
 
@@ -683,6 +822,8 @@ describe('CitasService', () => {
         admin,
       );
       expect(result.motivo).toBe('Nuevo motivo');
+      expect((result as any).mascota.raza.nombre).toBe('Golden');
+      expect((result as any).medico.nombreCompleto).toBe('Dra. Ana López');
     });
 
     it('should update fecha and revalidate overlaps', async () => {
@@ -704,7 +845,7 @@ describe('CitasService', () => {
       });
       mockPrisma.cita.findMany.mockResolvedValue([]);
       mockPrisma.cita.update.mockResolvedValue({
-        id: 'cita-1',
+        ...enrichedCita,
         fecha: new Date('2026-08-01'),
       });
 
@@ -714,6 +855,7 @@ describe('CitasService', () => {
         admin,
       );
       expect(result.fecha).toBeDefined();
+      expect((result as any).sucursal.nombre).toBe('Sucursal Centro');
     });
 
     it('should reject updating a completed cita', async () => {

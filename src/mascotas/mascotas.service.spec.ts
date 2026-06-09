@@ -5,7 +5,7 @@ import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { MascotasService } from './mascotas.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { ArchivosService } from '../archivos/archivos.service';
-import { mascotaInclude } from './mascotas.mapper';
+import { mascotaInclude } from '../common/mappers/mascota.mapper';
 
 const mockPrismaService = {
   $transaction: jest.fn(),
