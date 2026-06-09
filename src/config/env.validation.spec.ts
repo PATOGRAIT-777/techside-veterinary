@@ -8,6 +8,7 @@ describe('envSchema', () => {
     JWT_SECRET: 'this-is-a-very-long-secret-key-32-chars!!',
     JWT_EXPIRES_IN: '24h',
     BCRYPT_ROUNDS: '12',
+    RESEND_API_KEY: 're_test_key',
   };
 
   it('should parse a complete valid environment', () => {
@@ -41,11 +42,14 @@ describe('envSchema', () => {
     const minimal = {
       DATABASE_URL: validEnv.DATABASE_URL,
       JWT_SECRET: validEnv.JWT_SECRET,
+      RESEND_API_KEY: validEnv.RESEND_API_KEY,
     };
     const result = envSchema.parse(minimal);
     expect(result.NODE_ENV).toBe('development');
     expect(result.PORT).toBe(3000);
     expect(result.JWT_EXPIRES_IN).toBe('24h');
     expect(result.BCRYPT_ROUNDS).toBe(12);
+    expect(result.REDIS_URL).toBe('redis://localhost:6379');
+    expect(result.BACKEND_BASE_URL).toBe('http://localhost:3000');
   });
 });
