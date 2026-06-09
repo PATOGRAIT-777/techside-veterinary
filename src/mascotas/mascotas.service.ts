@@ -8,7 +8,10 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ArchivosService } from '../archivos/archivos.service';
 import { CrearMascotaDto } from './dto/crear-mascota.dto';
 import { ActualizarMascotaDto } from './dto/actualizar-mascota.dto';
-import { mapMascotaToResponse, mascotaInclude } from './mascotas.mapper';
+import {
+  mapMascotaToResponse,
+  mascotaInclude,
+} from '../common/mappers/mascota.mapper';
 
 function isPrismaErrorWithCode(error: unknown): error is { code: string } {
   return (

@@ -4,18 +4,19 @@ import {
   MascotaRelacionDto,
   ArchivoResumenDto,
   AlergiaResponseDto,
-} from './dto/mascota-response.dto';
+} from '../../mascotas/dto/mascota-response.dto';
+import { MascotaResumenDto } from '../dto/mascota-resumen.dto';
 
 export const mascotaInclude = {
-  raza: true,
-  color: true,
-  tipoPelo: true,
-  patronPelo: true,
-  comportamiento: true,
-  fotoPerfil: true,
-  carnetVacunacion: true,
-  alergias: { include: { alergia: true } },
-} as const;
+  raza: { select: { id: true, nombre: true } },
+  color: { select: { id: true, nombre: true } },
+  tipoPelo: { select: { id: true, nombre: true } },
+  patronPelo: { select: { id: true, nombre: true } },
+  comportamiento: { select: { id: true, nombre: true } },
+  fotoPerfil: { select: { id: true, url: true } },
+  carnetVacunacion: { select: { id: true, url: true } },
+  alergias: { include: { alergia: { select: { id: true, nombre: true } } } },
+} as const satisfies Prisma.MascotaInclude;
 
 export type MascotaWithRelations = Prisma.MascotaGetPayload<{
   include: typeof mascotaInclude;
@@ -70,5 +71,21 @@ export function mapMascotaToResponse(
         notas: a.notas ?? null,
       }),
     ),
+  };
+}
+
+export function mapMascotaToResumen(
+  mascota: MascotaWithRelations,
+): MascotaResumenDto {
+  return {
+    id: mascota.id,
+    nombre: mascota.nombre,
+    raza: toRelacion(mascota.raza),
+    color: toRelacion(mascota.color),
+    tipoPelo: toRelacion(mascota.tipoPelo),
+    patronPelo: toRelacion(mascota.patronPelo),
+    comportamiento: toRelacion(mascota.comportamiento),
+    fotoPerfil: toArchivoResumen(mascota.fotoPerfil),
+    carnetVacunacion: toArchivoResumen(mascota.carnetVacunacion),
   };
 }

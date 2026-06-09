@@ -15,6 +15,7 @@ import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 import { FolioGenerator } from './helpers/folio-generator';
 import { CitaEstadoHistorialService } from './cita-estado-historial.service';
 import { EmailService } from '../email/email.service';
+import { citaInclude, mapCitaToResponse } from './citas.mapper';
 
 @Injectable()
 export class CitasService {
@@ -196,13 +197,12 @@ export class CitasService {
         },
       },
       include: {
-        sucursal: true,
-        medico: { include: { usuario: { select: { persona: true } } } },
-        mascota: true,
-        servicio: true,
+        ...citaInclude,
         pago: true,
       },
     });
+
+    const citaResponse = mapCitaToResponse(cita);
 
     // Registrar cambio de estado inicial en audit log
     await this.historialService.registrarCambio(
@@ -239,7 +239,7 @@ export class CitasService {
       `Confirmación de cita\n\nFecha: ${fechaStr}\nHora: ${horaEmailStr}\nMédico: ${nombreMedico}\nConsultorio: ${consultorioData?.nombre ?? 'No disponible'}\nFolio de pago: ${folioPago}\nCantidad: ${precio.toFixed(2)}`,
     );
 
-    return cita;
+    return citaResponse;
   }
 
   async findAll(usuario: JwtPayload) {
@@ -265,26 +265,19 @@ export class CitasService {
     }
     // Admin ve todas
 
-    return this.prisma.cita.findMany({
+    const citas = await this.prisma.cita.findMany({
       where,
-      include: {
-        sucursal: true,
-        medico: { include: { usuario: { select: { persona: true } } } },
-        mascota: true,
-        servicio: true,
-      },
+      include: citaInclude,
       orderBy: [{ fecha: 'asc' }, { horaInicio: 'asc' }],
     });
+    return citas.map(mapCitaToResponse);
   }
 
-  async findOne(id: string, usuario: JwtPayload) {
+  private async findOneWithPermissions(id: string, usuario: JwtPayload) {
     const cita = await this.prisma.cita.findUnique({
       where: { id },
       include: {
-        sucursal: true,
-        medico: { include: { usuario: { select: { persona: true } } } },
-        mascota: true,
-        servicio: true,
+        ...citaInclude,
         receta: { include: { detalles: true } },
         consulta: true,
       },
@@ -313,8 +306,13 @@ export class CitasService {
     return cita;
   }
 
+  async findOne(id: string, usuario: JwtPayload) {
+    const cita = await this.findOneWithPermissions(id, usuario);
+    return mapCitaToResponse(cita);
+  }
+
   async update(id: string, dto: UpdateCitaDto, usuario: JwtPayload) {
-    const cita = await this.findOne(id, usuario);
+    const cita = await this.findOneWithPermissions(id, usuario);
 
     // Solo admin o el cliente propietario pueden actualizar
     if (usuario.rol === Rol.cliente) {
@@ -381,20 +379,16 @@ export class CitasService {
       );
     }
 
-    return this.prisma.cita.update({
+    const updated = await this.prisma.cita.update({
       where: { id },
       data,
-      include: {
-        sucursal: true,
-        medico: true,
-        mascota: true,
-        servicio: true,
-      },
+      include: citaInclude,
     });
+    return mapCitaToResponse(updated);
   }
 
   async remove(id: string, usuario: JwtPayload) {
-    const cita = await this.findOne(id, usuario);
+    const cita = await this.findOneWithPermissions(id, usuario);
 
     if (usuario.rol === Rol.cliente) {
       const mascota = await this.prisma.mascota.findUnique({
@@ -421,6 +415,7 @@ export class CitasService {
     const updated = await this.prisma.cita.update({
       where: { id },
       data: { estado: EstadoCita.cancelada },
+      include: citaInclude,
     });
 
     if (cita.estado === EstadoCita.pendiente_de_pago) {
@@ -438,7 +433,7 @@ export class CitasService {
       null,
     );
 
-    return updated;
+    return mapCitaToResponse(updated);
   }
 
   async cambiarEstado(
@@ -446,7 +441,7 @@ export class CitasService {
     dto: CambiarEstadoCitaDto,
     usuario: JwtPayload,
   ) {
-    const cita = await this.findOne(id, usuario);
+    const cita = await this.findOneWithPermissions(id, usuario);
 
     // Validar transiciones de estado
     const transicionesPermitidas: Record<EstadoCita, EstadoCita[]> = {
@@ -500,6 +495,7 @@ export class CitasService {
     const updated = await this.prisma.cita.update({
       where: { id },
       data: { estado: dto.estado },
+      include: citaInclude,
     });
 
     // Registrar transición en audit log
@@ -511,7 +507,7 @@ export class CitasService {
       null,
     );
 
-    return updated;
+    return mapCitaToResponse(updated);
   }
 
   // =================== Validaciones privadas ===================
