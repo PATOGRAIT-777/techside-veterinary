@@ -1,61 +1,102 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigService } from '@nestjs/config';
 import { EmailService } from './email.service';
+import { EmailTemplateService } from './email-template.service';
+
+const mockResendSend = jest.fn().mockResolvedValue({ id: 'test-email-id' });
+
+jest.mock('resend', () => ({
+  Resend: jest.fn().mockImplementation(() => ({
+    emails: { send: mockResendSend },
+  })),
+}));
 
 describe('EmailService', () => {
   let service: EmailService;
+  let mockTemplateService: { render: jest.Mock };
 
   beforeEach(async () => {
+    mockTemplateService = { render: jest.fn() };
+    mockResendSend.mockClear();
+
     const module: TestingModule = await Test.createTestingModule({
-      providers: [EmailService],
+      providers: [
+        EmailService,
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn((key: string) => {
+              if (key === 'RESEND_API_KEY') return 'test-api-key';
+              if (key === 'BACKEND_BASE_URL') return 'http://localhost:3000';
+              return undefined;
+            }),
+          },
+        },
+        {
+          provide: EmailTemplateService,
+          useValue: mockTemplateService,
+        },
+      ],
     }).compile();
 
     service = module.get<EmailService>(EmailService);
-    service.clear();
-    jest.clearAllMocks();
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
+  describe('sendVerificationEmail', () => {
+    it('should render template and send via Resend', async () => {
+      mockTemplateService.render.mockReturnValue('<html>verification</html>');
 
-  describe('send', () => {
-    it('should store message in memory and log to console', () => {
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
-
-      service.send('test@example.com', 'Test Subject', 'Test Body');
-
-      const messages = service.getSentMessages();
-      expect(messages).toHaveLength(1);
-      expect(messages[0]).toEqual({
-        to: 'test@example.com',
-        subject: 'Test Subject',
-        body: 'Test Body',
-      });
-      expect(consoleSpy).toHaveBeenCalledWith(
-        '[EMAIL] To: test@example.com | Subject: Test Subject | Body: Test Body',
+      await service.sendVerificationEmail(
+        'user@example.com',
+        'Juan Pérez',
+        'abc123token',
       );
 
-      consoleSpy.mockRestore();
-    });
+      expect(mockTemplateService.render).toHaveBeenCalledWith(
+        'cuentanueva',
+        expect.objectContaining({
+          UserName: 'Juan Pérez',
+          ClinicName: 'Clínica Veterinaria VETEC',
+          VerificationURL:
+            'http://localhost:3000/auth/verify?token=abc123token',
+          Year: String(new Date().getFullYear()),
+        }),
+      );
 
-    it('should store multiple messages', () => {
-      jest.spyOn(console, 'log').mockImplementation();
-
-      service.send('a@example.com', 'Subject A', 'Body A');
-      service.send('b@example.com', 'Subject B', 'Body B');
-
-      expect(service.getSentMessages()).toHaveLength(2);
+      expect(mockResendSend).toHaveBeenCalledWith(
+        expect.objectContaining({
+          from: 'VETEC <onboarding@resend.dev>',
+          to: 'user@example.com',
+          subject: 'Verificar mi cuenta - VETEC',
+          html: '<html>verification</html>',
+        }),
+      );
     });
   });
 
-  describe('clear', () => {
-    it('should empty the messages array', () => {
-      jest.spyOn(console, 'log').mockImplementation();
-      service.send('test@example.com', 'Subject', 'Body');
+  describe('sendAccountExistsEmail', () => {
+    it('should render template and send via Resend', async () => {
+      mockTemplateService.render.mockReturnValue('<html>exists</html>');
 
-      service.clear();
+      await service.sendAccountExistsEmail('user@example.com');
 
-      expect(service.getSentMessages()).toHaveLength(0);
+      expect(mockTemplateService.render).toHaveBeenCalledWith(
+        'cuentaexistente',
+        expect.objectContaining({
+          ClinicName: 'Clínica Veterinaria VETEC',
+          LoginURL: 'http://localhost:3000/auth/login',
+          Year: String(new Date().getFullYear()),
+        }),
+      );
+
+      expect(mockResendSend).toHaveBeenCalledWith(
+        expect.objectContaining({
+          from: 'VETEC <onboarding@resend.dev>',
+          to: 'user@example.com',
+          subject: 'Intento de registro - VETEC',
+          html: '<html>exists</html>',
+        }),
+      );
     });
   });
 });
