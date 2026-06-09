@@ -297,4 +297,59 @@ export class AuthService {
       },
     );
   }
+
+  async verifyEmail(token: string): Promise<{ message: string }> {
+    const tokenRecord = await this.prisma.emailVerificationToken.findUnique({
+      where: { token },
+      include: { usuario: true },
+    });
+
+    if (
+      !tokenRecord ||
+      tokenRecord.usedAt ||
+      tokenRecord.expiresAt < new Date()
+    ) {
+      throw new BadRequestException(
+        'El enlace de verificación es inválido, ha expirado o ya fue utilizado.',
+      );
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.usuario.update({
+        where: { id: tokenRecord.usuarioId },
+        data: { status: 'activo' },
+      }),
+      this.prisma.emailVerificationToken.update({
+        where: { id: tokenRecord.id },
+        data: { usedAt: new Date() },
+      }),
+    ]);
+
+    return { message: 'Tu cuenta ha sido activada exitosamente.' };
+  }
+
+  async resendConfirmation(dto: {
+    email: string;
+  }): Promise<{ message: string }> {
+    const user = await this.usuariosService.findByEmailOrPhone(dto.email);
+
+    if (!user || user.status !== 'pendiente') {
+      return { message: 'Te enviamos un correo para continuar...' };
+    }
+
+    await this.prisma.emailVerificationToken.deleteMany({
+      where: {
+        usuarioId: user.id,
+        usedAt: null,
+      },
+    });
+
+    await this._createVerificationTokenAndEnqueue(
+      user.id,
+      user.email,
+      user.persona.nombreCompleto,
+    );
+
+    return { message: 'Te enviamos un correo para continuar...' };
+  }
 }
