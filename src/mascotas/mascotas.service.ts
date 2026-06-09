@@ -8,6 +8,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ArchivosService } from '../archivos/archivos.service';
 import { CrearMascotaDto } from './dto/crear-mascota.dto';
 import { ActualizarMascotaDto } from './dto/actualizar-mascota.dto';
+import { mapMascotaToResponse, mascotaInclude } from './mascotas.mapper';
 
 function isPrismaErrorWithCode(error: unknown): error is { code: string } {
   return (
@@ -102,10 +103,11 @@ export class MascotasService {
           };
         }
 
-        return tx.mascota.create({
+        const mascota = await tx.mascota.create({
           data,
-          include: { alergias: true },
+          include: mascotaInclude,
         });
+        return mapMascotaToResponse(mascota);
       });
     } catch (error) {
       for (const path of savedPaths) {
@@ -123,23 +125,24 @@ export class MascotasService {
   }
 
   async findAllByOwner(propietarioId: string) {
-    return this.prisma.mascota.findMany({
+    const mascotas = await this.prisma.mascota.findMany({
       where: { propietarioId },
-      include: { alergias: true },
+      include: mascotaInclude,
     });
+    return mascotas.map(mapMascotaToResponse);
   }
 
   async findOne(id: string, propietarioId: string) {
     const mascota = await this.prisma.mascota.findFirst({
       where: { id, propietarioId },
-      include: { alergias: true },
+      include: mascotaInclude,
     });
 
     if (!mascota) {
       throw new NotFoundException('Mascota no encontrada');
     }
 
-    return mascota;
+    return mapMascotaToResponse(mascota);
   }
 
   async update(
@@ -233,11 +236,12 @@ export class MascotasService {
           }
         }
 
-        return tx.mascota.update({
+        const mascota = await tx.mascota.update({
           where: { id },
           data,
-          include: { alergias: true },
+          include: mascotaInclude,
         });
+        return mapMascotaToResponse(mascota);
       });
 
       if (oldFotoUrl) this.archivosService.deleteFile(oldFotoUrl);

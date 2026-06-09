@@ -5,6 +5,7 @@ import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { MascotasService } from './mascotas.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { ArchivosService } from '../archivos/archivos.service';
+import { mascotaInclude } from './mascotas.mapper';
 
 const mockPrismaService = {
   $transaction: jest.fn(),
@@ -37,6 +38,31 @@ describe('MascotasService', () => {
   const mascotaId = '00000000-0000-4000-8000-000000000002';
   const razaId = '00000000-0000-4000-8000-000000000003';
   const alergiaId = '00000000-0000-4000-8000-000000000004';
+  const now = new Date('2024-01-01T00:00:00.000Z');
+
+  const baseMascota = {
+    id: mascotaId,
+    propietarioId,
+    nombre: 'Firulais',
+    raza: null,
+    color: null,
+    tipoPelo: null,
+    patronPelo: null,
+    comportamiento: null,
+    fechaNacimiento: null,
+    sexo: null,
+    peso: null,
+    esterilizado: false,
+    ruac: null,
+    microchip: null,
+    tatuaje: null,
+    fotoPerfil: null,
+    carnetVacunacion: null,
+    observaciones: null,
+    createdAt: now,
+    updatedAt: now,
+    alergias: [],
+  };
 
   const mockFile: Express.Multer.File = {
     fieldname: 'foto',
@@ -90,8 +116,15 @@ describe('MascotasService', () => {
         .mockResolvedValueOnce({ id: '00000000-0000-4000-8000-000000000011' });
 
       mockPrismaService.mascota.create.mockResolvedValue({
-        id: mascotaId,
-        nombre: 'Firulais',
+        ...baseMascota,
+        fotoPerfil: {
+          id: '00000000-0000-4000-8000-000000000010',
+          url: './uploads/foto-uuid.jpg',
+        },
+        carnetVacunacion: {
+          id: '00000000-0000-4000-8000-000000000011',
+          url: './uploads/carnet-uuid.pdf',
+        },
       });
 
       const result = await service.create(propietarioId, dto, {
@@ -123,16 +156,24 @@ describe('MascotasService', () => {
               ]),
             },
           }),
+          include: mascotaInclude,
         }),
       );
-      expect(result).toEqual({ id: mascotaId, nombre: 'Firulais' });
+      expect(result).toEqual({
+        ...baseMascota,
+        fotoPerfil: {
+          id: '00000000-0000-4000-8000-000000000010',
+          url: './uploads/foto-uuid.jpg',
+        },
+        carnetVacunacion: {
+          id: '00000000-0000-4000-8000-000000000011',
+          url: './uploads/carnet-uuid.pdf',
+        },
+      });
     });
 
     it('should create pet without files', async () => {
-      mockPrismaService.mascota.create.mockResolvedValue({
-        id: mascotaId,
-        nombre: 'Firulais',
-      });
+      mockPrismaService.mascota.create.mockResolvedValue(baseMascota);
 
       const result = await service.create(propietarioId, dto, {});
 
@@ -146,9 +187,10 @@ describe('MascotasService', () => {
             fotoPerfilId: undefined,
             carnetVacunacionId: undefined,
           }),
+          include: mascotaInclude,
         }),
       );
-      expect(result).toEqual({ id: mascotaId, nombre: 'Firulais' });
+      expect(result).toEqual(baseMascota);
     });
 
     it('should delete saved files on transaction failure', async () => {
@@ -197,14 +239,14 @@ describe('MascotasService', () => {
 
   describe('findAllByOwner', () => {
     it('should return pets scoped to caller', async () => {
-      const pets = [{ id: mascotaId, nombre: 'Firulais' }];
+      const pets = [baseMascota];
       mockPrismaService.mascota.findMany.mockResolvedValue(pets);
 
       const result = await service.findAllByOwner(propietarioId);
 
       expect(mockPrismaService.mascota.findMany).toHaveBeenCalledWith({
         where: { propietarioId },
-        include: { alergias: true },
+        include: mascotaInclude,
       });
       expect(result).toEqual(pets);
     });
@@ -212,16 +254,15 @@ describe('MascotasService', () => {
 
   describe('findOne', () => {
     it('should return pet for owner', async () => {
-      const pet = { id: mascotaId, nombre: 'Firulais' };
-      mockPrismaService.mascota.findFirst.mockResolvedValue(pet);
+      mockPrismaService.mascota.findFirst.mockResolvedValue(baseMascota);
 
       const result = await service.findOne(mascotaId, propietarioId);
 
       expect(mockPrismaService.mascota.findFirst).toHaveBeenCalledWith({
         where: { id: mascotaId, propietarioId },
-        include: { alergias: true },
+        include: mascotaInclude,
       });
-      expect(result).toEqual(pet);
+      expect(result).toEqual(baseMascota);
     });
 
     it('should throw NotFoundException for cross-owner access', async () => {
@@ -268,7 +309,7 @@ describe('MascotasService', () => {
         count: 1,
       });
       mockPrismaService.mascota.update.mockResolvedValue({
-        id: mascotaId,
+        ...baseMascota,
         nombre: 'Firulais II',
       });
 
@@ -289,12 +330,14 @@ describe('MascotasService', () => {
       expect(mockPrismaService.mascotaAlergia.createMany).toHaveBeenCalledWith({
         data: [{ mascotaId, alergiaId }],
       });
-      expect(mockPrismaService.mascota.update).toHaveBeenCalledWith({
-        where: { id: mascotaId },
-        data: expect.objectContaining({ nombre: 'Firulais II' }),
-        include: { alergias: true },
-      });
-      expect(result).toEqual({ id: mascotaId, nombre: 'Firulais II' });
+      expect(mockPrismaService.mascota.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: mascotaId },
+          data: expect.objectContaining({ nombre: 'Firulais II' }),
+          include: mascotaInclude,
+        }),
+      );
+      expect(result).toEqual({ ...baseMascota, nombre: 'Firulais II' });
     });
 
     it('should update pet without touching allergies when alergiaIds undefined', async () => {
@@ -307,7 +350,7 @@ describe('MascotasService', () => {
         carnetVacunacion: null,
       });
       mockPrismaService.mascota.update.mockResolvedValue({
-        id: mascotaId,
+        ...baseMascota,
         nombre: 'Firulais II',
       });
 
@@ -324,7 +367,7 @@ describe('MascotasService', () => {
       expect(
         mockPrismaService.mascotaAlergia.createMany,
       ).not.toHaveBeenCalled();
-      expect(result).toEqual({ id: mascotaId, nombre: 'Firulais II' });
+      expect(result).toEqual({ ...baseMascota, nombre: 'Firulais II' });
     });
 
     it('should delete old files and archivo records after successful update with new files', async () => {
@@ -352,7 +395,7 @@ describe('MascotasService', () => {
         .mockResolvedValueOnce({ id: '00000000-0000-4000-8000-000000000031' });
 
       mockPrismaService.mascota.update.mockResolvedValue({
-        id: mascotaId,
+        ...baseMascota,
         nombre: 'Firulais II',
       });
 
@@ -381,6 +424,7 @@ describe('MascotasService', () => {
             fotoPerfilId: '00000000-0000-4000-8000-000000000030',
             carnetVacunacionId: '00000000-0000-4000-8000-000000000031',
           }),
+          include: mascotaInclude,
         }),
       );
 
@@ -397,7 +441,7 @@ describe('MascotasService', () => {
         where: { id: '00000000-0000-4000-8000-000000000021' },
       });
 
-      expect(result).toEqual({ id: mascotaId, nombre: 'Firulais II' });
+      expect(result).toEqual({ ...baseMascota, nombre: 'Firulais II' });
     });
 
     it('should rollback new files when transaction fails during update', async () => {

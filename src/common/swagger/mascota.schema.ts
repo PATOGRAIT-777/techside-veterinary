@@ -12,35 +12,65 @@ export const mascotaResponseSchema = {
       example: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
     },
     nombre: { type: 'string', example: 'Luna' },
-    razaId: {
-      type: 'string',
-      format: 'uuid',
+    raza: {
+      type: 'object',
       nullable: true,
-      example: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+      properties: {
+        id: {
+          type: 'string',
+          format: 'uuid',
+          example: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+        },
+        nombre: { type: 'string', example: 'Golden Retriever' },
+      },
     },
-    colorId: {
-      type: 'string',
-      format: 'uuid',
+    color: {
+      type: 'object',
       nullable: true,
-      example: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+      properties: {
+        id: {
+          type: 'string',
+          format: 'uuid',
+          example: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+        },
+        nombre: { type: 'string', example: 'Negro' },
+      },
     },
-    tipoPeloId: {
-      type: 'string',
-      format: 'uuid',
+    tipoPelo: {
+      type: 'object',
       nullable: true,
-      example: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+      properties: {
+        id: {
+          type: 'string',
+          format: 'uuid',
+          example: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+        },
+        nombre: { type: 'string', example: 'Largo' },
+      },
     },
-    patronPeloId: {
-      type: 'string',
-      format: 'uuid',
+    patronPelo: {
+      type: 'object',
       nullable: true,
-      example: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+      properties: {
+        id: {
+          type: 'string',
+          format: 'uuid',
+          example: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+        },
+        nombre: { type: 'string', example: 'Manchado' },
+      },
     },
-    comportamientoId: {
-      type: 'string',
-      format: 'uuid',
+    comportamiento: {
+      type: 'object',
       nullable: true,
-      example: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+      properties: {
+        id: {
+          type: 'string',
+          format: 'uuid',
+          example: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+        },
+        nombre: { type: 'string', example: 'Tranquilo' },
+      },
     },
     fechaNacimiento: {
       type: 'string',
@@ -64,17 +94,35 @@ export const mascotaResponseSchema = {
       example: '985112345678901',
     },
     tatuaje: { type: 'string', nullable: true, example: 'TAT-001' },
-    fotoPerfilId: {
-      type: 'string',
-      format: 'uuid',
+    fotoPerfil: {
+      type: 'object',
       nullable: true,
-      example: 'cccccccc-dddd-eeee-ffff-000000000000',
+      properties: {
+        id: {
+          type: 'string',
+          format: 'uuid',
+          example: 'cccccccc-dddd-eeee-ffff-000000000000',
+        },
+        url: {
+          type: 'string',
+          example: '/uploads/foto-perfil-123.jpg',
+        },
+      },
     },
-    carnetVacunacionId: {
-      type: 'string',
-      format: 'uuid',
+    carnetVacunacion: {
+      type: 'object',
       nullable: true,
-      example: 'dddddddd-eeee-ffff-0000-111111111111',
+      properties: {
+        id: {
+          type: 'string',
+          format: 'uuid',
+          example: 'dddddddd-eeee-ffff-0000-111111111111',
+        },
+        url: {
+          type: 'string',
+          example: '/uploads/carnet-vacunacion-456.pdf',
+        },
+      },
     },
     observaciones: {
       type: 'string',
@@ -101,10 +149,16 @@ export const mascotaResponseSchema = {
             format: 'uuid',
             example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
           },
-          alergiaId: {
-            type: 'string',
-            format: 'uuid',
-            example: 'eeeeeeee-ffff-0000-1111-222222222222',
+          alergia: {
+            type: 'object',
+            properties: {
+              id: {
+                type: 'string',
+                format: 'uuid',
+                example: 'eeeeeeee-ffff-0000-1111-222222222222',
+              },
+              nombre: { type: 'string', example: 'Penicilina' },
+            },
           },
           notas: {
             type: 'string',
