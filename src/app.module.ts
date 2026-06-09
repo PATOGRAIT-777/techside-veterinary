@@ -1,9 +1,10 @@
 import { Module, Provider } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { BullModule } from '@nestjs/bull';
 import { APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
-import { envSchema } from './config/env.validation';
+import { envSchema, Env } from './config/env.validation';
 import { PrismaModule } from './prisma/prisma.module';
 import { MxDivisionesModule } from './mx-divisiones/mx-divisiones.module';
 import { AuthModule } from './auth/auth.module';
@@ -32,6 +33,13 @@ const throttlerGuardProvider: Provider = {
     ConfigModule.forRoot({
       isGlobal: true,
       validate: (env) => envSchema.parse(env),
+    }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService<Env, true>) => ({
+        redis: configService.get('REDIS_URL', { infer: true }),
+      }),
     }),
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
