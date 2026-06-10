@@ -16,7 +16,7 @@ import { RegisterDto } from './dto/register.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { generateSecureToken } from '../common/utils/generate-token';
 
-const BULL_QUEUE_TOKEN = 'BullQueue_email-queue';
+const EMAIL_QUEUE_TOKEN = 'EmailQueue';
 
 @Injectable()
 export class AuthService {
@@ -27,7 +27,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly medicosService: MedicosService,
-    @Inject(BULL_QUEUE_TOKEN)
+    @Inject(EMAIL_QUEUE_TOKEN)
     private readonly emailQueue: {
       add: (name: string, data: unknown, opts?: unknown) => Promise<unknown>;
     },
