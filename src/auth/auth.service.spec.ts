@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { UnauthorizedException, BadRequestException } from '@nestjs/common';
+// @nestjs/bull not installed yet (PR-2a); use Bull's internal token string
+const BULL_QUEUE_TOKEN = 'BullQueue_email-queue';
 import { Readable } from 'stream';
 import { AuthService } from './auth.service';
 import { UsuariosService } from '../usuarios/usuarios.service';
@@ -49,6 +51,10 @@ describe('AuthService', () => {
     registrarEntradaAutomatica: jest.fn(),
   };
 
+  const mockEmailQueue = {
+    add: jest.fn(),
+  };
+
   const mockPrismaService = {
     $transaction: jest.fn(),
     persona: {
@@ -64,6 +70,10 @@ describe('AuthService', () => {
     medico: {
       findFirst: jest.fn(),
     },
+    emailVerificationToken: {
+      create: jest.fn(),
+      deleteMany: jest.fn(),
+    },
   };
 
   beforeEach(async () => {
@@ -78,6 +88,7 @@ describe('AuthService', () => {
         { provide: MxDivisionesService, useValue: mockMxDivisionesService },
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: MedicosService, useValue: mockMedicosService },
+        { provide: BULL_QUEUE_TOKEN, useValue: mockEmailQueue },
       ],
     }).compile();
 
@@ -292,13 +303,14 @@ describe('AuthService', () => {
       path: '',
     };
 
-    it('should return generic 201 for duplicate email', async () => {
+    it('should enqueue account-exists email for duplicate active email', async () => {
       mockUsuariosService.findByEmailOrPhone.mockImplementation(
         (value: string) => {
           if (value === 'new@example.com') {
             return Promise.resolve({
               id: '00000000-0000-4000-8000-000000000001',
               email: 'new@example.com',
+              status: 'activo',
             });
           }
           return Promise.resolve(null);
@@ -313,21 +325,25 @@ describe('AuthService', () => {
       expect(result).toEqual({
         message: 'Te enviamos un correo para continuar...',
       });
-      expect(mockEmailService.send).toHaveBeenCalledWith(
-        'new@example.com',
-        'Cuenta existente',
-        'Ya tienes una cuenta. Inicia Sesión',
+      expect(mockEmailQueue.add).toHaveBeenCalledWith(
+        'send-account-exists',
+        { to: 'new@example.com' },
+        expect.any(Object),
       );
+      expect(
+        mockPrismaService.emailVerificationToken.create,
+      ).not.toHaveBeenCalled();
       expect(mockArchivosService.saveFile).not.toHaveBeenCalled();
     });
 
-    it('should return generic 201 for duplicate phone', async () => {
+    it('should enqueue account-exists email for duplicate active phone', async () => {
       mockUsuariosService.findByEmailOrPhone.mockImplementation(
         (value: string) => {
           if (value === '5215512345678') {
             return Promise.resolve({
               id: '00000000-0000-4000-8000-000000000001',
               telefono: '5215512345678',
+              status: 'activo',
             });
           }
           return Promise.resolve(null);
@@ -342,11 +358,58 @@ describe('AuthService', () => {
       expect(result).toEqual({
         message: 'Te enviamos un correo para continuar...',
       });
-      expect(mockEmailService.send).toHaveBeenCalledWith(
-        'new@example.com',
-        'Cuenta existente',
-        'Ya tienes una cuenta. Inicia Sesión',
+      expect(mockEmailQueue.add).toHaveBeenCalledWith(
+        'send-account-exists',
+        { to: 'new@example.com' },
+        expect.any(Object),
       );
+    });
+
+    it('should resend verification for duplicate pending user', async () => {
+      mockUsuariosService.findByEmailOrPhone.mockImplementation(
+        (value: string) => {
+          if (value === 'new@example.com') {
+            return Promise.resolve({
+              id: '00000000-0000-4000-8000-000000000001',
+              email: 'new@example.com',
+              status: 'pendiente',
+              persona: {
+                nombreCompleto: 'Juan Pérez',
+              },
+            });
+          }
+          return Promise.resolve(null);
+        },
+      );
+
+      const result = await service.register(validDto, {
+        addressDoc: mockAddressDoc,
+        identityDoc: mockIdentityDoc,
+      });
+
+      expect(result).toEqual({
+        message: 'Te enviamos un correo para continuar...',
+      });
+      expect(
+        mockPrismaService.emailVerificationToken.deleteMany,
+      ).toHaveBeenCalledWith({
+        where: {
+          usuarioId: '00000000-0000-4000-8000-000000000001',
+          usedAt: null,
+        },
+      });
+      expect(
+        mockPrismaService.emailVerificationToken.create,
+      ).toHaveBeenCalled();
+      expect(mockEmailQueue.add).toHaveBeenCalledWith(
+        'send-verification',
+        expect.objectContaining({
+          to: 'new@example.com',
+          userName: 'Juan Pérez',
+        }),
+        expect.any(Object),
+      );
+      expect(mockArchivosService.saveFile).not.toHaveBeenCalled();
     });
 
     it('should return 400 for invalid sucursalId', async () => {
@@ -363,7 +426,7 @@ describe('AuthService', () => {
       ).rejects.toThrow(BadRequestException);
     });
 
-    it('should register new user and send activation email', async () => {
+    it('should register new user and enqueue verification email', async () => {
       mockUsuariosService.findByEmailOrPhone.mockResolvedValue(null);
       mockMxDivisionesService.findById.mockResolvedValue({
         id: '00000000-0000-4000-8000-000000000001',
@@ -381,6 +444,7 @@ describe('AuthService', () => {
 
       mockPrismaService.persona.create.mockResolvedValue({
         id: '00000000-0000-4000-8000-00000000000a',
+        nombreCompleto: 'Juan Pérez',
       });
       mockPrismaService.usuario.create.mockResolvedValue({
         id: '00000000-0000-4000-8000-000000000014',
@@ -404,10 +468,16 @@ describe('AuthService', () => {
       });
       expect(mockArchivosService.saveFile).toHaveBeenCalledTimes(2);
       expect(mockPrismaService.$transaction).toHaveBeenCalled();
-      expect(mockEmailService.send).toHaveBeenCalledWith(
-        'new@example.com',
-        'Activa tu cuenta',
-        'Haz clic aquí para activar tu cuenta',
+      expect(
+        mockPrismaService.emailVerificationToken.create,
+      ).toHaveBeenCalled();
+      expect(mockEmailQueue.add).toHaveBeenCalledWith(
+        'send-verification',
+        expect.objectContaining({
+          to: 'new@example.com',
+          userName: 'Juan Pérez',
+        }),
+        expect.any(Object),
       );
     });
 

@@ -8,10 +8,14 @@ import {
   UploadedFiles,
   BadRequestException,
   UseGuards,
+  Get,
+  Query,
+  Res,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { Throttle } from '@nestjs/throttler';
+import { Throttle as ThrottlerDecorator } from '@nestjs/throttler';
 import { Rol } from '@prisma/client';
+import type { Response } from 'express';
 import {
   ApiOperation,
   ApiBody,
@@ -23,6 +27,8 @@ import { loginSchema } from './dto/login.dto';
 import type { LoginDto } from './dto/login.dto';
 import { registerSchema } from './dto/register.dto';
 import type { RegisterDto } from './dto/register.dto';
+import { resendConfirmationSchema } from './dto/resend-confirmation.dto';
+import type { ResendConfirmationDto } from './dto/resend-confirmation.dto';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { OptionalJwtAuthGuard } from '../common/guards/optional-jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -31,12 +37,17 @@ import {
   ApiUnauthorizedResponse,
   ApiTooManyRequestsResponse,
 } from '../common/swagger/error-responses';
+import { ConfigService } from '@nestjs/config';
+import { Env } from '../config/env.validation';
 
 const ALLOWED_MIME_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService<Env, true>,
+  ) {}
 
   @ApiOperation({
     summary: 'Login a user',
@@ -101,7 +112,7 @@ export class AuthController {
   @ApiTooManyRequestsResponse()
   @Post('login')
   @HttpCode(200)
-  @Throttle({ auth: { limit: 5, ttl: 900000 } })
+  @ThrottlerDecorator({ auth: { limit: 5, ttl: 900000 } })
   @UsePipes(new ZodValidationPipe(loginSchema))
   async login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
@@ -213,7 +224,7 @@ export class AuthController {
   @ApiTooManyRequestsResponse()
   @Post('register')
   @HttpCode(201)
-  @Throttle({ auth: { limit: 5, ttl: 900000 } })
+  @ThrottlerDecorator({ auth: { limit: 5, ttl: 900000 } })
   @UseGuards(OptionalJwtAuthGuard)
   @UseInterceptors(
     FileFieldsInterceptor(
@@ -269,6 +280,103 @@ export class AuthController {
       addressDoc: files?.addressDoc?.[0],
       identityDoc: files?.identityDoc?.[0],
     });
+  }
+
+  @ApiOperation({
+    summary: 'Verify email address',
+    description:
+      'Validates a verification token and activates the user account.\n\n' +
+      'Rate limit: 10 attempts per minute.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Account activated',
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'string',
+          example: 'Tu cuenta ha sido activada exitosamente.',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 302,
+    description: 'Redirect to configured success/error URL',
+  })
+  @ApiBadRequestResponse()
+  @ApiTooManyRequestsResponse()
+  @Get('verify')
+  @ThrottlerDecorator({ default: { limit: 10, ttl: 60000 } })
+  async verifyEmail(
+    @Query('token') token: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    try {
+      const result = await this.authService.verifyEmail(token);
+      const successUrl = this.configService.get(
+        'FRONTEND_CONFIRMATION_SUCCESS_URL',
+        { infer: true },
+      );
+      if (successUrl) {
+        res.redirect(successUrl);
+        return;
+      }
+      res.status(200).json(result);
+    } catch (error) {
+      const errorUrl = this.configService.get(
+        'FRONTEND_CONFIRMATION_ERROR_URL',
+        { infer: true },
+      );
+      if (errorUrl) {
+        res.redirect(errorUrl);
+        return;
+      }
+      throw error;
+    }
+  }
+
+  @ApiOperation({
+    summary: 'Resend confirmation email',
+    description:
+      'Requests a new confirmation email for pending accounts.\n\n' +
+      'Rate limit: 3 attempts per hour.',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        email: {
+          type: 'string',
+          format: 'email',
+          example: 'user@example.com',
+        },
+      },
+      required: ['email'],
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Confirmation email requested',
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'string',
+          example: 'Te enviamos un correo para continuar...',
+        },
+      },
+    },
+  })
+  @ApiBadRequestResponse()
+  @ApiTooManyRequestsResponse()
+  @Post('resend-confirmation')
+  @HttpCode(200)
+  @ThrottlerDecorator({ default: { limit: 3, ttl: 3600000 } })
+  @UsePipes(new ZodValidationPipe(resendConfirmationSchema))
+  async resendConfirmation(@Body() dto: ResendConfirmationDto) {
+    return this.authService.resendConfirmation(dto);
   }
 
   private isRegistrationAllowed(requestedRol: Rol, callerRol?: Rol): boolean {
