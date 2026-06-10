@@ -19,6 +19,11 @@ export class EmailService {
       const apiKey = this.configService.get('RESEND_API_KEY', {
         infer: true,
       });
+      if (!apiKey) {
+        throw new Error(
+          'RESEND_API_KEY is not configured. Set it in your .env file.',
+        );
+      }
       this.resendClient = new Resend(apiKey);
     }
     return this.resendClient;

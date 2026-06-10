@@ -7,9 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UsuariosService } from '../usuarios/usuarios.service';
-import { PersonasService } from '../personas/personas.service';
 import { ArchivosService } from '../archivos/archivos.service';
-import { EmailService } from '../email/email.service';
 import { MxDivisionesService } from '../mx-divisiones/mx-divisiones.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { MedicosService } from '../medicos/medicos.service';
@@ -24,9 +22,7 @@ const BULL_QUEUE_TOKEN = 'BullQueue_email-queue';
 export class AuthService {
   constructor(
     private readonly usuariosService: UsuariosService,
-    private readonly personasService: PersonasService,
     private readonly archivosService: ArchivosService,
-    private readonly emailService: EmailService,
     private readonly mxDivisionesService: MxDivisionesService,
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
@@ -110,20 +106,12 @@ export class AuthService {
     }
 
     if (existingByEmail?.status === 'pendiente') {
-      await this._handlePendingResend(
-        existingByEmail as typeof existingByEmail & {
-          persona: { nombreCompleto: string };
-        },
-      );
+      await this._handlePendingResend(existingByEmail);
       return { message: 'Te enviamos un correo para continuar...' };
     }
 
     if (existingByPhone?.status === 'pendiente') {
-      await this._handlePendingResend(
-        existingByPhone as typeof existingByPhone & {
-          persona: { nombreCompleto: string };
-        },
-      );
+      await this._handlePendingResend(existingByPhone);
       return { message: 'Te enviamos un correo para continuar...' };
     }
 
@@ -299,31 +287,33 @@ export class AuthService {
   }
 
   async verifyEmail(token: string): Promise<{ message: string }> {
-    const tokenRecord = await this.prisma.emailVerificationToken.findUnique({
-      where: { token },
-      include: { usuario: true },
+    const now = new Date();
+
+    // Atomic consumption: only succeeds if token is valid, unused, and not expired
+    const updateResult = await this.prisma.emailVerificationToken.updateMany({
+      where: {
+        token,
+        usedAt: null,
+        expiresAt: { gt: now },
+      },
+      data: { usedAt: now },
     });
 
-    if (
-      !tokenRecord ||
-      tokenRecord.usedAt ||
-      tokenRecord.expiresAt < new Date()
-    ) {
+    if (updateResult.count === 0) {
       throw new BadRequestException(
         'El enlace de verificación es inválido, ha expirado o ya fue utilizado.',
       );
     }
 
-    await this.prisma.$transaction([
-      this.prisma.usuario.update({
-        where: { id: tokenRecord.usuarioId },
-        data: { status: 'activo' },
-      }),
-      this.prisma.emailVerificationToken.update({
-        where: { id: tokenRecord.id },
-        data: { usedAt: new Date() },
-      }),
-    ]);
+    // Retrieve the consumed token to know which user to activate
+    const tokenRecord = await this.prisma.emailVerificationToken.findUnique({
+      where: { token },
+    });
+
+    await this.prisma.usuario.update({
+      where: { id: tokenRecord!.usuarioId },
+      data: { status: 'activo' },
+    });
 
     return { message: 'Tu cuenta ha sido activada exitosamente.' };
   }
