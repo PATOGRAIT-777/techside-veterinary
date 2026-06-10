@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { UnauthorizedException, BadRequestException } from '@nestjs/common';
 // @nestjs/bull not installed yet (PR-2a); use Bull's internal token string
-const BULL_QUEUE_TOKEN = 'BullQueue_email-queue';
+const EMAIL_QUEUE_TOKEN = 'EmailQueue';
 import { Readable } from 'stream';
 import { AuthService } from './auth.service';
 import { UsuariosService } from '../usuarios/usuarios.service';
@@ -74,7 +74,7 @@ describe('AuthService', () => {
         { provide: MxDivisionesService, useValue: mockMxDivisionesService },
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: MedicosService, useValue: mockMedicosService },
-        { provide: BULL_QUEUE_TOKEN, useValue: mockEmailQueue },
+        { provide: EMAIL_QUEUE_TOKEN, useValue: mockEmailQueue },
       ],
     }).compile();
 
