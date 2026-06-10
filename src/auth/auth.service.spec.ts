@@ -6,9 +6,7 @@ const BULL_QUEUE_TOKEN = 'BullQueue_email-queue';
 import { Readable } from 'stream';
 import { AuthService } from './auth.service';
 import { UsuariosService } from '../usuarios/usuarios.service';
-import { PersonasService } from '../personas/personas.service';
 import { ArchivosService } from '../archivos/archivos.service';
-import { EmailService } from '../email/email.service';
 import { MxDivisionesService } from '../mx-divisiones/mx-divisiones.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { MedicosService } from '../medicos/medicos.service';
@@ -28,19 +26,9 @@ describe('AuthService', () => {
     sign: jest.fn().mockReturnValue('mock-token'),
   };
 
-  const mockPersonasService = {
-    create: jest.fn(),
-  };
-
   const mockArchivosService = {
     saveFile: jest.fn(),
     deleteFile: jest.fn(),
-  };
-
-  const mockEmailService = {
-    send: jest.fn(),
-    getSentMessages: jest.fn().mockReturnValue([]),
-    clear: jest.fn(),
   };
 
   const mockMxDivisionesService = {
@@ -82,9 +70,7 @@ describe('AuthService', () => {
         AuthService,
         { provide: UsuariosService, useValue: mockUsuariosService },
         { provide: JwtService, useValue: mockJwtService },
-        { provide: PersonasService, useValue: mockPersonasService },
         { provide: ArchivosService, useValue: mockArchivosService },
-        { provide: EmailService, useValue: mockEmailService },
         { provide: MxDivisionesService, useValue: mockMxDivisionesService },
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: MedicosService, useValue: mockMedicosService },

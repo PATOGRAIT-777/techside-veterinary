@@ -99,4 +99,26 @@ describe('EmailService', () => {
       );
     });
   });
+
+  describe('send (legacy)', () => {
+    it('should send plain body wrapped in pre tag', async () => {
+      await service.send(
+        'legacy@example.com',
+        'Legacy subject',
+        'Line 1\nLine 2',
+      );
+
+      expect(mockResendSend).toHaveBeenCalledWith(
+        expect.objectContaining({
+          from: 'VETEC <onboarding@resend.dev>',
+          to: 'legacy@example.com',
+          subject: 'Legacy subject',
+        }),
+      );
+      const callHtml = (mockResendSend.mock.calls[0] as unknown[])[0] as {
+        html: string;
+      };
+      expect(callHtml.html).toContain('Line 1');
+    });
+  });
 });
