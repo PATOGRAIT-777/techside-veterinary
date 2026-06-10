@@ -1,3 +1,14 @@
+/**
+ * Email Verification Integration Test
+ *
+ * This is an integration test (not a true E2E) that validates the HTTP
+ * contracts of the email verification flow. It mocks external dependencies
+ * (Prisma, Bull queue, bcrypt) because the project does not yet have a
+ * dedicated test database or Redis instance for E2E testing.
+ *
+ * TODO: Convert to a true E2E test once a test database and Redis
+ * infrastructure are available in the CI environment.
+ */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call */
 jest.mock('@nestjs/bull', () => ({
   BullModule: {
@@ -244,13 +255,15 @@ describe('Email Verification (e2e)', () => {
 
   describe('GET /auth/verify', () => {
     it('should activate user with valid token', async () => {
+      mockPrisma.emailVerificationToken.updateMany.mockResolvedValue({
+        count: 1,
+      });
       mockPrisma.emailVerificationToken.findUnique.mockResolvedValue({
         id: '00000000-0000-4000-8000-000000000020',
         token: 'valid-token-123',
         expiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000),
-        usedAt: null,
+        usedAt: new Date(),
         usuarioId: '00000000-0000-4000-8000-000000000014',
-        usuario: { id: '00000000-0000-4000-8000-000000000014' },
       });
 
       const response = await request(app.getHttpServer()).get(
@@ -261,16 +274,19 @@ describe('Email Verification (e2e)', () => {
       expect(response.body).toEqual({
         message: 'Tu cuenta ha sido activada exitosamente.',
       });
+      expect(mockPrisma.emailVerificationToken.updateMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            token: 'valid-token-123',
+            usedAt: null,
+          }),
+          data: expect.objectContaining({ usedAt: expect.any(Date) }),
+        }),
+      );
       expect(mockPrisma.usuario.update).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { id: '00000000-0000-4000-8000-000000000014' },
           data: { status: 'activo' },
-        }),
-      );
-      expect(mockPrisma.emailVerificationToken.update).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { id: '00000000-0000-4000-8000-000000000020' },
-          data: expect.objectContaining({ usedAt: expect.any(Date) }),
         }),
       );
     });
@@ -284,13 +300,15 @@ describe('Email Verification (e2e)', () => {
         }),
       };
 
+      mockPrisma.emailVerificationToken.updateMany.mockResolvedValue({
+        count: 1,
+      });
       mockPrisma.emailVerificationToken.findUnique.mockResolvedValue({
         id: '00000000-0000-4000-8000-000000000020',
         token: 'valid-token-123',
         expiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000),
-        usedAt: null,
+        usedAt: new Date(),
         usuarioId: '00000000-0000-4000-8000-000000000014',
-        usuario: { id: '00000000-0000-4000-8000-000000000014' },
       });
 
       const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -315,59 +333,13 @@ describe('Email Verification (e2e)', () => {
       await testApp.close();
     });
 
-    it('should return 400 for invalid token', async () => {
-      mockPrisma.emailVerificationToken.findUnique.mockResolvedValue(null);
+    it('should return 400 for invalid/expired/used token (atomic rejection)', async () => {
+      mockPrisma.emailVerificationToken.updateMany.mockResolvedValue({
+        count: 0,
+      });
 
       const response = await request(app.getHttpServer()).get(
         '/auth/verify?token=invalid-token',
-      );
-
-      expect(response.status).toBe(400);
-      expect(response.body).toEqual(
-        expect.objectContaining({
-          statusCode: 400,
-          message:
-            'El enlace de verificación es inválido, ha expirado o ya fue utilizado.',
-        }),
-      );
-    });
-
-    it('should return 400 for expired token', async () => {
-      mockPrisma.emailVerificationToken.findUnique.mockResolvedValue({
-        id: '00000000-0000-4000-8000-000000000020',
-        token: 'expired-token',
-        expiresAt: new Date(Date.now() - 60 * 60 * 1000), // 1 hour ago
-        usedAt: null,
-        usuarioId: '00000000-0000-4000-8000-000000000014',
-        usuario: { id: '00000000-0000-4000-8000-000000000014' },
-      });
-
-      const response = await request(app.getHttpServer()).get(
-        '/auth/verify?token=expired-token',
-      );
-
-      expect(response.status).toBe(400);
-      expect(response.body).toEqual(
-        expect.objectContaining({
-          statusCode: 400,
-          message:
-            'El enlace de verificación es inválido, ha expirado o ya fue utilizado.',
-        }),
-      );
-    });
-
-    it('should return 400 for already used token', async () => {
-      mockPrisma.emailVerificationToken.findUnique.mockResolvedValue({
-        id: '00000000-0000-4000-8000-000000000020',
-        token: 'used-token',
-        expiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000),
-        usedAt: new Date(),
-        usuarioId: '00000000-0000-4000-8000-000000000014',
-        usuario: { id: '00000000-0000-4000-8000-000000000014' },
-      });
-
-      const response = await request(app.getHttpServer()).get(
-        '/auth/verify?token=used-token',
       );
 
       expect(response.status).toBe(400);
@@ -390,7 +362,9 @@ describe('Email Verification (e2e)', () => {
         }),
       };
 
-      mockPrisma.emailVerificationToken.findUnique.mockResolvedValue(null);
+      mockPrisma.emailVerificationToken.updateMany.mockResolvedValue({
+        count: 0,
+      });
 
       const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [AppModule],
@@ -503,13 +477,15 @@ describe('Email Verification (e2e)', () => {
 
   describe('Login after verification', () => {
     it('should allow login after user is activated', async () => {
+      mockPrisma.emailVerificationToken.updateMany.mockResolvedValue({
+        count: 1,
+      });
       mockPrisma.emailVerificationToken.findUnique.mockResolvedValue({
         id: '00000000-0000-4000-8000-000000000020',
         token: 'valid-token-123',
         expiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000),
-        usedAt: null,
+        usedAt: new Date(),
         usuarioId: '00000000-0000-4000-8000-000000000014',
-        usuario: { id: '00000000-0000-4000-8000-000000000014' },
       });
 
       // Verify the email
