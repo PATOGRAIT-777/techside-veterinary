@@ -21,7 +21,12 @@ import {
 } from '@nestjs/swagger';
 import { MascotasService } from './mascotas.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { Throttle } from '@nestjs/throttler';
+import { Rol } from '@prisma/client';
+import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 import { crearMascotaSchema } from './dto/crear-mascota.dto';
 import { actualizarMascotaSchema } from './dto/actualizar-mascota.dto';
 import type { CrearMascotaDto } from './dto/crear-mascota.dto';
@@ -152,6 +157,11 @@ export class MascotasController {
           },
           example: ['aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'],
         },
+        propietarioId: {
+          type: 'string',
+          format: 'uuid',
+          example: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+        },
         foto: {
           type: 'string',
           format: 'binary',
@@ -175,6 +185,9 @@ export class MascotasController {
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
   @ApiTooManyRequestsResponse()
+  @Throttle({ default: { limit: 8, ttl: 60000 } })
+  @Roles(Rol.cliente, Rol.medico, Rol.admin)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post()
   @UseInterceptors(
     FileFieldsInterceptor([
@@ -184,7 +197,7 @@ export class MascotasController {
   )
   async create(
     @Body() body: Record<string, unknown>,
-    @CurrentUser('sub') propietarioId: string,
+    @CurrentUser() user: JwtPayload,
     @UploadedFiles()
     files: {
       foto?: Express.Multer.File[];
@@ -206,7 +219,7 @@ export class MascotasController {
 
     const dto: CrearMascotaDto = parseResult.data;
 
-    return this.mascotasService.create(propietarioId, dto, {
+    return this.mascotasService.create({ sub: user.sub, rol: user.rol }, dto, {
       foto: files?.foto?.[0],
       carnet: files?.carnet?.[0],
     });
