@@ -8,7 +8,14 @@ import {
   Param,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiResponse,
+  ApiBody,
+  ApiParam,
+} from '@nestjs/swagger';
 import { CitasService } from './citas.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -24,12 +31,14 @@ import {
   ApiUnauthorizedResponse,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
+  ApiTooManyRequestsResponse,
 } from '../common/swagger/error-responses';
 import {
   citaResponseSchema,
   citasListSchema,
 } from '../common/swagger/citas.schema';
 
+@ApiTags('Citas')
 @Controller('api/v1/citas')
 @UseGuards(JwtAuthGuard)
 export class CitasController {
@@ -37,6 +46,45 @@ export class CitasController {
 
   @ApiOperation({ summary: 'Create appointment' })
   @ApiBearerAuth('access-token')
+  @ApiBody({
+    description: 'Appointment creation payload',
+    schema: {
+      type: 'object',
+      properties: {
+        emailUsuario: {
+          type: 'string',
+          format: 'email',
+          nullable: true,
+          description: 'Optional user email to assign the appointment',
+        },
+        sucursalId: { type: 'string', format: 'uuid' },
+        medicoId: { type: 'string', format: 'uuid' },
+        mascotaId: { type: 'string', format: 'uuid' },
+        servicioId: { type: 'string', format: 'uuid' },
+        fecha: {
+          type: 'string',
+          format: 'date',
+          description: 'Formato YYYY-MM-DD',
+          example: '2025-12-25',
+        },
+        horaInicio: {
+          type: 'string',
+          format: 'time',
+          description: 'Formato HH:MM',
+          example: '09:00',
+        },
+        motivo: { type: 'string', maxLength: 500, nullable: true },
+      },
+      required: [
+        'sucursalId',
+        'medicoId',
+        'mascotaId',
+        'servicioId',
+        'fecha',
+        'horaInicio',
+      ],
+    },
+  })
   @ApiResponse({
     status: 201,
     description: 'Appointment created',
@@ -45,6 +93,8 @@ export class CitasController {
   @ApiBadRequestResponse()
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
+  @ApiNotFoundResponse()
+  @ApiTooManyRequestsResponse()
   @Post()
   @UseGuards(RolesGuard)
   @Roles('cliente', 'admin')
@@ -64,6 +114,7 @@ export class CitasController {
   })
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
+  @ApiNotFoundResponse()
   @Get()
   findAll(@CurrentUser() usuario: JwtPayload) {
     return this.citasService.findAll(usuario);
@@ -71,6 +122,12 @@ export class CitasController {
 
   @ApiOperation({ summary: 'Get appointment by ID' })
   @ApiBearerAuth('access-token')
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    format: 'uuid',
+    description: 'Appointment UUID',
+  })
   @ApiResponse({
     status: 200,
     description: 'Appointment found',
@@ -86,6 +143,36 @@ export class CitasController {
 
   @ApiOperation({ summary: 'Update appointment' })
   @ApiBearerAuth('access-token')
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    format: 'uuid',
+    description: 'Appointment UUID',
+  })
+  @ApiBody({
+    description: 'Appointment update payload (at least one field required)',
+    schema: {
+      type: 'object',
+      properties: {
+        sucursalId: { type: 'string', format: 'uuid', nullable: true },
+        medicoId: { type: 'string', format: 'uuid', nullable: true },
+        servicioId: { type: 'string', format: 'uuid', nullable: true },
+        fecha: {
+          type: 'string',
+          format: 'date',
+          nullable: true,
+          description: 'Formato YYYY-MM-DD',
+        },
+        horaInicio: {
+          type: 'string',
+          format: 'time',
+          nullable: true,
+          description: 'Formato HH:MM',
+        },
+        motivo: { type: 'string', maxLength: 500, nullable: true },
+      },
+    },
+  })
   @ApiResponse({
     status: 200,
     description: 'Appointment updated',
@@ -95,6 +182,7 @@ export class CitasController {
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
   @ApiNotFoundResponse()
+  @ApiTooManyRequestsResponse()
   @Patch(':id')
   @UseGuards(RolesGuard)
   @Roles('cliente', 'admin')
@@ -108,6 +196,27 @@ export class CitasController {
 
   @ApiOperation({ summary: 'Change appointment status' })
   @ApiBearerAuth('access-token')
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    format: 'uuid',
+    description: 'Appointment UUID',
+  })
+  @ApiBody({
+    description: 'New appointment status',
+    schema: {
+      type: 'object',
+      properties: {
+        estado: {
+          type: 'string',
+          enum: ['pendiente', 'en_curso', 'inasistencia', 'cancelada'],
+          description:
+            'Estado de cita no válido. No se permite cambiar directamente a pendiente_de_pago ni completada',
+        },
+      },
+      required: ['estado'],
+    },
+  })
   @ApiResponse({
     status: 200,
     description: 'Appointment status changed',
@@ -117,6 +226,7 @@ export class CitasController {
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
   @ApiNotFoundResponse()
+  @ApiTooManyRequestsResponse()
   @Patch(':id/estado')
   @UseGuards(RolesGuard)
   @Roles('medico', 'admin')
@@ -131,6 +241,12 @@ export class CitasController {
 
   @ApiOperation({ summary: 'Cancel appointment' })
   @ApiBearerAuth('access-token')
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    format: 'uuid',
+    description: 'Appointment UUID',
+  })
   @ApiResponse({
     status: 200,
     description: 'Appointment cancelled',
@@ -140,6 +256,7 @@ export class CitasController {
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
   @ApiNotFoundResponse()
+  @ApiTooManyRequestsResponse()
   @Delete(':id')
   @UseGuards(RolesGuard)
   @Roles('cliente', 'admin')
