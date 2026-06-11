@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { UsuariosService } from './usuarios.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { BuscarUsuariosQueryDto } from './dto/buscar-usuarios-query.dto';
 import * as bcrypt from 'bcrypt';
 
 jest.mock('bcrypt');
@@ -13,6 +14,8 @@ describe('UsuariosService', () => {
     usuario: {
       findUnique: jest.fn(),
       create: jest.fn(),
+      findMany: jest.fn(),
+      count: jest.fn(),
     },
   };
 
@@ -160,6 +163,190 @@ describe('UsuariosService', () => {
         },
       });
       expect(result).toEqual(mockUser);
+    });
+  });
+
+  describe('search', () => {
+    const mockUsers = [
+      {
+        id: '00000000-0000-4000-8000-000000000001',
+        email: 'juan@example.com',
+        telefono: '5551234567',
+        persona: { nombreCompleto: 'Juan Pérez' },
+      },
+      {
+        id: '00000000-0000-4000-8000-000000000002',
+        email: 'ana@example.com',
+        telefono: '5559876543',
+        persona: { nombreCompleto: 'Ana López' },
+      },
+    ];
+
+    it('should return default pagination (skip=0, take=20)', async () => {
+      mockPrisma.usuario.findMany.mockResolvedValue(mockUsers);
+      mockPrisma.usuario.count.mockResolvedValue(2);
+
+      const result = await service.search({} as BuscarUsuariosQueryDto);
+
+      expect(mockPrisma.usuario.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {},
+          skip: 0,
+          take: 20,
+          select: {
+            id: true,
+            email: true,
+            telefono: true,
+            persona: { select: { nombreCompleto: true } },
+          },
+          orderBy: { persona: { nombreCompleto: 'asc' } },
+        }),
+      );
+      expect(mockPrisma.usuario.count).toHaveBeenCalledWith({ where: {} });
+      expect(result.total).toBe(2);
+      expect(result.data).toHaveLength(2);
+    });
+
+    it('should apply OR search across email, telefono and persona.nombreCompleto', async () => {
+      mockPrisma.usuario.findMany.mockResolvedValue([mockUsers[0]]);
+      mockPrisma.usuario.count.mockResolvedValue(1);
+
+      await service.search({ search: 'Juan' } as BuscarUsuariosQueryDto);
+
+      expect(mockPrisma.usuario.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            OR: [
+              { email: { contains: 'Juan', mode: 'insensitive' } },
+              { telefono: { contains: 'Juan', mode: 'insensitive' } },
+              {
+                persona: {
+                  nombreCompleto: { contains: 'Juan', mode: 'insensitive' },
+                },
+              },
+            ],
+          },
+        }),
+      );
+    });
+
+    it('should apply rol filter alone', async () => {
+      mockPrisma.usuario.findMany.mockResolvedValue([mockUsers[0]]);
+      mockPrisma.usuario.count.mockResolvedValue(1);
+
+      await service.search({ rol: 'cliente' } as BuscarUsuariosQueryDto);
+
+      expect(mockPrisma.usuario.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { rol: 'cliente' },
+        }),
+      );
+      expect(mockPrisma.usuario.count).toHaveBeenCalledWith({
+        where: { rol: 'cliente' },
+      });
+    });
+
+    it('should combine search and rol filter', async () => {
+      mockPrisma.usuario.findMany.mockResolvedValue([mockUsers[0]]);
+      mockPrisma.usuario.count.mockResolvedValue(1);
+
+      await service.search({
+        search: 'Juan',
+        rol: 'cliente',
+      } as BuscarUsuariosQueryDto);
+
+      expect(mockPrisma.usuario.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            rol: 'cliente',
+            OR: [
+              { email: { contains: 'Juan', mode: 'insensitive' } },
+              { telefono: { contains: 'Juan', mode: 'insensitive' } },
+              {
+                persona: {
+                  nombreCompleto: { contains: 'Juan', mode: 'insensitive' },
+                },
+              },
+            ],
+          },
+        }),
+      );
+    });
+
+    it('should clamp limit to 100 when given 200', async () => {
+      mockPrisma.usuario.findMany.mockResolvedValue([]);
+      mockPrisma.usuario.count.mockResolvedValue(0);
+
+      await service.search({ limit: 200 } as BuscarUsuariosQueryDto);
+
+      expect(mockPrisma.usuario.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ take: 100 }),
+      );
+    });
+
+    it('should clamp limit to 1 when given -5', async () => {
+      mockPrisma.usuario.findMany.mockResolvedValue([]);
+      mockPrisma.usuario.count.mockResolvedValue(0);
+
+      await service.search({ limit: -5 } as BuscarUsuariosQueryDto);
+
+      expect(mockPrisma.usuario.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ take: 1 }),
+      );
+    });
+
+    it('should map results to UsuarioResumenDto and strip sensitive fields', async () => {
+      mockPrisma.usuario.findMany.mockResolvedValue(mockUsers);
+      mockPrisma.usuario.count.mockResolvedValue(2);
+
+      const result = await service.search({} as BuscarUsuariosQueryDto);
+
+      expect(result.data[0]).toEqual({
+        id: '00000000-0000-4000-8000-000000000001',
+        email: 'juan@example.com',
+        telefono: '5551234567',
+        nombreCompleto: 'Juan Pérez',
+      });
+      expect(result.data[1]).toEqual({
+        id: '00000000-0000-4000-8000-000000000002',
+        email: 'ana@example.com',
+        telefono: '5559876543',
+        nombreCompleto: 'Ana López',
+      });
+      expect(result.data[0]).not.toHaveProperty('passwordHash');
+      expect(result.data[0]).not.toHaveProperty('status');
+    });
+
+    it('should return total from prisma.usuario.count', async () => {
+      mockPrisma.usuario.findMany.mockResolvedValue([]);
+      mockPrisma.usuario.count.mockResolvedValue(42);
+
+      const result = await service.search({} as BuscarUsuariosQueryDto);
+
+      expect(result.total).toBe(42);
+    });
+
+    it('should return empty data and total=0 when no matches', async () => {
+      mockPrisma.usuario.findMany.mockResolvedValue([]);
+      mockPrisma.usuario.count.mockResolvedValue(0);
+
+      const result = await service.search({
+        search: 'xyznonexistent',
+      } as BuscarUsuariosQueryDto);
+
+      expect(result.data).toEqual([]);
+      expect(result.total).toBe(0);
+    });
+
+    it('should use offset=0 boundary correctly', async () => {
+      mockPrisma.usuario.findMany.mockResolvedValue([]);
+      mockPrisma.usuario.count.mockResolvedValue(0);
+
+      await service.search({ offset: 0 } as BuscarUsuariosQueryDto);
+
+      expect(mockPrisma.usuario.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ skip: 0 }),
+      );
     });
   });
 });

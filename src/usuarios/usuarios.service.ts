@@ -4,6 +4,8 @@ import { Prisma, Usuario } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { Env } from '../config/env.validation';
+import { BuscarUsuariosQueryDto } from './dto/buscar-usuarios-query.dto';
+import { UsuarioResumenDto } from './dto/usuario-resumen.dto';
 
 @Injectable()
 export class UsuariosService {
@@ -69,5 +71,58 @@ export class UsuariosService {
         passwordHash: hashedPassword,
       },
     });
+  }
+
+  async search(
+    query: BuscarUsuariosQueryDto,
+  ): Promise<{ data: UsuarioResumenDto[]; total: number }> {
+    const { search, rol, limit, offset } = query;
+
+    const where: Prisma.UsuarioWhereInput = {};
+
+    if (rol) {
+      where.rol = rol;
+    }
+
+    if (search) {
+      where.OR = [
+        { email: { contains: search, mode: 'insensitive' } },
+        { telefono: { contains: search, mode: 'insensitive' } },
+        {
+          persona: {
+            nombreCompleto: { contains: search, mode: 'insensitive' },
+          },
+        },
+      ];
+    }
+
+    const take = Math.min(Math.max(limit ?? 20, 1), 100);
+    const skip = Math.max(offset ?? 0, 0);
+
+    const [data, total] = await Promise.all([
+      this.prisma.usuario.findMany({
+        where,
+        skip,
+        take,
+        select: {
+          id: true,
+          email: true,
+          telefono: true,
+          persona: { select: { nombreCompleto: true } },
+        },
+        orderBy: { persona: { nombreCompleto: 'asc' } },
+      }),
+      this.prisma.usuario.count({ where }),
+    ]);
+
+    return {
+      data: data.map((u) => ({
+        id: u.id,
+        email: u.email,
+        telefono: u.telefono,
+        nombreCompleto: u.persona.nombreCompleto,
+      })),
+      total,
+    };
   }
 }
