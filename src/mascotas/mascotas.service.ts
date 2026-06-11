@@ -3,7 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, Rol } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ArchivosService } from '../archivos/archivos.service';
 import { CrearMascotaDto } from './dto/crear-mascota.dto';
@@ -30,13 +30,38 @@ export class MascotasService {
   ) {}
 
   async create(
-    propietarioId: string,
+    currentUser: { sub: string; rol: Rol },
     dto: CrearMascotaDto,
     files: {
       foto?: Express.Multer.File;
       carnet?: Express.Multer.File;
     },
   ) {
+    let effectivePropietarioId: string;
+
+    if (currentUser.rol === 'cliente') {
+      effectivePropietarioId = currentUser.sub;
+    } else {
+      if (!dto.propietarioId) {
+        throw new BadRequestException(
+          'El propietario es obligatorio para registrar una mascota en este rol.',
+        );
+      }
+
+      const owner = await this.prisma.usuario.findUnique({
+        where: { id: dto.propietarioId },
+        select: { id: true, rol: true },
+      });
+
+      if (!owner || owner.rol !== 'cliente') {
+        throw new BadRequestException(
+          'El propietario no existe o no tiene rol de cliente.',
+        );
+      }
+
+      effectivePropietarioId = dto.propietarioId;
+    }
+
     const savedPaths: string[] = [];
 
     const fotoPath = files.foto
@@ -79,7 +104,7 @@ export class MascotasService {
         }
 
         const data: Prisma.MascotaUncheckedCreateInput = {
-          propietarioId,
+          propietarioId: effectivePropietarioId,
           nombre: dto.nombre,
           razaId: dto.razaId,
           colorId: dto.colorId,

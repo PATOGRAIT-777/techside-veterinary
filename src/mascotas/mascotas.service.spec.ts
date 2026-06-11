@@ -2,6 +2,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Readable } from 'stream';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { Rol } from '@prisma/client';
 import { MascotasService } from './mascotas.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { ArchivosService } from '../archivos/archivos.service';
@@ -23,6 +24,9 @@ const mockPrismaService = {
   archivo: {
     create: jest.fn(),
     delete: jest.fn(),
+  },
+  usuario: {
+    findUnique: jest.fn(),
   },
 };
 
@@ -106,7 +110,7 @@ describe('MascotasService', () => {
       alergiaIds: [alergiaId],
     };
 
-    it('should create pet with files and allergies', async () => {
+    it('cliente role should force propietarioId to currentUser.sub and ignore body value', async () => {
       mockArchivosService.saveFile
         .mockReturnValueOnce('./uploads/foto-uuid.jpg')
         .mockReturnValueOnce('./uploads/carnet-uuid.pdf');
@@ -127,23 +131,26 @@ describe('MascotasService', () => {
         },
       });
 
-      const result = await service.create(propietarioId, dto, {
-        foto: mockFile,
-        carnet: {
-          ...mockFile,
-          fieldname: 'carnet',
-          originalname: 'carnet.pdf',
-          mimetype: 'application/pdf',
+      const currentUser = { sub: propietarioId, rol: Rol.cliente };
+      const result = await service.create(
+        currentUser,
+        { ...dto, propietarioId: '00000000-0000-4000-8000-000000000099' },
+        {
+          foto: mockFile,
+          carnet: {
+            ...mockFile,
+            fieldname: 'carnet',
+            originalname: 'carnet.pdf',
+            mimetype: 'application/pdf',
+          },
         },
-      });
+      );
 
-      expect(mockArchivosService.saveFile).toHaveBeenCalledTimes(2);
-      expect(mockPrismaService.$transaction).toHaveBeenCalled();
-      expect(mockPrismaService.archivo.create).toHaveBeenCalledTimes(2);
+      expect(mockPrismaService.usuario.findUnique).not.toHaveBeenCalled();
       expect(mockPrismaService.mascota.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            propietarioId,
+            propietarioId: currentUser.sub,
             nombre: 'Firulais',
             razaId,
             fotoPerfilId: '00000000-0000-4000-8000-000000000010',
@@ -172,17 +179,133 @@ describe('MascotasService', () => {
       });
     });
 
+    it('medico with valid propietarioId referencing cliente should create pet', async () => {
+      const ownerId = '00000000-0000-4000-8000-000000000005';
+      mockPrismaService.usuario.findUnique.mockResolvedValue({
+        id: ownerId,
+        rol: Rol.cliente,
+      });
+      mockPrismaService.mascota.create.mockResolvedValue({
+        ...baseMascota,
+        propietarioId: ownerId,
+      });
+
+      const currentUser = { sub: propietarioId, rol: Rol.medico };
+      const result = await service.create(
+        currentUser,
+        { ...dto, propietarioId: ownerId },
+        {},
+      );
+
+      expect(mockPrismaService.usuario.findUnique).toHaveBeenCalledWith({
+        where: { id: ownerId },
+        select: { id: true, rol: true },
+      });
+      expect(mockPrismaService.mascota.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            propietarioId: ownerId,
+          }),
+          include: mascotaInclude,
+        }),
+      );
+      expect(result.propietarioId).toBe(ownerId);
+    });
+
+    it('admin with valid propietarioId referencing cliente should create pet', async () => {
+      const ownerId = '00000000-0000-4000-8000-000000000006';
+      mockPrismaService.usuario.findUnique.mockResolvedValue({
+        id: ownerId,
+        rol: Rol.cliente,
+      });
+      mockPrismaService.mascota.create.mockResolvedValue({
+        ...baseMascota,
+        propietarioId: ownerId,
+      });
+
+      const currentUser = { sub: propietarioId, rol: Rol.admin };
+      const result = await service.create(
+        currentUser,
+        { ...dto, propietarioId: ownerId },
+        {},
+      );
+
+      expect(mockPrismaService.usuario.findUnique).toHaveBeenCalledWith({
+        where: { id: ownerId },
+        select: { id: true, rol: true },
+      });
+      expect(result.propietarioId).toBe(ownerId);
+    });
+
+    it('medico missing propietarioId should throw BadRequestException before touching Prisma', async () => {
+      const currentUser = { sub: propietarioId, rol: Rol.medico };
+
+      await expect(service.create(currentUser, dto, {})).rejects.toThrow(
+        new BadRequestException(
+          'El propietario es obligatorio para registrar una mascota en este rol.',
+        ),
+      );
+
+      expect(mockPrismaService.usuario.findUnique).not.toHaveBeenCalled();
+      expect(mockPrismaService.$transaction).not.toHaveBeenCalled();
+      expect(mockArchivosService.saveFile).not.toHaveBeenCalled();
+    });
+
+    it('medico with non-existent propietarioId should throw BadRequestException', async () => {
+      mockPrismaService.usuario.findUnique.mockResolvedValue(null);
+      const currentUser = { sub: propietarioId, rol: Rol.medico };
+
+      await expect(
+        service.create(
+          currentUser,
+          { ...dto, propietarioId: '00000000-0000-4000-8000-000000000099' },
+          {},
+        ),
+      ).rejects.toThrow(
+        new BadRequestException(
+          'El propietario no existe o no tiene rol de cliente.',
+        ),
+      );
+
+      expect(mockPrismaService.usuario.findUnique).toHaveBeenCalled();
+      expect(mockPrismaService.$transaction).not.toHaveBeenCalled();
+    });
+
+    it('medico with propietarioId pointing to non-cliente should throw BadRequestException', async () => {
+      mockPrismaService.usuario.findUnique.mockResolvedValue({
+        id: '00000000-0000-4000-8000-000000000007',
+        rol: Rol.admin,
+      });
+      const currentUser = { sub: propietarioId, rol: Rol.medico };
+
+      await expect(
+        service.create(
+          currentUser,
+          { ...dto, propietarioId: '00000000-0000-4000-8000-000000000007' },
+          {},
+        ),
+      ).rejects.toThrow(
+        new BadRequestException(
+          'El propietario no existe o no tiene rol de cliente.',
+        ),
+      );
+
+      expect(mockPrismaService.usuario.findUnique).toHaveBeenCalled();
+      expect(mockPrismaService.$transaction).not.toHaveBeenCalled();
+    });
+
     it('should create pet without files', async () => {
       mockPrismaService.mascota.create.mockResolvedValue(baseMascota);
 
-      const result = await service.create(propietarioId, dto, {});
+      const currentUser = { sub: propietarioId, rol: Rol.cliente };
+      const result = await service.create(currentUser, dto, {});
 
       expect(mockArchivosService.saveFile).not.toHaveBeenCalled();
       expect(mockPrismaService.archivo.create).not.toHaveBeenCalled();
       expect(mockPrismaService.mascota.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            propietarioId,
+            propietarioId: currentUser.sub,
             nombre: 'Firulais',
             fotoPerfilId: undefined,
             carnetVacunacionId: undefined,
@@ -200,8 +323,9 @@ describe('MascotasService', () => {
 
       mockPrismaService.$transaction.mockRejectedValue(new Error('DB error'));
 
+      const currentUser = { sub: propietarioId, rol: Rol.cliente };
       await expect(
-        service.create(propietarioId, dto, {
+        service.create(currentUser, dto, {
           foto: mockFile,
           carnet: {
             ...mockFile,
@@ -227,8 +351,9 @@ describe('MascotasService', () => {
       prismaError.code = 'P2003';
       mockPrismaService.$transaction.mockRejectedValue(prismaError);
 
+      const currentUser = { sub: propietarioId, rol: Rol.cliente };
       await expect(
-        service.create(propietarioId, dto, { foto: mockFile }),
+        service.create(currentUser, dto, { foto: mockFile }),
       ).rejects.toThrow(BadRequestException);
 
       expect(mockArchivosService.deleteFile).toHaveBeenCalledWith(
