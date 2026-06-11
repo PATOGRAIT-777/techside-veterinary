@@ -56,4 +56,9 @@ export class CatalogosController {
   findAllAlergias() {
     return this.catalogosService.findAllAlergias();
   }
+
+  @Get('servicios')
+  findServicios() {
+    return this.catalogosService.findServicios();
+  }
 }

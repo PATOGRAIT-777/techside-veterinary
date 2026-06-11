@@ -27,6 +27,9 @@ describe('CatalogosService', () => {
     catalogoAlergia: {
       findMany: jest.fn(),
     },
+    servicio: {
+      findMany: jest.fn(),
+    },
   };
 
   beforeEach(async () => {
@@ -208,6 +211,23 @@ describe('CatalogosService', () => {
       expect(result).toEqual(allergies);
       expect(mockPrismaService.catalogoAlergia.findMany).toHaveBeenCalledWith({
         orderBy: { nombre: 'asc' },
+      });
+    });
+  });
+
+  describe('findServicios', () => {
+    it('should return services ordered by nombre with selected fields', async () => {
+      const services = [
+        { id: 'uuid-1', nombre: 'Consulta general', precioBase: '350.00' },
+        { id: 'uuid-2', nombre: 'Vacunación', precioBase: '150.00' },
+      ];
+      mockPrismaService.servicio.findMany.mockResolvedValue(services);
+
+      const result = await service.findServicios();
+      expect(result).toEqual(services);
+      expect(mockPrismaService.servicio.findMany).toHaveBeenCalledWith({
+        orderBy: { nombre: 'asc' },
+        select: { id: true, nombre: true, precioBase: true },
       });
     });
   });

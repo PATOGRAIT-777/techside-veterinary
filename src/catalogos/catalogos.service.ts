@@ -39,4 +39,11 @@ export class CatalogosService {
       orderBy: { nombre: 'asc' },
     });
   }
+
+  findServicios() {
+    return this.prisma.servicio.findMany({
+      orderBy: { nombre: 'asc' },
+      select: { id: true, nombre: true, precioBase: true },
+    });
+  }
 }

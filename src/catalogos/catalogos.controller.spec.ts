@@ -1,6 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ExecutionContext } from '@nestjs/common';
+import {
+  INestApplication,
+  ExecutionContext,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { GUARDS_METADATA } from '@nestjs/common/constants';
 import request from 'supertest';
 import { CatalogosController } from './catalogos.controller';
 import { CatalogosService } from './catalogos.service';
@@ -17,6 +22,7 @@ describe('CatalogosController', () => {
     findAllPatronesPelo: jest.fn(),
     findAllComportamientos: jest.fn(),
     findAllAlergias: jest.fn(),
+    findServicios: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -169,6 +175,60 @@ describe('CatalogosController', () => {
         .expect(200);
 
       expect(response.body).toEqual([{ id: 'uuid-1', nombre: 'Polen' }]);
+    });
+  });
+
+  describe('GET /catalogos/servicios', () => {
+    it('should return 200 with services array ordered by nombre', async () => {
+      mockService.findServicios.mockResolvedValue([
+        { id: 'uuid-1', nombre: 'Consulta general', precioBase: '350.00' },
+        { id: 'uuid-2', nombre: 'Vacunación', precioBase: '150.00' },
+      ]);
+
+      const response = await request(app.getHttpServer())
+        .get('/catalogos/servicios')
+        .expect(200);
+
+      expect(response.body).toEqual([
+        { id: 'uuid-1', nombre: 'Consulta general', precioBase: '350.00' },
+        { id: 'uuid-2', nombre: 'Vacunación', precioBase: '150.00' },
+      ]);
+      expect(mockService.findServicios).toHaveBeenCalledTimes(1);
+    });
+
+    it('should have JwtAuthGuard at class level', () => {
+      const guards = Reflect.getMetadata(
+        GUARDS_METADATA,
+        CatalogosController,
+      ) as (new (...args: unknown[]) => unknown)[];
+      expect(guards).toBeDefined();
+      expect(guards.some((guard) => guard === JwtAuthGuard)).toBe(true);
+    });
+  });
+
+  describe('Auth — GET /catalogos/servicios without JWT', () => {
+    it('should return 401 when JwtAuthGuard rejects', async () => {
+      const module: TestingModule = await Test.createTestingModule({
+        controllers: [CatalogosController],
+        providers: [{ provide: CatalogosService, useValue: mockService }],
+      })
+        .overrideGuard(JwtAuthGuard)
+        .useValue({
+          canActivate: jest.fn().mockImplementation(() => {
+            throw new UnauthorizedException();
+          }),
+        })
+        .compile();
+
+      const rejectedApp = module.createNestApplication();
+      await rejectedApp.init();
+
+      const response = await request(rejectedApp.getHttpServer()).get(
+        '/catalogos/servicios',
+      );
+
+      expect(response.status).toBe(401);
+      await rejectedApp.close();
     });
   });
 });
