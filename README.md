@@ -73,23 +73,29 @@ pnpm run test:cov
 pnpm run test:e2e
 ```
 
-**Estado actual:** 24 suites, 140 tests — todos pasan ✅
+**Estado actual:** 40 suites, 308 tests — todos pasan ✅
 
 ## 📚 Documentación de API
 
 Ver [`API-DOCS.md`](./API-DOCS.md) para documentación completa de todos los endpoints.
+
+También puedes consultar la documentación interactiva de Swagger UI en `/api/docs` cuando el servidor esté corriendo.
 
 ### Módulos implementados
 
 | Módulo | Endpoints | Descripción |
 |--------|-----------|-------------|
 | **Auth** | `POST /auth/login`, `POST /auth/register` | Login JWT y registro de usuarios |
+| **Usuarios** | `GET /usuarios` | Búsqueda paginada de usuarios |
 | **Mascotas** | `POST/GET/PATCH /mascotas` | Gestión de mascotas del cliente |
-| **Catálogos** | `GET /catalogos/*` | Especies, razas, colores, alergias, etc. |
+| **Catálogos** | `GET /catalogos/*` | Especies, razas, colores, alergias, servicios, etc. |
 | **Citas** | `POST/GET/PATCH/DELETE /api/v1/citas` | Agendamiento con validaciones de negocio |
 | **Médicos** | `POST/GET/PATCH /api/v1/medicos` | Perfiles, horarios y asistencias |
+| **Especialidades** | `GET /api/v1/especialidades` | Especialidades médicas |
 | **Recetas** | `POST/GET /api/v1/recetas` | Generación al completar cita |
 | **Consultas** | `POST/GET/PATCH /api/v1/consultas` | Datos clínicos de la atención |
+| **Pagos** | `POST/GET /api/v1/pagos` | Gestión de pagos por folio |
+| **Historial Médico** | `GET /mascotas/:id/historial/*`, `GET /admin/historial-mascotas` | Historial clínico y dashboard admin |
 
 ## 🗄️ Base de Datos
 
@@ -164,8 +170,9 @@ src/
 ├── mascotas/          # Gestión de mascotas
 ├── catalogos/         # Catálogos (especies, razas, etc.)
 ├── mx-divisiones/     # Sucursales
-├── personas/          # Datos personales
+├── personas/          # Datos personales (placeholder; aún no expone endpoints propios)
 ├── usuarios/          # Gestión de usuarios
+├── historial-medico/  # Historial clínico y dashboard admin
 ├── common/            # Guards, pipes, decorators, filters
 ├── prisma/            # Prisma service
 └── config/            # Configuración y validación de env

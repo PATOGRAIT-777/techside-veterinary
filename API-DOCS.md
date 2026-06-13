@@ -88,13 +88,35 @@ Authorization: Bearer <access_token>
 
 ---
 
+
+## 👥 Usuarios
+
+### Buscar usuarios
+
+#### `GET /usuarios?search={texto}&rol={rol}&limit={limit}&offset={offset}`
+
+**Auth:** Requiere JWT
+
+**Query params:**
+
+| Param | Tipo | Requerido | Descripción |
+|-------|------|-----------|-------------|
+| `search` | string | ❌ | Búsqueda por nombre, email o teléfono |
+| `rol` | string | ❌ | Filtrar por rol (`cliente`, `medico`, `admin`) |
+| `limit` | integer | ❌ | Límite de resultados (default 20) |
+| `offset` | integer | ❌ | Offset para paginación |
+
+**Response:** `{ data: [...], total: number }`
+
+---
+
 ## 🐕 Mascotas
 
 ### Crear mascota
 
 #### `POST /mascotas`
 
-**Auth:** Requiere JWT (cliente)
+**Auth:** Requiere JWT (cliente o admin)
 
 **Content-Type:** `multipart/form-data`
 
@@ -157,7 +179,7 @@ Authorization: Bearer <access_token>
 
 #### `PATCH /mascotas/:id`
 
-**Auth:** Requiere JWT (cliente)
+**Auth:** Requiere JWT (cliente propietario o admin)
 
 **Content-Type:** `multipart/form-data`
 
@@ -204,9 +226,22 @@ Lista todas las alergias del catálogo.
 ]
 ```
 
+#### `GET /catalogos/servicios`
+
+Lista todos los servicios disponibles para citas.
+
+**Response ejemplo:**
+```json
+[
+  { "id": "uuid", "nombre": "Consulta general" }
+]
+```
+
 ---
 
 ## 🏥 Sucursales (MxDivisiones)
+
+**Nota:** Los endpoints de sucursales son **públicos** y no requieren JWT.
 
 #### `GET /mx-divisiones`
 
@@ -226,6 +261,24 @@ Obtiene una sucursal por ID.
   "telefono": "55512345678",
   "activo": true
 }
+```
+
+---
+
+
+## 🩺 Especialidades
+
+#### `GET /api/v1/especialidades`
+
+**Auth:** Requiere JWT
+
+Lista todas las especialidades médicas.
+
+**Response ejemplo:**
+```json
+[
+  { "id": "uuid", "nombre": "Medicina Interna" }
+]
 ```
 
 ---
@@ -306,31 +359,6 @@ Obtiene una sucursal por ID.
 
 ---
 
-### Consultar disponibilidad
-
-#### `GET /api/v1/citas/disponibilidad?medicoId=<UUID>&fecha=YYYY-MM-DD`
-
-**Auth:** Requiere JWT (o puede ser público)
-
-**Response:**
-```json
-{
-  "slots": [
-    {
-      "horaInicio": "09:00",
-      "horaFin": "10:00",
-      "disponible": true
-    },
-    {
-      "horaInicio": "10:00",
-      "horaFin": "11:00",
-      "disponible": false
-    }
-  ]
-}
-```
-
----
 
 ### Actualizar cita
 
@@ -415,6 +443,39 @@ Cambia el estado a `cancelada`. Solo funciona si está `pendiente` o `en_curso`.
 
 ---
 
+
+### Disponibilidad de días
+
+#### `GET /api/v1/medicos/:id/disponibilidad-dias?desde=YYYY-MM-DD&hasta=YYYY-MM-DD`
+
+**Auth:** Requiere JWT
+
+**Query params:**
+
+| Param | Tipo | Requerido | Descripción |
+|-------|------|-----------|-------------|
+| `desde` | string (YYYY-MM-DD) | ✅ | Fecha inicial |
+| `hasta` | string (YYYY-MM-DD) | ✅ | Fecha final |
+
+**Response:** Array de fechas con disponibilidad para agendar citas.
+
+---
+
+### Disponibilidad de slots
+
+#### `GET /api/v1/medicos/:id/disponibilidad-slots?fecha=YYYY-MM-DD`
+
+**Auth:** Requiere JWT
+
+**Query params:**
+
+| Param | Tipo | Requerido | Descripción |
+|-------|------|-----------|-------------|
+| `fecha` | string (YYYY-MM-DD) | ✅ | Fecha a consultar |
+
+**Response:** Array de slots disponibles para la fecha.
+
+---
 ### Actualizar médico
 
 #### `PATCH /api/v1/medicos/:id`
@@ -629,6 +690,36 @@ Marca la hora de salida para el día actual.
 **Auth:** Requiere JWT (médico de la cita o admin)
 
 **Body:** Campos opcionales (mismos que POST).
+
+---
+
+
+## 💳 Pagos
+
+### Crear pago
+
+#### `POST /api/v1/pagos`
+
+**Auth:** Requiere JWT
+
+**Body:**
+```json
+{
+  "folioPago": "VET-20260520-0001"
+}
+```
+
+**Response 201:** Datos del pago creado.
+
+---
+
+### Obtener pago por folio
+
+#### `GET /api/v1/pagos/:folioPago`
+
+**Auth:** Requiere JWT
+
+**Response:** Datos del pago.
 
 ---
 
@@ -1049,8 +1140,11 @@ Sucursal (1:N) → Consultorio
 ### 1. Agendar una cita
 ```
 GET /catalogos/servicios        → Obtener servicios disponibles
+GET /api/v1/especialidades      → Obtener especialidades
 GET /api/v1/medicos             → Obtener médicos
-GET /api/v1/citas/disponibilidad?medicoId=X&fecha=YYYY-MM-DD
+GET /api/v1/medicos/:id/disponibilidad-dias
+                                → Ver días disponibles
+GET /api/v1/medicos/:id/disponibilidad-slots?fecha=YYYY-MM-DD
                                 → Ver slots disponibles
 POST /api/v1/citas              → Crear cita
 ```
@@ -1082,4 +1176,4 @@ GET /admin/historial-mascotas?fechaDesde=A&fechaHasta=B
 
 ---
 
-*Documentación actualizada el 2026-06-07. Para cambios recientes, revisar los controllers en `src/`.*
+*Documentación actualizada el 2026-06-13. Para cambios recientes, revisar los controllers en `src/`.*
