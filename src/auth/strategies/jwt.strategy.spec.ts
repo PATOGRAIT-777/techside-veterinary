@@ -36,7 +36,7 @@ describe('JwtStrategy', () => {
       const result = strategy.validate(payload);
 
       expect(result).toEqual({
-        userId: '00000000-0000-4000-8000-000000000001',
+        sub: '00000000-0000-4000-8000-000000000001',
         email: 'test@example.com',
         rol: 'cliente',
       });
