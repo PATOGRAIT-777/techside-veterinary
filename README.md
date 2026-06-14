@@ -73,7 +73,7 @@ pnpm run test:cov
 pnpm run test:e2e
 ```
 
-**Estado actual:** 40 suites, 308 tests — todos pasan ✅
+**Estado actual:** 41 suites, 315 tests — todos pasan ✅
 
 ## 📚 Documentación de API
 
@@ -87,6 +87,7 @@ También puedes consultar la documentación interactiva de Swagger UI en `/api/d
 |--------|-----------|-------------|
 | **Auth** | `POST /auth/login`, `POST /auth/register` | Login JWT y registro de usuarios |
 | **Usuarios** | `GET /usuarios` | Búsqueda paginada de usuarios |
+| **Personas** | `GET /personas/me`, `PATCH /personas/me` | Perfil del usuario autenticado |
 | **Mascotas** | `POST/GET/PATCH /mascotas` | Gestión de mascotas del cliente |
 | **Catálogos** | `GET /catalogos/*` | Especies, razas, colores, alergias, servicios, etc. |
 | **Citas** | `POST/GET/PATCH/DELETE /api/v1/citas` | Agendamiento con validaciones de negocio |
@@ -170,7 +171,7 @@ src/
 ├── mascotas/          # Gestión de mascotas
 ├── catalogos/         # Catálogos (especies, razas, etc.)
 ├── mx-divisiones/     # Sucursales
-├── personas/          # Datos personales (placeholder; aún no expone endpoints propios)
+├── personas/          # Datos personales y perfil del usuario autenticado
 ├── usuarios/          # Gestión de usuarios
 ├── historial-medico/  # Historial clínico y dashboard admin
 ├── common/            # Guards, pipes, decorators, filters

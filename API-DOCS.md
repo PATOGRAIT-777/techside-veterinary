@@ -88,6 +88,114 @@ Authorization: Bearer <access_token>
 
 ---
 
+## 👤 Perfil de usuario
+
+### Obtener perfil del usuario autenticado
+
+#### `GET /personas/me`
+
+**Auth:** Requiere JWT
+
+**Response 200:**
+```json
+{
+  "id": "uuid",
+  "email": "juan@vetec.local",
+  "telefono": "55511111111",
+  "rol": "cliente",
+  "personaId": "uuid",
+  "nombreCompleto": "Juan Pérez",
+  "telefonoSecundario": "+525555555556",
+  "calle": "Av. Reforma",
+  "numExterior": "123",
+  "numInterior": "A",
+  "sucursal": {
+    "id": "uuid",
+    "nombre": "Vetec Centro"
+  }
+}
+```
+
+**Response médico 200:**
+```json
+{
+  "id": "uuid",
+  "email": "carlos@vetec.local",
+  "telefono": "55533333333",
+  "rol": "medico",
+  "personaId": "uuid",
+  "nombreCompleto": "Dr. Carlos Ruiz",
+  "telefonoSecundario": null,
+  "calle": "Blvd. Médicos",
+  "numExterior": "45",
+  "numInterior": null,
+  "sucursal": {
+    "id": "uuid",
+    "nombre": "Vetec Centro"
+  },
+  "medico": {
+    "cedulaProfesional": "CED-123456",
+    "especialidadPrincipal": {
+      "id": "uuid",
+      "nombre": "Cirugía General"
+    },
+    "sucursal": {
+      "id": "uuid",
+      "nombre": "Vetec Centro"
+    },
+    "horarios": [
+      {
+        "id": "uuid",
+        "diaSemana": "lunes",
+        "horaInicio": "1970-01-01T09:00:00.000Z",
+        "horaFin": "1970-01-01T14:00:00.000Z",
+        "consultorio": {
+          "id": "uuid",
+          "nombre": "Consultorio 1"
+        }
+      }
+    ]
+  }
+}
+```
+
+**Notas:**
+- `email`, `telefono`, `rol` y `sucursal` son de solo lectura.
+- Para usuarios con `rol !== medico`, la propiedad `medico` se omite.
+
+---
+
+### Actualizar datos personales
+
+#### `PATCH /personas/me`
+
+**Auth:** Requiere JWT
+
+**Body:** Campos editables (al menos uno requerido)
+
+| Campo | Tipo | Requerido | Descripción |
+|-------|------|-----------|-------------|
+| `nombreCompleto` | string | ❌ | Máx 200 caracteres |
+| `telefonoSecundario` | string \| null | ❌ | Máx 15 caracteres |
+| `calle` | string | ❌ | Máx 200 caracteres |
+| `numExterior` | string \| null | ❌ | Máx 20 caracteres |
+| `numInterior` | string \| null | ❌ | Máx 20 caracteres |
+
+**Ejemplo:**
+```json
+{
+  "nombreCompleto": "Juan Pérez López",
+  "calle": "Av. Reforma Norte"
+}
+```
+
+**Response 200:** Mismo shape que `GET /personas/me` con los campos actualizados.
+
+**Restricciones:**
+- No se permite modificar `email`, `telefono`, `sucursalId`, `rol` ni `password`.
+- Enviar un campo no permitido devuelve `400`.
+
+---
 
 ## 👥 Usuarios
 
