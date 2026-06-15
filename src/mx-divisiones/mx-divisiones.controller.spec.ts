@@ -9,6 +9,7 @@ describe('MxDivisionesController', () => {
   const mockService = {
     findAll: jest.fn(),
     findById: jest.fn(),
+    findSucursales: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -43,6 +44,22 @@ describe('MxDivisionesController', () => {
       const result = await controller.findAll();
       expect(result).toEqual(divisions);
       expect(mockService.findAll).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('findSucursales', () => {
+    it('should delegate to service.findSucursales', async () => {
+      const sucursales = [
+        {
+          id: '00000000-0000-4000-8000-000000000003',
+          nombre: 'Vetec Centro',
+        },
+      ];
+      mockService.findSucursales.mockResolvedValue(sucursales);
+
+      const result = await controller.findSucursales();
+      expect(result).toEqual(sucursales);
+      expect(mockService.findSucursales).toHaveBeenCalledTimes(1);
     });
   });
 

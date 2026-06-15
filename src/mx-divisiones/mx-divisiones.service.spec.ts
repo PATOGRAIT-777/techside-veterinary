@@ -12,6 +12,9 @@ describe('MxDivisionesService', () => {
       findMany: jest.fn(),
       findFirst: jest.fn(),
     },
+    sucursal: {
+      findMany: jest.fn(),
+    },
   };
 
   beforeEach(async () => {
@@ -84,6 +87,26 @@ describe('MxDivisionesService', () => {
       ).rejects.toThrow(NotFoundException);
       expect(mockPrismaService.mxDivision.findFirst).toHaveBeenCalledWith({
         where: { id: '00000000-0000-4000-8000-0000000003e7', activo: true },
+      });
+    });
+  });
+
+  describe('findSucursales', () => {
+    it('should return only active sucursales with id and nombre', async () => {
+      const sucursales = [
+        {
+          id: '00000000-0000-4000-8000-000000000003',
+          nombre: 'Vetec Centro',
+        },
+      ];
+      mockPrismaService.sucursal.findMany.mockResolvedValue(sucursales);
+
+      const result = await service.findSucursales();
+      expect(result).toEqual(sucursales);
+      expect(mockPrismaService.sucursal.findMany).toHaveBeenCalledWith({
+        where: { activo: true },
+        select: { id: true, nombre: true },
+        orderBy: { nombre: 'asc' },
       });
     });
   });

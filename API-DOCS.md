@@ -85,6 +85,7 @@ Authorization: Bearer <access_token>
 **Notas:**
 - Solo admin puede registrar médicos u otros admins.
 - Si el email/teléfono ya existe, devuelve 201 genérico (por seguridad).
+- El `telefono` se normaliza eliminando todos los caracteres no numéricos (por ejemplo `+52 1 55 1234 5678` → `5215512345678`). Después de la normalización debe tener entre 10 y 15 dígitos.
 
 ---
 
@@ -371,6 +372,18 @@ Obtiene una sucursal por ID.
 }
 ```
 
+#### `GET /sucursales`
+
+Lista **pública** (sin JWT) de sucursales activas en formato reducido. Útil para llenar selectores durante el registro y agendamiento.
+
+**Response ejemplo:**
+```json
+[
+  { "id": "uuid", "nombre": "Vetec Centro" },
+  { "id": "uuid", "nombre": "Vetec Norte" }
+]
+```
+
 ---
 
 
@@ -418,6 +431,12 @@ Lista todas las especialidades médicas.
 - No puede haber 2 citas del mismo paciente con el mismo médico el mismo día
 - No traslape de horarios para médico, consultorio ni paciente
 - Si es en otra sucursal, debe haber 2h de diferencia con otras citas
+
+**Precio y pago:**
+- Al crear la cita se genera automáticamente un `Pago` en estado `pendiente`.
+- El monto se calcula con la función `calcularPrecioCita`:  
+  `servicio.precioBase + medico.especialidadPrincipal.precio`.
+- Ejemplo: servicio $400 + especialidad $300 = pago de $700.
 
 **Response:**
 ```json
@@ -1247,6 +1266,7 @@ Sucursal (1:N) → Consultorio
 
 ### 1. Agendar una cita
 ```
+GET /sucursales                 → Obtener sucursales activas (registro/agenda)
 GET /catalogos/servicios        → Obtener servicios disponibles
 GET /api/v1/especialidades      → Obtener especialidades
 GET /api/v1/medicos             → Obtener médicos
@@ -1254,15 +1274,18 @@ GET /api/v1/medicos/:id/disponibilidad-dias
                                 → Ver días disponibles
 GET /api/v1/medicos/:id/disponibilidad-slots?fecha=YYYY-MM-DD
                                 → Ver slots disponibles
-POST /api/v1/citas              → Crear cita
+POST /api/v1/citas              → Crear cita (genera pago automático)
 ```
 
 ### 2. El médico atiende
 ```
 PATCH /api/v1/citas/:id/estado  → { "estado": "en_curso" }
 POST /api/v1/consultas          → Registrar datos clínicos
-POST /api/v1/recetas            → Generar receta (completa la cita)
+POST /api/v1/recetas            → Generar receta
+PATCH /api/v1/citas/:id/estado  → { "estado": "completada" }
 ```
+
+**Nota:** La API permite crear la receta y la consulta en cualquier orden. Para completar la cita, deben existir **ambas** (receta + consulta) y luego cambiar el estado a `completada`. El frontend puede guiar al médico creando primero la receta o la consulta según su flujo de trabajo.
 
 ### 3. Ver historial médico
 ```

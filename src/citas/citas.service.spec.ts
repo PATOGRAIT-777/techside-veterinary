@@ -43,6 +43,9 @@ describe('CitasService', () => {
       findFirst: jest.fn(),
       findUnique: jest.fn(),
     },
+    servicio: {
+      findUnique: jest.fn(),
+    },
     usuario: {
       findUnique: jest.fn(),
     },
@@ -237,12 +240,25 @@ describe('CitasService', () => {
         id: dto.medicoId,
         especialidadPrincipal: { precio: 1500.0 },
       });
+      mockPrisma.servicio.findUnique.mockResolvedValue({
+        id: dto.servicioId,
+        precioBase: 350.0,
+      });
       mockFolioGenerator.generate.mockResolvedValue('VET-20260606-0001');
-      mockPrisma.cita.create.mockResolvedValue(enrichedCita);
+      mockPrisma.cita.create.mockResolvedValue({
+        ...enrichedCita,
+        pago: {
+          id: 'pago-1',
+          folioPago: 'VET-20260606-0001',
+          cantidad: 1850.0,
+          estado: 'pendiente',
+          fechaPago: null,
+        },
+      });
       mockPrisma.pago.create.mockResolvedValue({
         id: 'pago-1',
         folioPago: 'VET-20260606-0001',
-        cantidad: 1500.0,
+        cantidad: 1850.0,
         estado: 'pendiente',
       });
       mockPrisma.usuario.findUnique.mockResolvedValue({
@@ -274,7 +290,7 @@ describe('CitasService', () => {
       expect((result as any).pago).toEqual({
         id: 'pago-1',
         folioPago: 'VET-20260606-0001',
-        cantidad: '1500',
+        cantidad: '1850',
         estado: 'pendiente',
         fechaPago: null,
       });
@@ -323,8 +339,21 @@ describe('CitasService', () => {
         id: dto.medicoId,
         especialidadPrincipal: { precio: 1500.0 },
       });
+      mockPrisma.servicio.findUnique.mockResolvedValue({
+        id: dto.servicioId,
+        precioBase: 350.0,
+      });
       mockFolioGenerator.generate.mockResolvedValue('VET-20260606-0003');
-      mockPrisma.cita.create.mockResolvedValue(enrichedCita);
+      mockPrisma.cita.create.mockResolvedValue({
+        ...enrichedCita,
+        pago: {
+          id: 'pago-1',
+          folioPago: 'VET-20260606-0003',
+          cantidad: 1850.0,
+          estado: 'pendiente',
+          fechaPago: null,
+        },
+      });
       mockPrisma.consultorio.findUnique.mockResolvedValue({
         id: 'cons-1',
         nombre: 'Consultorio A',
@@ -339,7 +368,7 @@ describe('CitasService', () => {
       expect((result as any).medico.nombreCompleto).toBe('Dra. Ana López');
       expect((result as any).sucursal.nombre).toBe('Sucursal Centro');
       expect((result as any).pago).toBeDefined();
-      expect((result as any).pago.cantidad).toBe('1500');
+      expect((result as any).pago.cantidad).toBe('1850');
       expect(mockPrisma.usuario.findUnique).toHaveBeenCalledWith({
         where: { email: 'juan@test.com' },
       });
@@ -415,6 +444,10 @@ describe('CitasService', () => {
         id: dto.medicoId,
         especialidadPrincipal: { precio: 2000.0 },
       });
+      mockPrisma.servicio.findUnique.mockResolvedValue({
+        id: dto.servicioId,
+        precioBase: 350.0,
+      });
       mockFolioGenerator.generate.mockResolvedValue('VET-20260606-0002');
       mockPrisma.cita.create.mockResolvedValue(enrichedCita);
       mockPrisma.pago.create.mockResolvedValue({
@@ -432,12 +465,99 @@ describe('CitasService', () => {
       ];
       expect(createCall[0].data.pago).toEqual({
         create: {
-          cantidad: 2000.0,
+          cantidad: 2350.0,
           folioPago: 'VET-20260606-0002',
           estado: 'pendiente',
         },
       });
       expect((result as any).mascota).not.toHaveProperty('propietarioId');
+    });
+
+    it('should create Pago with only specialty price when service is not found', async () => {
+      const fechaFutura = new Date();
+      fechaFutura.setDate(fechaFutura.getDate() + 2);
+      const dtoValido = {
+        ...dto,
+        fecha: fechaFutura.toISOString().split('T')[0],
+      };
+
+      mockPrisma.mascota.findUnique.mockResolvedValue({
+        id: dto.mascotaId,
+        propietarioId: cliente.sub,
+      });
+      mockPrisma.cita.findFirst.mockResolvedValue(null);
+      mockPrisma.cita.findMany.mockResolvedValue([]);
+      mockPrisma.medicoHorario.findFirst.mockResolvedValue({
+        id: 'h1',
+        medicoId: dto.medicoId,
+        consultorioId: 'cons-1',
+      });
+      mockPrisma.medicoHorario.findMany.mockResolvedValue([]);
+      mockPrisma.medico.findUnique.mockResolvedValue({
+        id: dto.medicoId,
+        especialidadPrincipal: { precio: 2000.0 },
+      });
+      mockPrisma.servicio.findUnique.mockResolvedValue(null);
+      mockFolioGenerator.generate.mockResolvedValue('VET-20260606-0005');
+      mockPrisma.cita.create.mockResolvedValue(enrichedCita);
+
+      await service.create(dtoValido, cliente);
+
+      const createCall = mockPrisma.cita.create.mock.calls[0] as unknown as [
+        { data: Record<string, unknown> },
+      ];
+      expect(createCall[0].data.pago).toEqual({
+        create: {
+          cantidad: 2000.0,
+          folioPago: 'VET-20260606-0005',
+          estado: 'pendiente',
+        },
+      });
+    });
+
+    it('should create Pago with only service price when medico has no specialty price', async () => {
+      const fechaFutura = new Date();
+      fechaFutura.setDate(fechaFutura.getDate() + 2);
+      const dtoValido = {
+        ...dto,
+        fecha: fechaFutura.toISOString().split('T')[0],
+      };
+
+      mockPrisma.mascota.findUnique.mockResolvedValue({
+        id: dto.mascotaId,
+        propietarioId: cliente.sub,
+      });
+      mockPrisma.cita.findFirst.mockResolvedValue(null);
+      mockPrisma.cita.findMany.mockResolvedValue([]);
+      mockPrisma.medicoHorario.findFirst.mockResolvedValue({
+        id: 'h1',
+        medicoId: dto.medicoId,
+        consultorioId: 'cons-1',
+      });
+      mockPrisma.medicoHorario.findMany.mockResolvedValue([]);
+      mockPrisma.medico.findUnique.mockResolvedValue({
+        id: dto.medicoId,
+        especialidadPrincipal: null,
+      });
+      mockPrisma.servicio.findUnique.mockResolvedValue({
+        id: dto.servicioId,
+        precioBase: 350.0,
+      });
+      mockFolioGenerator.generate.mockResolvedValue('VET-20260606-0006');
+      mockPrisma.cita.create.mockResolvedValue(enrichedCita);
+
+      await service.create(dtoValido, cliente);
+
+      const createCall = mockPrisma.cita.create.mock.calls[0] as unknown as [
+        { data: Record<string, unknown> },
+      ];
+      expect(createCall[0].data.pago).toEqual({
+        create: {
+          cantidad: 350.0,
+          folioPago: 'VET-20260606-0006',
+          estado: 'pendiente',
+        },
+      });
     });
 
     it('should write initial audit row on cita creation', async () => {
@@ -463,6 +583,10 @@ describe('CitasService', () => {
       mockPrisma.medico.findUnique.mockResolvedValue({
         id: dto.medicoId,
         especialidadPrincipal: { precio: 1500.0 },
+      });
+      mockPrisma.servicio.findUnique.mockResolvedValue({
+        id: dto.servicioId,
+        precioBase: 350.0,
       });
       mockFolioGenerator.generate.mockResolvedValue('VET-20260606-0004');
       mockPrisma.cita.create.mockResolvedValue(enrichedCita);

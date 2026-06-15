@@ -18,11 +18,20 @@ export const registerSchema = z.object({
   telefono: z
     .string()
     .min(1, 'El teléfono es obligatorio')
-    .transform((val) => normalizePhone(val)),
+    .transform((val) => normalizePhone(val))
+    .refine((val) => val.length >= 10 && val.length <= 15, {
+      message: 'El teléfono debe tener entre 10 y 15 dígitos',
+    }),
   telefonoSecundario: z
     .string()
     .optional()
-    .transform((val) => (val ? normalizePhone(val) : undefined)),
+    .transform((val) => (val ? normalizePhone(val) : undefined))
+    .refine(
+      (val) => val === undefined || (val.length >= 10 && val.length <= 15),
+      {
+        message: 'El teléfono secundario debe tener entre 10 y 15 dígitos',
+      },
+    ),
   calle: z
     .string()
     .min(1, 'La calle es obligatoria')

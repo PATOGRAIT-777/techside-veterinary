@@ -13,6 +13,7 @@ import { CambiarEstadoCitaDto } from './dto/cambiar-estado-cita.dto';
 import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 
 import { FolioGenerator } from './helpers/folio-generator';
+import { calcularPrecioCita } from './helpers/calcular-precio-cita';
 import { CitaEstadoHistorialService } from './cita-estado-historial.service';
 import { EmailService } from '../email/email.service';
 import { citaInclude, mapCitaToResponse } from './citas.mapper';
@@ -171,7 +172,15 @@ export class CitasService {
         usuario: { select: { persona: true } },
       },
     });
-    const precio = medicoData?.especialidadPrincipal?.precio ?? 0;
+
+    const servicioData = await this.prisma.servicio.findUnique({
+      where: { id: dto.servicioId },
+    });
+
+    const precio = calcularPrecioCita(
+      servicioData?.precioBase,
+      medicoData?.especialidadPrincipal?.precio,
+    );
 
     // Generar folio de pago
     const folioPago = await this.folioGenerator.generate();
