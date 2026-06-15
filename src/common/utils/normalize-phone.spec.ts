@@ -20,4 +20,18 @@ describe('normalizePhone', () => {
   it('should return the same string when already clean', () => {
     expect(normalizePhone('15512345678')).toBe('15512345678');
   });
+
+  it('should return empty string when input is empty', () => {
+    expect(normalizePhone('')).toBe('');
+  });
+
+  it('should return empty string when input has no digits', () => {
+    expect(normalizePhone('abc-+-()')).toBe('');
+  });
+
+  it('should preserve very long digit strings', () => {
+    expect(normalizePhone('+52 123 456 789 012 345 6')).toBe(
+      '521234567890123456',
+    );
+  });
 });

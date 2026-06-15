@@ -26,4 +26,24 @@ describe('calcularPrecioCita', () => {
   it('should default both null/undefined to 0', () => {
     expect(calcularPrecioCita(null, undefined)).toBe(0);
   });
+
+  it('should default invalid strings to 0', () => {
+    expect(calcularPrecioCita('abc', 'def')).toBe(0);
+  });
+
+  it('should default empty strings to 0', () => {
+    expect(calcularPrecioCita('', '')).toBe(0);
+  });
+
+  it('should handle negative numbers', () => {
+    expect(calcularPrecioCita(-500, 1500)).toBe(1000);
+  });
+
+  it('should handle floating point sums', () => {
+    expect(calcularPrecioCita(0.1, 0.2)).toBeCloseTo(0.3);
+  });
+
+  it('should handle Decimal-like objects with toNumber', () => {
+    expect(calcularPrecioCita({ toNumber: () => 100 }, undefined)).toBe(100);
+  });
 });
