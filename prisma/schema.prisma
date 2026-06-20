@@ -28,7 +28,6 @@ model MxDivision {
   activo      Boolean  @default(true)
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
-  personas    Persona[]
   sucursales  Sucursal[]
   @@map("mx_divisiones")
 }
@@ -44,7 +43,7 @@ model Persona {
   sucursalId          String   @map("sucursal_id") @db.Uuid
   proofAddressId      String?  @map("proof_address_id") @db.Uuid
   proofIdId           String?  @map("proof_id_id") @db.Uuid
-  sucursal            MxDivision @relation(fields: [sucursalId], references: [id])
+  sucursal            Sucursal @relation(fields: [sucursalId], references: [id])
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt           DateTime @updatedAt @map("updated_at")
   usuario             Usuario?
@@ -275,6 +274,7 @@ model Sucursal {
   createdAt         DateTime @default(now()) @map("created_at")
 
   ubicacion         MxDivision? @relation(fields: [ubicacionId], references: [id])
+  personas          Persona[]
   consultorios      Consultorio[]
   medicos           Medico[]
   especialidades    SucursalEspecialidad[]
