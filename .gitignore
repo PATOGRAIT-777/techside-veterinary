@@ -55,6 +55,10 @@ pids
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
+# Package manager lockfiles (we use pnpm)
+package-lock.json
+npm-shrinkwrap.json
+
 # Requirements documents
 *.md
 # Local Pi runtime state

@@ -15,7 +15,7 @@ Backend API para clínica veterinaria. Sistema de agendamiento de citas, gestió
 
 - Node.js 20+
 - PostgreSQL 15+
-- pnpm (o npm)
+- pnpm
 
 ## ⚙️ Configuración
 
@@ -38,13 +38,13 @@ Backend API para clínica veterinaria. Sistema de agendamiento de citas, gestió
 
 4. **Generar Prisma Client y correr migraciones**
    ```bash
-   npx prisma generate
-   npx prisma migrate deploy
+   pnpm run db:generate
+   pnpm run db:deploy
    ```
 
 5. **Seed de datos**
    ```bash
-   npx prisma db seed
+   pnpm run db:seed
    ```
 
 ## 🏃 Correr el proyecto
@@ -183,10 +183,10 @@ src/
 
 ```bash
 # Prisma
-npx prisma migrate dev     # Crear migración en desarrollo
-npx prisma migrate deploy  # Aplicar migraciones en producción
-npx prisma db seed         # Poblar base de datos
-npx prisma studio          # UI visual de la BD
+pnpm run db:migrate        # Crear migración en desarrollo
+pnpm run db:deploy         # Aplicar migraciones en producción
+pnpm run db:seed           # Poblar base de datos
+pnpm run db:studio         # UI visual de la BD
 
 # Lint y format
 pnpm run lint
