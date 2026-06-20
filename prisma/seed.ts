@@ -1,66 +1,54 @@
 import { PrismaClient, UsuarioStatus, Rol, EstadoPago } from '@prisma/client';
+import { calcularPrecioCita } from '../src/citas/helpers/calcular-precio-cita';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // 1. Seed mx_divisiones (5 branches: 4 active, 1 inactive)
-  const branches = [
+  // 1. Seed sucursales as the single source of branch truth
+  const sucursalesData = [
     {
       nombre: 'Vetec Centro',
-      clave: 'VTC-001',
-      direccion: 'Av. Principal 100, Centro',
-      telefono: '55512345678',
+      calleNumero: 'Av. Principal 100, Centro',
+      telefonoPrincipal: '55512345678',
+      whatsapp: '55512345678',
       activo: true,
     },
     {
       nombre: 'Vetec Norte',
-      clave: 'VTN-002',
-      direccion: 'Calle Norte 200, Col. Industrial',
-      telefono: '55598765432',
+      calleNumero: 'Calle Norte 200, Col. Industrial',
+      telefonoPrincipal: '55598765432',
+      whatsapp: '55598765432',
       activo: true,
     },
     {
       nombre: 'Vetec Sur',
-      clave: 'VTS-003',
-      direccion: 'Av. Sur 300, Col. Reforma',
-      telefono: '55545678901',
+      calleNumero: 'Av. Sur 300, Col. Reforma',
+      telefonoPrincipal: '55545678901',
+      whatsapp: '55545678901',
       activo: true,
-    },
-    {
-      nombre: 'Vetec Oriente',
-      clave: 'VTO-004',
-      direccion: 'Blvd. Oriente 400',
-      telefono: '55511122233',
-      activo: true,
-    },
-    {
-      nombre: 'Vetec Poniente',
-      clave: 'VTP-005',
-      direccion: 'Calle Poniente 500',
-      telefono: '55544455566',
-      activo: false,
     },
   ];
 
-  for (const b of branches) {
-    await prisma.mxDivision.upsert({
-      where: { clave: b.clave },
-      update: {},
-      create: b,
+  const sucursalesCreadas: Record<string, string> = {};
+  for (const s of sucursalesData) {
+    const existente = await prisma.sucursal.findFirst({
+      where: { nombre: s.nombre },
     });
+    if (!existente) {
+      const creada = await prisma.sucursal.create({ data: s });
+      sucursalesCreadas[s.nombre] = creada.id;
+    } else {
+      sucursalesCreadas[s.nombre] = existente.id;
+    }
   }
 
-  // 2. Look up first active branch dynamically
-  const branch = await prisma.mxDivision.findUnique({
-    where: { clave: 'VTC-001' },
-  });
-
+  const branch = sucursalesCreadas['Vetec Centro'];
   if (!branch) {
-    throw new Error('Branch VTC-001 not found');
+    throw new Error('Branch Vetec Centro not found');
   }
 
-  // 3. Seed first admin (idempotent)
+  // 2. Seed first admin (idempotent)
   let adminPersona = await prisma.persona.findFirst({
     where: { telefono: '55500000000' },
   });
@@ -70,7 +58,7 @@ async function main() {
         nombreCompleto: 'Administrador Sistema',
         telefono: '55500000000',
         calle: 'Oficina Central',
-        sucursalId: branch.id,
+        sucursalId: branch,
       },
     });
   }
@@ -91,7 +79,7 @@ async function main() {
     });
   }
 
-  // 4. Seed catalogos
+  // 3. Seed catalogos
   const especieCanino = await prisma.especie.upsert({
     where: { nombre: 'Canino' },
     update: {},
@@ -198,26 +186,26 @@ async function main() {
     });
   }
 
-  // 5. Seed especialidades
+  // 4. Seed especialidades with non-zero prices
   const especialidades = [
-    'Cirugía General',
-    'Dermatología',
-    'Cardiología',
-    'Oftalmología',
-    'Odontología',
-    'Neurología',
-    'Oncología',
-    'Medicina Interna',
+    { nombre: 'Cirugía General', precio: 1500.0 },
+    { nombre: 'Dermatología', precio: 1200.0 },
+    { nombre: 'Cardiología', precio: 1300.0 },
+    { nombre: 'Oftalmología', precio: 1100.0 },
+    { nombre: 'Odontología', precio: 1000.0 },
+    { nombre: 'Neurología', precio: 1400.0 },
+    { nombre: 'Oncología', precio: 1600.0 },
+    { nombre: 'Medicina Interna', precio: 900.0 },
   ];
-  for (const nombre of especialidades) {
+  for (const e of especialidades) {
     await prisma.especialidad.upsert({
-      where: { nombre },
+      where: { nombre: e.nombre },
       update: {},
-      create: { nombre },
+      create: e,
     });
   }
 
-  // 6. Seed servicios
+  // 5. Seed servicios
   const servicios = [
     { nombre: 'Consulta General', precioBase: 350 },
     { nombre: 'Vacunación', precioBase: 200 },
@@ -236,44 +224,7 @@ async function main() {
     });
   }
 
-  // 7. Seed sucursales
-  const sucursalesData = [
-    {
-      nombre: 'Vetec Centro',
-      calleNumero: 'Av. Principal 100, Centro',
-      telefonoPrincipal: '55512345678',
-      whatsapp: '55512345678',
-      activo: true,
-    },
-    {
-      nombre: 'Vetec Norte',
-      calleNumero: 'Calle Norte 200, Col. Industrial',
-      telefonoPrincipal: '55598765432',
-      whatsapp: '55598765432',
-      activo: true,
-    },
-    {
-      nombre: 'Vetec Sur',
-      calleNumero: 'Av. Sur 300, Col. Reforma',
-      telefonoPrincipal: '55545678901',
-      whatsapp: '55545678901',
-      activo: true,
-    },
-  ];
-  const sucursalesCreadas: Record<string, string> = {};
-  for (const s of sucursalesData) {
-    const existente = await prisma.sucursal.findFirst({
-      where: { nombre: s.nombre },
-    });
-    if (!existente) {
-      const creada = await prisma.sucursal.create({ data: s });
-      sucursalesCreadas[s.nombre] = creada.id;
-    } else {
-      sucursalesCreadas[s.nombre] = existente.id;
-    }
-  }
-
-  // 8. Seed consultorios
+  // 6. Seed consultorios
   if (sucursalesCreadas['Vetec Centro']) {
     await prisma.consultorio.createMany({
       data: [
@@ -317,7 +268,7 @@ async function main() {
   }
 
   // ============================================================
-  // 9. Demo data for Epic 2: Historial Médico
+  // 7. Demo data for Epic 2: Historial Médico
   // ============================================================
 
   // Lookup catalog data
@@ -423,13 +374,13 @@ async function main() {
     return;
   }
 
-  // ── 9.1 Client users ──
+  // ── 7.1 Client users ──
   const personaJuan = await prisma.persona.create({
     data: {
       nombreCompleto: 'Juan Pérez',
       telefono: '55511111111',
       calle: 'Calle Primavera 123',
-      sucursalId: branch.id,
+      sucursalId: branch,
     },
   });
   const usuarioJuan = await prisma.usuario.create({
@@ -448,7 +399,7 @@ async function main() {
       nombreCompleto: 'María García',
       telefono: '55522222222',
       calle: 'Av. Reforma 456',
-      sucursalId: branch.id,
+      sucursalId: branch,
     },
   });
   const usuarioMaria = await prisma.usuario.create({
@@ -462,13 +413,13 @@ async function main() {
     },
   });
 
-  // ── 9.2 Médicos ──
+  // ── 7.2 Médicos ──
   const personaCarlos = await prisma.persona.create({
     data: {
       nombreCompleto: 'Dr. Carlos Ruiz',
       telefono: '55533333333',
       calle: 'Blvd. Médicos 789',
-      sucursalId: branch.id,
+      sucursalId: branch,
     },
   });
   const usuarioCarlos = await prisma.usuario.create({
@@ -497,7 +448,7 @@ async function main() {
       nombreCompleto: 'Dra. Ana López',
       telefono: '55544444444',
       calle: 'Calle Salud 321',
-      sucursalId: branch.id,
+      sucursalId: branch,
     },
   });
   const usuarioAna = await prisma.usuario.create({
@@ -521,7 +472,7 @@ async function main() {
     },
   });
 
-  // ── 9.3 Médico horarios ──
+  // ── 7.3 Médico horarios ──
   await prisma.medicoHorario.createMany({
     data: [
       {
@@ -583,7 +534,7 @@ async function main() {
     ],
   });
 
-  // ── 9.4 Mascotas ──
+  // ── 7.4 Mascotas ──
   const mascotaFido = await prisma.mascota.create({
     data: {
       propietarioId: usuarioJuan.id,
@@ -653,7 +604,7 @@ async function main() {
     },
   });
 
-  // ── 9.5 Citas (8 citas) ──
+  // ── 7.5 Citas (8 citas) ──
   // Helper to create time
   const t = (h: number, m: number) => new Date(1970, 0, 1, h, m);
 
@@ -769,7 +720,7 @@ async function main() {
     },
   });
 
-  // ── 9.6 Consultas (3) ──
+  // ── 7.6 Consultas (3) ──
   await prisma.consulta.create({
     data: {
       citaId: citaFido1.id,
@@ -809,7 +760,7 @@ async function main() {
     },
   });
 
-  // ── 9.7 Recetas (3) ──
+  // ── 7.7 Recetas (3) ──
   await prisma.receta.create({
     data: {
       citaId: citaFido1.id,
@@ -889,7 +840,7 @@ async function main() {
     },
   });
 
-  // ── 9.8 Pagos (8) ──
+  // ── 7.8 Pagos (8) ──
   let folioCounter = 1;
   const nextFolio = (fecha: Date) => {
     const prefix = fecha.toISOString().split('T')[0].replace(/-/g, '');
@@ -897,75 +848,60 @@ async function main() {
     return `VET-${prefix}-${num}`;
   };
 
-  const pagosData: {
-    citaId: string;
-    estado: EstadoPago;
-    fechaPago: Date | null;
-    cantidad: number;
-  }[] = [
+  const citasCreadas = [
     {
-      citaId: citaFido1.id,
-      estado: 'pagada',
+      cita: citaFido1,
+      estado: 'pagada' as EstadoPago,
       fechaPago: new Date('2024-01-15'),
-      cantidad: Number(espCirugia.precio),
     },
     {
-      citaId: citaFido2.id,
-      estado: 'pagada',
+      cita: citaFido2,
+      estado: 'pagada' as EstadoPago,
       fechaPago: new Date('2024-03-20'),
-      cantidad: Number(espCirugia.precio),
     },
+    { cita: citaFido3, estado: 'cancelada' as EstadoPago, fechaPago: null },
+    { cita: citaFido4, estado: 'pendiente' as EstadoPago, fechaPago: null },
+    { cita: citaFido5, estado: 'pendiente' as EstadoPago, fechaPago: null },
     {
-      citaId: citaFido3.id,
-      estado: 'cancelada',
-      fechaPago: null,
-      cantidad: Number(espDermato.precio),
-    },
-    {
-      citaId: citaFido4.id,
-      estado: 'pendiente',
-      fechaPago: null,
-      cantidad: Number(espCirugia.precio),
-    },
-    {
-      citaId: citaFido5.id,
-      estado: 'pendiente',
-      fechaPago: null,
-      cantidad: Number(espDermato.precio),
-    },
-    {
-      citaId: citaLuna1.id,
-      estado: 'pagada',
+      cita: citaLuna1,
+      estado: 'pagada' as EstadoPago,
       fechaPago: new Date('2024-02-10'),
-      cantidad: Number(espDermato.precio),
     },
     {
-      citaId: citaLuna2.id,
-      estado: 'pagada',
+      cita: citaLuna2,
+      estado: 'pagada' as EstadoPago,
       fechaPago: new Date('2024-04-05'),
-      cantidad: Number(espCirugia.precio),
     },
     {
-      citaId: citaRocky1.id,
-      estado: 'pagada',
+      cita: citaRocky1,
+      estado: 'pagada' as EstadoPago,
       fechaPago: new Date('2024-06-12'),
-      cantidad: Number(espCirugia.precio),
     },
   ];
 
-  for (const p of pagosData) {
-    const cita = await prisma.cita.findUnique({ where: { id: p.citaId } });
-    if (cita) {
-      await prisma.pago.create({
-        data: {
-          citaId: p.citaId,
-          folioPago: nextFolio(cita.fecha),
-          cantidad: p.cantidad || 350.0,
-          estado: p.estado,
-          fechaPago: p.fechaPago,
-        },
-      });
-    }
+  for (const item of citasCreadas) {
+    const citaConPrecios = await prisma.cita.findUnique({
+      where: { id: item.cita.id },
+      include: {
+        servicio: true,
+        medico: { include: { especialidadPrincipal: true } },
+      },
+    });
+
+    const cantidad = calcularPrecioCita(
+      citaConPrecios?.servicio?.precioBase,
+      citaConPrecios?.medico?.especialidadPrincipal?.precio,
+    );
+
+    await prisma.pago.create({
+      data: {
+        citaId: item.cita.id,
+        folioPago: nextFolio(item.cita.fecha),
+        cantidad,
+        estado: item.estado,
+        fechaPago: item.fechaPago,
+      },
+    });
   }
 
   console.log('Seed complete. Demo data created:');
