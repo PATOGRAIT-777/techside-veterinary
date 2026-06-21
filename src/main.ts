@@ -1,16 +1,33 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
 import { SanitizeInterceptor } from './common/interceptors/sanitize.interceptor';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { Env } from './config/env.validation';
+import {
+  CORS_ALLOWED_HEADERS,
+  CORS_METHODS,
+  resolveCorsOrigin,
+} from './config/cors.config';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const configService = app.get(ConfigService<Env, true>);
+
+  const frontendUrl = configService.get('FRONTEND_URL', { infer: true });
+  const nodeEnv = configService.get('NODE_ENV', { infer: true });
 
   // Global middlewares & interceptors
+  app.enableCors({
+    origin: resolveCorsOrigin(frontendUrl, nodeEnv),
+    methods: CORS_METHODS,
+    allowedHeaders: CORS_ALLOWED_HEADERS,
+    credentials: false,
+  });
   app.use(helmet());
   app.useGlobalInterceptors(new SanitizeInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter());
@@ -19,7 +36,7 @@ async function bootstrap() {
   app.useStaticAssets(join(process.cwd(), 'public'));
 
   // Swagger — disabled in production
-  if (process.env.NODE_ENV !== 'production') {
+  if (nodeEnv !== 'production') {
     const config = new DocumentBuilder()
       .setTitle('Techside Veterinary API')
       .setDescription(
@@ -49,7 +66,7 @@ async function bootstrap() {
     });
   }
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(configService.get('PORT', { infer: true }) ?? 3000);
 }
 
 bootstrap().catch((err: unknown) => {

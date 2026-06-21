@@ -15,6 +15,7 @@ export const envSchema = z.object({
   REDIS_URL: z.string().url().default('redis://localhost:6379'),
   FRONTEND_CONFIRMATION_SUCCESS_URL: z.string().url().optional(),
   FRONTEND_CONFIRMATION_ERROR_URL: z.string().url().optional(),
+  FRONTEND_URL: z.string().url().optional(),
   BACKEND_BASE_URL: z.string().url().default('http://localhost:3000'),
 });
 
