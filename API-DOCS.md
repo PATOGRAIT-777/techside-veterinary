@@ -451,7 +451,7 @@ Lista todas las especialidades médicas.
   "fecha": "2026-12-31T00:00:00.000Z",
   "horaInicio": "1970-01-01T10:00:00.000Z",
   "horaFin": "1970-01-01T11:00:00.000Z",
-  "estado": "pendiente",
+  "estado": "pendiente_de_pago",
   "motivo": "Consulta general",
   "sucursal": { ... },
   "medico": { ... },
@@ -460,6 +460,8 @@ Lista todas las especialidades médicas.
   "servicio": { ... }
 }
 ```
+
+**Nota:** Al crearse, la cita queda en estado `pendiente_de_pago` hasta que se registre el pago. Una vez pagada, pasa a `pendiente`.
 
 ---
 
@@ -506,7 +508,7 @@ Lista todas las especialidades médicas.
 
 **Auth:** Requiere JWT (cliente propietario o admin)
 
-Cambia el estado a `cancelada`. Solo funciona si está `pendiente` o `en_curso`.
+Cambia el estado a `cancelada`. Funciona si está `pendiente_de_pago`, `pendiente` o `en_curso`.
 
 ---
 
@@ -524,9 +526,12 @@ Cambia el estado a `cancelada`. Solo funciona si está `pendiente` o `en_curso`.
 ```
 
 **Transiciones permitidas:**
+- `pendiente_de_pago` → `pendiente` (automático al pagar) o `cancelada` (manual o por cron de no pago)
 - `pendiente` → `en_curso`, `cancelada`
 - `en_curso` → `completada`, `inasistencia`, `cancelada`
 - `completada`, `inasistencia`, `cancelada` → (no se puede cambiar)
+
+**Nota:** No se puede cambiar directamente de `pendiente_de_pago` a ningún otro estado por este endpoint; el pago se registra por `POST /api/v1/pagos`.
 
 ---
 
@@ -822,6 +827,52 @@ Marca la hora de salida para el día actual.
 ---
 
 
+## 🔄 Máquina de estados: Pagos y Citas
+
+### Estados del pago (`EstadoPago`)
+
+| Estado | Significado |
+|--------|-------------|
+| `pendiente` | El pago aún no se ha registrado. La cita sigue en `pendiente_de_pago`. |
+| `pagada` | El pago fue registrado exitosamente vía `POST /api/v1/pagos`. |
+| `cancelada` | La obligación de pago fue cancelada (cancelación manual o cron de no pago). |
+
+### Estados de la cita (`EstadoCita`)
+
+| Estado | Significado |
+|--------|-------------|
+| `pendiente_de_pago` | Cita creada, aún no pagada. |
+| `pendiente` | Cita pagada/confirmada, esperando la fecha/hora del turno. |
+| `en_curso` | El horario del turno ha llegado (transición automática por cron). |
+| `completada` | Se registraron consulta y receta. |
+| `inasistencia` | El paciente no asistió al turno. |
+| `cancelada` | La cita fue cancelada manualmente o por no pago. |
+
+### Flujo típico
+
+```
+Cita creada
+    │
+    ▼
+Cita: pendiente_de_pago   Pago: pendiente
+    │
+    ▼  POST /api/v1/pagos
+Cita: pendiente           Pago: pagada
+    │
+    ▼  cron (hora de inicio)
+Cita: en_curso
+    │
+    ▼  consulta + receta registradas
+Cita: completada
+```
+
+**Notas importantes:**
+- `pagada` es un estado de **pago**, no de cita. La cita nunca tiene estado `pagada`; pasa directamente de `pendiente_de_pago` a `pendiente`.
+- El médico solo ve pagos de citas que ya salieron de `pendiente_de_pago` (`pendiente`, `en_curso`, `completada`, `cancelada`).
+- El cliente ve todos los pagos de sus mascotas, incluidos los cancelados.
+
+---
+
 ## 💳 Pagos
 
 ### Crear pago
@@ -837,7 +888,62 @@ Marca la hora de salida para el día actual.
 }
 ```
 
-**Response 201:** Datos del pago creado.
+**Response 201:** Datos del pago actualizado.
+
+**Efecto secundario:** Si el pago es exitoso, la cita asociada pasa de `pendiente_de_pago` a `pendiente`.
+
+---
+
+### Listar pagos
+
+#### `GET /api/v1/pagos?estado={estado}&limit={limit}&offset={offset}`
+
+**Auth:** Requiere JWT
+
+**Query params:**
+
+| Param | Tipo | Requerido | Descripción |
+|-------|------|-----------|-------------|
+| `estado` | string | ❌ | Filtrar por estado del pago (`pendiente`, `pagada`, `cancelada`) |
+| `limit` | integer | ❌ | Límite de resultados (default 20, max 100) |
+| `offset` | integer | ❌ | Offset para paginación (min 0, default 0) |
+
+**Visibilidad por rol:**
+- **Cliente:** ve solo los pagos de sus mascotas.
+- **Médico:** ve solo los pagos de citas asignadas a él que ya salieron de `pendiente_de_pago`.
+- **Admin:** ve todos los pagos.
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": "uuid",
+      "folioPago": "VET-20260520-0001",
+      "cantidad": 700,
+      "estado": "pagada",
+      "fechaPago": "2026-05-20T00:00:00.000Z",
+      "createdAt": "2026-05-20T00:00:00.000Z",
+      "updatedAt": "2026-05-20T00:00:00.000Z",
+      "cita": {
+        "id": "uuid",
+        "estado": "pendiente",
+        "fecha": "2026-05-20T00:00:00.000Z",
+        "horaInicio": "2026-05-20T10:00:00.000Z",
+        "mascota": { "id": "uuid", "nombre": "Firulais" },
+        "servicio": { "id": "uuid", "nombre": "Consulta general" },
+        "sucursal": { "id": "uuid", "nombre": "Vetec Centro" },
+        "medico": { "id": "uuid", "nombreCompleto": "Dr. Juan Pérez" }
+      }
+    }
+  ],
+  "meta": {
+    "total": 1,
+    "limit": 20,
+    "offset": 0
+  }
+}
+```
 
 ---
 
@@ -847,7 +953,15 @@ Marca la hora de salida para el día actual.
 
 **Auth:** Requiere JWT
 
-**Response:** Datos del pago.
+**Visibilidad por rol:**
+- **Cliente:** solo si la cita pertenece a una de sus mascotas.
+- **Médico:** solo si la cita está asignada a él y ya salió de `pendiente_de_pago`.
+- **Admin:** cualquier folio.
+
+**Response:** Mismo shape que un ítem de `GET /api/v1/pagos`.
+
+**Errores:**
+- `404 Not Found` si el folio no existe o el usuario no está autorizado a verlo.
 
 ---
 
@@ -1218,6 +1332,9 @@ Marca la hora de salida para el día actual.
 | `POST /api/v1/consultas` | ❌ | ✅ (suya) | ✅ |
 | `POST /api/v1/medicos` | ❌ | ❌ | ✅ |
 | `POST /api/v1/medicos/:id/horarios` | ❌ | ❌ | ✅ |
+| `POST /api/v1/pagos` | ✅ | ✅ | ✅ |
+| `GET /api/v1/pagos` | ✅ (suyos) | ✅ (asignados) | ✅ |
+| `GET /api/v1/pagos/:folioPago` | ✅ (suyo) | ✅ (asignado) | ✅ |
 | `GET /mascotas/:id/historial` | ✅ (suya) | ✅ (relación) | ✅ |
 | `GET /mascotas/:id/historial/citas-proximas` | ✅ (suya) | ✅ (relación) | ✅ |
 | `GET /mascotas/:id/historial/citas-pasadas` | ✅ (suya) | ✅ (relación) | ✅ |
@@ -1276,6 +1393,7 @@ GET /api/v1/medicos/:id/disponibilidad-dias
 GET /api/v1/medicos/:id/disponibilidad-slots?fecha=YYYY-MM-DD
                                 → Ver slots disponibles
 POST /api/v1/citas              → Crear cita (genera pago automático)
+POST /api/v1/pagos              → Registrar el pago del folio generado
 ```
 
 ### 2. El médico atiende
@@ -1308,4 +1426,4 @@ GET /admin/historial-mascotas?fechaDesde=A&fechaHasta=B
 
 ---
 
-*Documentación actualizada el 2026-06-13. Para cambios recientes, revisar los controllers en `src/`.*
+*Documentación actualizada el 2026-06-21.*
