@@ -66,6 +66,8 @@ export type PagoWithRelations = Prisma.PagoGetPayload<{
   include: typeof pagoInclude;
 }>;
 
+const UNKNOWN_MEDICO_NAME = 'Veterinario no disponible';
+
 export function mapPagoToResponse(pago: PagoWithRelations): PagoResponseDto {
   return {
     id: pago.id,
@@ -80,12 +82,23 @@ export function mapPagoToResponse(pago: PagoWithRelations): PagoResponseDto {
       estado: pago.cita.estado,
       fecha: pago.cita.fecha,
       horaInicio: pago.cita.horaInicio,
-      mascota: pago.cita.mascota,
-      servicio: pago.cita.servicio,
-      sucursal: pago.cita.sucursal,
+      mascota: {
+        id: pago.cita.mascota.id,
+        nombre: pago.cita.mascota.nombre,
+      },
+      servicio: {
+        id: pago.cita.servicio.id,
+        nombre: pago.cita.servicio.nombre,
+      },
+      sucursal: {
+        id: pago.cita.sucursal.id,
+        nombre: pago.cita.sucursal.nombre,
+      },
       medico: {
         id: pago.cita.medico.id,
-        nombreCompleto: pago.cita.medico.usuario?.persona?.nombreCompleto ?? '',
+        nombreCompleto:
+          pago.cita.medico.usuario?.persona?.nombreCompleto ??
+          UNKNOWN_MEDICO_NAME,
       },
     },
   };

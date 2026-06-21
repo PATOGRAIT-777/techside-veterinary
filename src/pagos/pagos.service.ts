@@ -76,16 +76,16 @@ export class PagosService {
 
   async findAll(
     query: BuscarPagosQueryDto,
-    usuario: JwtPayload,
+    currentUser: JwtPayload,
   ): Promise<PaginatedPagosResponseDto> {
-    if (!this.isKnownRole(usuario.rol)) {
+    if (!this.isKnownRole(currentUser.rol)) {
       return {
         data: [],
         meta: { total: 0, limit: query.limit, offset: query.offset },
       };
     }
 
-    const where = this.buildWhereForUser(usuario, query.estado);
+    const where = this.buildWhereForUser(currentUser, query.estado);
 
     const [total, pagos] = await Promise.all([
       this.prisma.pago.count({ where }),
@@ -108,7 +108,7 @@ export class PagosService {
     };
   }
 
-  async findByFolio(folioPago: string, usuario: JwtPayload) {
+  async findByFolio(folioPago: string, currentUser: JwtPayload) {
     const pago = await this.prisma.pago.findUnique({
       where: { folioPago },
       include: pagoInclude,
@@ -118,20 +118,7 @@ export class PagosService {
       throw new NotFoundException('Pago no encontrado');
     }
 
-    if (usuario.rol === Rol.cliente) {
-      if (pago.cita.mascota.propietarioId !== usuario.sub) {
-        throw new NotFoundException('Pago no encontrado');
-      }
-    } else if (usuario.rol === Rol.medico) {
-      if (
-        !MEDICO_VISIBLE_ESTADOS_CITA.includes(pago.cita.estado) ||
-        pago.cita.medico.usuarioId !== usuario.sub
-      ) {
-        throw new NotFoundException('Pago no encontrado');
-      }
-    } else if (usuario.rol !== Rol.admin) {
-      throw new NotFoundException('Pago no encontrado');
-    }
+    this.ensureFolioAuthorized(pago, currentUser);
 
     return mapPagoToResponse(pago);
   }
@@ -140,30 +127,55 @@ export class PagosService {
     return rol === Rol.cliente || rol === Rol.medico || rol === Rol.admin;
   }
 
+  private ensureFolioAuthorized(
+    pago: Prisma.PagoGetPayload<{ include: typeof pagoInclude }>,
+    currentUser: JwtPayload,
+  ): void {
+    if (currentUser.rol === Rol.cliente) {
+      if (pago.cita.mascota.propietarioId !== currentUser.sub) {
+        throw new NotFoundException('Pago no encontrado');
+      }
+      return;
+    }
+
+    if (currentUser.rol === Rol.medico) {
+      if (
+        !MEDICO_VISIBLE_ESTADOS_CITA.includes(pago.cita.estado) ||
+        pago.cita.medico.usuarioId !== currentUser.sub
+      ) {
+        throw new NotFoundException('Pago no encontrado');
+      }
+      return;
+    }
+
+    if (currentUser.rol !== Rol.admin) {
+      throw new NotFoundException('Pago no encontrado');
+    }
+  }
+
   private buildWhereForUser(
-    usuario: JwtPayload,
+    currentUser: JwtPayload,
     estado?: EstadoPago,
   ): Prisma.PagoWhereInput {
-    const where: Prisma.PagoWhereInput = {};
+    const roleFilter: Prisma.PagoWhereInput[] = [];
 
-    if (usuario.rol === Rol.cliente) {
-      where.cita = {
-        mascota: { propietarioId: usuario.sub },
-      };
-    } else if (usuario.rol === Rol.medico) {
-      where.cita = {
-        medico: { usuarioId: usuario.sub },
-        estado: { in: MEDICO_VISIBLE_ESTADOS_CITA },
-      };
+    if (currentUser.rol === Rol.cliente) {
+      roleFilter.push({
+        cita: { mascota: { propietarioId: currentUser.sub } },
+      });
+    } else if (currentUser.rol === Rol.medico) {
+      roleFilter.push({
+        cita: {
+          medico: { usuarioId: currentUser.sub },
+          estado: { in: MEDICO_VISIBLE_ESTADOS_CITA },
+        },
+      });
     }
 
-    if (estado && where.cita) {
-      where.AND = [{ cita: where.cita }, { estado }];
-      delete where.cita;
-    } else if (estado) {
-      where.estado = estado;
+    if (estado) {
+      roleFilter.push({ estado });
     }
 
-    return where;
+    return roleFilter.length > 0 ? { AND: roleFilter } : {};
   }
 }

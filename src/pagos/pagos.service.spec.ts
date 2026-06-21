@@ -49,38 +49,39 @@ describe('PagosService', () => {
     rol: 'unknown' as Rol,
   };
 
+  const baseCita: PagoWithRelations['cita'] = {
+    id: 'cita-1',
+    estado: EstadoCita.pendiente,
+    fecha: new Date('2026-06-06'),
+    horaInicio: new Date('2026-06-06T10:00:00Z'),
+    mascota: {
+      id: 'mascota-1',
+      nombre: 'Firulais',
+      propietarioId: 'cliente-1',
+    },
+    servicio: { id: 'servicio-1', nombre: 'Consulta general' },
+    sucursal: { id: 'sucursal-1', nombre: 'Sucursal Norte' },
+    medico: {
+      id: 'medico-1',
+      usuarioId: 'medico-1',
+      usuario: { persona: { nombreCompleto: 'Dr. House' } },
+    },
+  } as unknown as PagoWithRelations['cita'];
+
   const basePago = (
     overrides?: Partial<PagoWithRelations>,
-  ): PagoWithRelations =>
-    ({
-      id: 'pago-1',
-      folioPago: 'VET-20260606-0001',
-      cantidad: 1000 as unknown as never,
-      estado: EstadoPago.pendiente,
-      citaId: 'cita-1',
-      fechaPago: null,
-      createdAt: new Date('2026-06-06T10:00:00Z'),
-      updatedAt: new Date('2026-06-06T10:00:00Z'),
-      cita: {
-        id: 'cita-1',
-        estado: EstadoCita.pendiente,
-        fecha: new Date('2026-06-06'),
-        horaInicio: new Date('2026-06-06T10:00:00Z'),
-        mascota: {
-          id: 'mascota-1',
-          nombre: 'Firulais',
-          propietarioId: 'cliente-1',
-        },
-        servicio: { id: 'servicio-1', nombre: 'Consulta general' },
-        sucursal: { id: 'sucursal-1', nombre: 'Sucursal Norte' },
-        medico: {
-          id: 'medico-1',
-          usuarioId: 'medico-1',
-          usuario: { persona: { nombreCompleto: 'Dr. House' } },
-        },
-      },
-      ...overrides,
-    }) as PagoWithRelations;
+  ): PagoWithRelations => ({
+    id: 'pago-1',
+    folioPago: 'VET-20260606-0001',
+    cantidad: 1000 as unknown as never,
+    estado: EstadoPago.pendiente,
+    citaId: 'cita-1',
+    fechaPago: null,
+    createdAt: new Date('2026-06-06T10:00:00Z'),
+    updatedAt: new Date('2026-06-06T10:00:00Z'),
+    cita: baseCita,
+    ...overrides,
+  });
 
   beforeEach(async () => {
     mockPrisma = {
@@ -191,7 +192,7 @@ describe('PagosService', () => {
 
       expect(mockPrisma.pago.count).toHaveBeenCalledWith({
         where: {
-          cita: { mascota: { propietarioId: 'cliente-1' } },
+          AND: [{ cita: { mascota: { propietarioId: 'cliente-1' } } }],
         },
       });
       expect(result.data).toHaveLength(1);
@@ -200,19 +201,7 @@ describe('PagosService', () => {
 
     it('should return only allowed-state payments for medico', async () => {
       mockPrisma.pago.count.mockResolvedValue(1);
-      mockPrisma.pago.findMany.mockResolvedValue([
-        basePago({
-          cita: {
-            ...basePago().cita,
-            estado: EstadoCita.pendiente,
-            medico: {
-              id: 'medico-1',
-              usuarioId: 'medico-1',
-              usuario: { persona: { nombreCompleto: 'Dr. House' } },
-            },
-          },
-        }),
-      ]);
+      mockPrisma.pago.findMany.mockResolvedValue([basePago()]);
 
       const result = await service.findAll(
         { limit: 20, offset: 0 },
@@ -221,23 +210,27 @@ describe('PagosService', () => {
 
       expect(mockPrisma.pago.count).toHaveBeenCalledWith({
         where: {
-          cita: {
-            medico: { usuarioId: 'medico-1' },
-            estado: {
-              in: [
-                EstadoCita.pendiente,
-                EstadoCita.en_curso,
-                EstadoCita.completada,
-                EstadoCita.cancelada,
-              ],
+          AND: [
+            {
+              cita: {
+                medico: { usuarioId: 'medico-1' },
+                estado: {
+                  in: [
+                    EstadoCita.pendiente,
+                    EstadoCita.en_curso,
+                    EstadoCita.completada,
+                    EstadoCita.cancelada,
+                  ],
+                },
+              },
             },
-          },
+          ],
         },
       });
       expect(result.data).toHaveLength(1);
     });
 
-    it('should return empty list for medico without linked record', async () => {
+    it('should return empty list for medico when Prisma returns no rows', async () => {
       mockPrisma.pago.count.mockResolvedValue(0);
       mockPrisma.pago.findMany.mockResolvedValue([]);
 
@@ -263,7 +256,7 @@ describe('PagosService', () => {
       expect(result.data).toHaveLength(2);
     });
 
-    it('should compose estado filter with role filter', async () => {
+    it('should compose estado filter with cliente role filter', async () => {
       mockPrisma.pago.count.mockResolvedValue(1);
       mockPrisma.pago.findMany.mockResolvedValue([basePago()]);
 
@@ -279,6 +272,51 @@ describe('PagosService', () => {
             { estado: EstadoPago.pagada },
           ],
         },
+      });
+    });
+
+    it('should compose estado filter with medico role filter', async () => {
+      mockPrisma.pago.count.mockResolvedValue(1);
+      mockPrisma.pago.findMany.mockResolvedValue([basePago()]);
+
+      await service.findAll(
+        { estado: EstadoPago.pagada, limit: 20, offset: 0 },
+        medicoUser,
+      );
+
+      expect(mockPrisma.pago.count).toHaveBeenCalledWith({
+        where: {
+          AND: [
+            {
+              cita: {
+                medico: { usuarioId: 'medico-1' },
+                estado: {
+                  in: [
+                    EstadoCita.pendiente,
+                    EstadoCita.en_curso,
+                    EstadoCita.completada,
+                    EstadoCita.cancelada,
+                  ],
+                },
+              },
+            },
+            { estado: EstadoPago.pagada },
+          ],
+        },
+      });
+    });
+
+    it('should compose estado filter for admin', async () => {
+      mockPrisma.pago.count.mockResolvedValue(1);
+      mockPrisma.pago.findMany.mockResolvedValue([basePago()]);
+
+      await service.findAll(
+        { estado: EstadoPago.cancelada, limit: 20, offset: 0 },
+        adminUser,
+      );
+
+      expect(mockPrisma.pago.count).toHaveBeenCalledWith({
+        where: { AND: [{ estado: EstadoPago.cancelada }] },
       });
     });
 
@@ -322,10 +360,23 @@ describe('PagosService', () => {
       expect(result.data).toHaveLength(0);
       expect(result.meta.total).toBe(0);
     });
+
+    it('should return empty list for cliente with no own payments', async () => {
+      mockPrisma.pago.count.mockResolvedValue(0);
+      mockPrisma.pago.findMany.mockResolvedValue([]);
+
+      const result = await service.findAll(
+        { limit: 20, offset: 0 },
+        clienteUser,
+      );
+
+      expect(result.data).toHaveLength(0);
+      expect(result.meta.total).toBe(0);
+    });
   });
 
   describe('findByFolio', () => {
-    it('should return payment for authorized cliente', async () => {
+    it('should return payment DTO for authorized cliente', async () => {
       mockPrisma.pago.findUnique.mockResolvedValue(basePago());
 
       const result = await service.findByFolio(
@@ -333,14 +384,40 @@ describe('PagosService', () => {
         clienteUser,
       );
 
+      expect(result.id).toBe('pago-1');
       expect(result.folioPago).toBe('VET-20260606-0001');
+      expect(result.cantidad).toBe(1000);
+      expect(result.estado).toBe(EstadoPago.pendiente);
+      expect(result.fechaPago).toBeNull();
+      expect(result.createdAt).toBeInstanceOf(Date);
+      expect(result.updatedAt).toBeInstanceOf(Date);
+      expect(result.cita.id).toBe('cita-1');
+      expect(result.cita.estado).toBe(EstadoCita.pendiente);
+      expect(result.cita.fecha).toBeInstanceOf(Date);
+      expect(result.cita.horaInicio).toBeInstanceOf(Date);
+      expect(result.cita.mascota).toEqual({
+        id: 'mascota-1',
+        nombre: 'Firulais',
+      });
+      expect(result.cita.servicio).toEqual({
+        id: 'servicio-1',
+        nombre: 'Consulta general',
+      });
+      expect(result.cita.sucursal).toEqual({
+        id: 'sucursal-1',
+        nombre: 'Sucursal Norte',
+      });
+      expect(result.cita.medico).toEqual({
+        id: 'medico-1',
+        nombreCompleto: 'Dr. House',
+      });
     });
 
     it('should throw NotFoundException for unauthorized cliente folio', async () => {
       mockPrisma.pago.findUnique.mockResolvedValue(
         basePago({
           cita: {
-            ...basePago().cita,
+            ...baseCita,
             mascota: {
               id: 'mascota-2',
               nombre: 'Otra',
@@ -366,10 +443,7 @@ describe('PagosService', () => {
     it('should throw NotFoundException for medico when estado is pendiente_de_pago', async () => {
       mockPrisma.pago.findUnique.mockResolvedValue(
         basePago({
-          cita: {
-            ...basePago().cita,
-            estado: EstadoCita.pendiente_de_pago,
-          },
+          cita: { ...baseCita, estado: EstadoCita.pendiente_de_pago },
         }),
       );
 
@@ -382,7 +456,7 @@ describe('PagosService', () => {
       mockPrisma.pago.findUnique.mockResolvedValue(
         basePago({
           cita: {
-            ...basePago().cita,
+            ...baseCita,
             medico: {
               id: 'medico-2',
               usuarioId: 'medico-2',
@@ -401,7 +475,7 @@ describe('PagosService', () => {
       mockPrisma.pago.findUnique.mockResolvedValue(
         basePago({
           cita: {
-            ...basePago().cita,
+            ...baseCita,
             mascota: {
               id: 'mascota-2',
               nombre: 'Otra',
@@ -430,6 +504,32 @@ describe('PagosService', () => {
       await expect(
         service.findByFolio('VET-20260606-0001', unknownUser),
       ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should return fallback medico name when persona is missing', async () => {
+      mockPrisma.pago.findUnique.mockResolvedValue(
+        basePago({
+          cita: {
+            ...baseCita,
+            medico: {
+              id: 'medico-1',
+              usuarioId: 'medico-1',
+              usuario: {
+                persona: null,
+              } as unknown as PagoWithRelations['cita']['medico']['usuario'],
+            },
+          },
+        }),
+      );
+
+      const result = await service.findByFolio(
+        'VET-20260606-0001',
+        clienteUser,
+      );
+
+      expect(result.cita.medico.nombreCompleto).toBe(
+        'Veterinario no disponible',
+      );
     });
   });
 });
