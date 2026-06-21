@@ -10,6 +10,8 @@ import {
 import { PagosService } from './pagos.service';
 import { CreatePagoDto } from './dto/create-pago.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 import {
   ApiBadRequestResponse,
   ApiUnauthorizedResponse,
@@ -65,7 +67,10 @@ export class PagosController {
   @ApiUnauthorizedResponse()
   @ApiNotFoundResponse()
   @Get(':folioPago')
-  async findByFolio(@Param('folioPago') folioPago: string) {
-    return this.pagosService.findByFolio(folioPago);
+  async findByFolio(
+    @Param('folioPago') folioPago: string,
+    @CurrentUser() usuario: JwtPayload,
+  ) {
+    return this.pagosService.findByFolio(folioPago, usuario);
   }
 }

@@ -4,9 +4,16 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { EstadoCita, EstadoPago } from '@prisma/client';
+import { EstadoCita, EstadoPago, Prisma, Rol } from '@prisma/client';
 import { CreatePagoDto } from './dto/create-pago.dto';
 import { CitaEstadoHistorialService } from '../citas/cita-estado-historial.service';
+import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
+import { BuscarPagosQueryDto } from './dto/buscar-pagos-query.dto';
+import {
+  mapPagoToResponse,
+  PaginatedPagosResponseDto,
+  pagoInclude,
+} from './dto/pago-response.dto';
 
 @Injectable()
 export class PagosService {
@@ -60,16 +67,90 @@ export class PagosService {
     return updatedPago;
   }
 
-  async findByFolio(folioPago: string) {
+  async findAll(
+    query: BuscarPagosQueryDto,
+    usuario: JwtPayload,
+  ): Promise<PaginatedPagosResponseDto> {
+    const where = this.buildWhereForUser(usuario, query.estado);
+
+    const [total, pagos] = await Promise.all([
+      this.prisma.pago.count({ where }),
+      this.prisma.pago.findMany({
+        where,
+        include: pagoInclude,
+        orderBy: { createdAt: 'desc' },
+        skip: query.offset,
+        take: query.limit,
+      }),
+    ]);
+
+    return {
+      data: pagos.map(mapPagoToResponse),
+      meta: {
+        total,
+        limit: query.limit,
+        offset: query.offset,
+      },
+    };
+  }
+
+  async findByFolio(folioPago: string, usuario: JwtPayload) {
     const pago = await this.prisma.pago.findUnique({
       where: { folioPago },
-      include: { cita: true },
+      include: pagoInclude,
     });
 
     if (!pago) {
       throw new NotFoundException('Pago no encontrado');
     }
 
-    return pago;
+    if (usuario.rol === Rol.cliente) {
+      if (pago.cita.mascota.propietarioId !== usuario.sub) {
+        throw new NotFoundException('Pago no encontrado');
+      }
+    } else if (usuario.rol === Rol.medico) {
+      if (
+        pago.cita.estado === EstadoCita.pendiente_de_pago ||
+        pago.cita.medico.usuarioId !== usuario.sub
+      ) {
+        throw new NotFoundException('Pago no encontrado');
+      }
+    }
+
+    return mapPagoToResponse(pago);
+  }
+
+  private buildWhereForUser(
+    usuario: JwtPayload,
+    estado?: EstadoPago,
+  ): Prisma.PagoWhereInput {
+    const where: Prisma.PagoWhereInput = {};
+
+    if (usuario.rol === Rol.cliente) {
+      where.cita = {
+        mascota: { propietarioId: usuario.sub },
+      };
+    } else if (usuario.rol === Rol.medico) {
+      where.cita = {
+        medico: { usuarioId: usuario.sub },
+        estado: {
+          in: [
+            EstadoCita.pendiente,
+            EstadoCita.en_curso,
+            EstadoCita.completada,
+            EstadoCita.cancelada,
+          ],
+        },
+      };
+    }
+
+    if (estado && where.cita) {
+      where.AND = [{ cita: where.cita }, { estado }];
+      delete where.cita;
+    } else if (estado) {
+      where.estado = estado;
+    }
+
+    return where;
   }
 }
