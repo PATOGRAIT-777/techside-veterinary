@@ -71,3 +71,6 @@ openspec/
 
 # Local database exports
 database/
+
+# Uploaded files (PDFs, etc.)
+/uploads
