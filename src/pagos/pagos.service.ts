@@ -15,6 +15,13 @@ import {
   pagoInclude,
 } from './dto/pago-response.dto';
 
+const MEDICO_VISIBLE_ESTADOS_CITA: EstadoCita[] = [
+  EstadoCita.pendiente,
+  EstadoCita.en_curso,
+  EstadoCita.completada,
+  EstadoCita.cancelada,
+];
+
 @Injectable()
 export class PagosService {
   constructor(
@@ -71,6 +78,13 @@ export class PagosService {
     query: BuscarPagosQueryDto,
     usuario: JwtPayload,
   ): Promise<PaginatedPagosResponseDto> {
+    if (!this.isKnownRole(usuario.rol)) {
+      return {
+        data: [],
+        meta: { total: 0, limit: query.limit, offset: query.offset },
+      };
+    }
+
     const where = this.buildWhereForUser(usuario, query.estado);
 
     const [total, pagos] = await Promise.all([
@@ -110,14 +124,20 @@ export class PagosService {
       }
     } else if (usuario.rol === Rol.medico) {
       if (
-        pago.cita.estado === EstadoCita.pendiente_de_pago ||
+        !MEDICO_VISIBLE_ESTADOS_CITA.includes(pago.cita.estado) ||
         pago.cita.medico.usuarioId !== usuario.sub
       ) {
         throw new NotFoundException('Pago no encontrado');
       }
+    } else if (usuario.rol !== Rol.admin) {
+      throw new NotFoundException('Pago no encontrado');
     }
 
     return mapPagoToResponse(pago);
+  }
+
+  private isKnownRole(rol: string): boolean {
+    return rol === Rol.cliente || rol === Rol.medico || rol === Rol.admin;
   }
 
   private buildWhereForUser(
@@ -133,14 +153,7 @@ export class PagosService {
     } else if (usuario.rol === Rol.medico) {
       where.cita = {
         medico: { usuarioId: usuario.sub },
-        estado: {
-          in: [
-            EstadoCita.pendiente,
-            EstadoCita.en_curso,
-            EstadoCita.completada,
-            EstadoCita.cancelada,
-          ],
-        },
+        estado: { in: MEDICO_VISIBLE_ESTADOS_CITA },
       };
     }
 

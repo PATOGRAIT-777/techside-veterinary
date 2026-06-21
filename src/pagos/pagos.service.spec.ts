@@ -43,6 +43,12 @@ describe('PagosService', () => {
     rol: Rol.admin,
   };
 
+  const unknownUser: JwtPayload = {
+    sub: 'unknown-1',
+    email: 'unknown@test.com',
+    rol: 'unknown' as Rol,
+  };
+
   const basePago = (
     overrides?: Partial<PagoWithRelations>,
   ): PagoWithRelations =>
@@ -304,6 +310,18 @@ describe('PagosService', () => {
       );
       expect(result.data[0].id).toBe('pago-newer');
     });
+
+    it('should return empty list for unknown role', async () => {
+      const result = await service.findAll(
+        { limit: 20, offset: 0 },
+        unknownUser,
+      );
+
+      expect(mockPrisma.pago.count).not.toHaveBeenCalled();
+      expect(mockPrisma.pago.findMany).not.toHaveBeenCalled();
+      expect(result.data).toHaveLength(0);
+      expect(result.meta.total).toBe(0);
+    });
   });
 
   describe('findByFolio', () => {
@@ -403,6 +421,14 @@ describe('PagosService', () => {
 
       await expect(
         service.findByFolio('VET-19990101-9999', adminUser),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw NotFoundException for unknown role', async () => {
+      mockPrisma.pago.findUnique.mockResolvedValue(basePago());
+
+      await expect(
+        service.findByFolio('VET-20260606-0001', unknownUser),
       ).rejects.toThrow(NotFoundException);
     });
   });
