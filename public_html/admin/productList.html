@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Producto eliminado</title>
+    <link rel="stylesheet" href="../css/universalCss.css">
+  </head>
+  <body style="display:flex;align-items:center;justify-content:center;height:100vh">
+    <div style="text-align:center">
+      <h1>Página retirada</h1>
+      <p>La vista <strong>productList.html</strong> ya no está disponible. Visita el <a href="prodCatalog.html">Catálogo</a> en su lugar.</p>
+    </div>
+  </body>
+</html>
+<script src="../js/session.js"></script>
+                const params = new URLSearchParams(window.location.search);
+                const cat = params.get('category');
+                const grid = document.getElementById('product-list-grid');
+                const all = [
+                  {name:'Croquetas Premium',category:'alimentos',price:'$850',img:'img/extras/doge.jpg'},
+                  {name:'Collar Reflectante',category:'accesorios',price:'$220',img:'img/extras/doge.jpg'},
+                  {name:'Pipeta Antipulgas',category:'farmacia',price:'$250',img:'img/extras/doge.jpg'},
+                  {name:'Juguete Mordedera',category:'juguetes',price:'$120',img:'img/extras/doge.jpg'}
+                ];
+                const items = all.filter(p=>!cat||p.category===cat);
+                items.forEach(p=>{
+                  const card = document.createElement('article'); card.className='producto';
+                  card.innerHTML = `<img src="${p.img}" style="width:100%;height:160px;object-fit:cover;border-radius:6px"><h3>${p.name}</h3><p class="muted">${p.category}</p><h4 style="color:#16a34a">${p.price}</h4><div style="display:flex;gap:8px"><input type="number" min="1" value="1" style="width:80px"><button class="btn-primary">Añadir</button><button class="btn-ghost">Comprar ahora</button></div>`;
+                  grid.appendChild(card);
+                });
+            })();
+        </script>
+
+    </body>
+</html>

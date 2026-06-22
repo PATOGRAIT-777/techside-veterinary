@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Carrito — TechSide</title>
+  <link rel="stylesheet" href="../css/universalCss.css">
+  <style>.cart-row{display:flex;align-items:center;gap:12px;padding:8px;border-bottom:1px solid rgba(0,0,0,0.06)}</style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="initPag.html">🐶 TechSide Vet</a>
+      <nav class="main-nav" aria-label="Navegación principal">
+        <a href="prodCatalog.html">Tienda</a>
+        <a href="cart.html" class="active">Carrito</a>
+      </nav>
+      <div class="header-actions">
+        <button class="btn-primary" onclick="openLogin()">Entrar</button>
+      </div>
+    </div>
+      <script src="../js/session.js"></script>
+  </header>
+
+  <main class="container" style="padding:20px;max-width:900p*x">
+    <h1>Carrito de compras</h1>
+    <div id="cart-contents"></div>
+    <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center">
+      <strong id="cart-total">Total: $0.00</strong>
+      <div>
+        <button id="clear-cart" class="btn-ghost">Vaciar carrito</button>
+        <button id="checkout" class="btn-primary">Pagar</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function openLogin(){/* placeholder */}
+    function getCart(){return JSON.parse(localStorage.getItem('cart')||'[]');}
+    function setCart(c){localStorage.setItem('cart',JSON.stringify(c)); renderCart();}
+    function renderCart(){
+      const c = getCart(); const container = document.getElementById('cart-contents'); container.innerHTML='';
+      if(!c.length){ container.innerHTML='<p class="muted">Tu carrito está vacío.</p>'; document.getElementById('cart-total').textContent='Total: $0.00'; return; }
+      let total = 0;
+      // load branches for selection
+      fetch('branches.json').then(r=>r.json()).then(j=>{
+        const branches = j.branches||[];
+        c.forEach((it, idx)=>{
+          const row = document.createElement('div'); row.className='cart-row';
+          const name = document.createElement('div'); name.style.flex='1'; name.innerHTML=`<strong>${it.name}</strong><div class="muted">$${it.price.toFixed(2)} c/u</div>`;
+          const branchSel = document.createElement('select'); branchSel.style.width='180px'; branchSel.innerHTML = '<option value="">Selecciona sucursal</option>' + branches.map(b=>`<option value="${b.id}" ${it.branch===b.id? 'selected':''}>${b.name}</option>`).join('');
+          branchSel.addEventListener('change', ()=>{ it.branch = branchSel.value; setCart(c); });
+          const dateInput = document.createElement('input'); dateInput.type='date'; dateInput.value = it.pickup||''; dateInput.addEventListener('change', ()=>{ it.pickup = dateInput.value; setCart(c); });
+          const qty = document.createElement('input'); qty.type='number'; qty.min=1; qty.value=it.qty; qty.style.width='72px'; qty.addEventListener('change', ()=>{ it.qty = Math.max(1,parseInt(qty.value||1,10)); setCart(c); });
+          const remove = document.createElement('button'); remove.className='btn-ghost'; remove.textContent='Eliminar'; remove.addEventListener('click', ()=>{ c.splice(idx,1); setCart(c); });
+          row.appendChild(name); row.appendChild(branchSel); row.appendChild(dateInput); row.appendChild(qty); row.appendChild(remove); container.appendChild(row);
+          total += it.price * it.qty;
+        });
+        document.getElementById('cart-total').textContent = 'Total: $' + total.toFixed(2);
+      }).catch(()=>{
+        // fallback: render without branches
+        c.forEach((it, idx)=>{
+          const row = document.createElement('div'); row.className='cart-row';
+          const name = document.createElement('div'); name.style.flex='1'; name.innerHTML=`<strong>${it.name}</strong><div class="muted">$${it.price.toFixed(2)} c/u</div>`;
+          const qty = document.createElement('input'); qty.type='number'; qty.min=1; qty.value=it.qty; qty.style.width='72px'; qty.addEventListener('change', ()=>{ it.qty = Math.max(1,parseInt(qty.value||1,10)); setCart(c); });
+          const remove = document.createElement('button'); remove.className='btn-ghost'; remove.textContent='Eliminar'; remove.addEventListener('click', ()=>{ c.splice(idx,1); setCart(c); });
+          row.appendChild(name); row.appendChild(qty); row.appendChild(remove); container.appendChild(row);
+          total += it.price * it.qty;
+        });
+        document.getElementById('cart-total').textContent = 'Total: $' + total.toFixed(2);
+      });
+    }
+    document.getElementById('clear-cart').addEventListener('click', ()=>{ localStorage.removeItem('cart'); renderCart(); });
+    document.getElementById('checkout').addEventListener('click', ()=>{ alert('Checkout simulado. Implementar integración con BD/servicio.'); localStorage.removeItem('cart'); renderCart(); });
+    renderCart();
+  </script>
+</body>
+</html>

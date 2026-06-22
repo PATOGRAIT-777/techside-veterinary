@@ -1,0 +1,76 @@
+/* Sección registro */
+#reg-section {
+    background: linear-gradient(180deg,#071025 0%, var(--bg) 100%);
+    padding: 50px 0;
+    font-family: 'Arial', sans-serif;
+    min-height: 900px;
+    height: auto;
+}
+
+.reg-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: center;
+    min-height: 800px;
+}
+
+.reg-card {
+    background: linear-gradient(160deg,#071045 10%, var(--bg) 100%);
+    border-radius: 1rem;
+    padding: 2rem;
+    width: 35%;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.reg-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+}
+
+.reg-card h2 {
+    margin-bottom: 1.5rem;
+    color: #26DA08;
+}
+
+.reg-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.reg-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+.reg-card input, .reg-card select {
+    padding: 0.9rem 1rem;
+    border: 1px solid #fff;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    color: #fff;
+    background: linear-gradient(180deg,#071025 0%, var(--bg) 100%);
+}
+
+.reg-btn-submit {
+    background: #22c55e;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.reg-btn-submit:hover {
+    background: #16a34a;
+    transform: scale(1.05);
+}
+
+.hidden {
+    display: none;
+}
+

@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Registrar Mascota — TechSide</title>
+    <link rel="stylesheet" href="../css/universalCss.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    <link rel="stylesheet" href="../css/initSes.css">
+    <link rel="stylesheet" href="../css/divs.css">
+    <style>
+        .reg-card { padding: 20px; color: white; }
+        .reg-card label { display: block; margin-top: 10px; font-size: 1rem; }
+        .reg-card input, .reg-card select, .reg-card textarea {
+            width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #ddd;
+            background: rgba(0,0,0,0.2); color: white; box-sizing: border-box;
+        }
+        .reg-card select option { background-color: #333; }
+        .form-row { display: flex; gap: 15px; }
+        .form-row > div { flex: 1; }
+        .preview-img { display: block; margin: 10px auto; width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 2px solid white; display:none;}
+    </style>
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="/">Clinica</a>
+            <nav class="main-nav">
+                <a href="initPag.html">Inicio</a>
+                <a href="listas.html">Mis mascotas</a>
+                <a href="regUser.html">Mi cuenta</a>
+            </nav>
+        </div>
+    </header>
+
+    <section id="reg-section">
+        <div class="reg-container">
+            
+            <form id="regPetForm" enctype="multipart/form-data"></form>>
+                
+                <div class="reg-card">
+                    <h2>Datos Generales</h2>
+                    
+                    <label>Nombre *</label>
+                    <input type="text" name="nombre" required>
+
+                    <div class="form-row">
+                        <div>
+                            <label>Especie *</label>
+                            <select id="especie" required>
+                                <option value="">Cargando...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Raza *</label>
+                            <select id="raza" name="raza_id" required disabled>
+                                <option value="">Selecciona especie</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div>
+                            <label>Sexo *</label>
+                            <select name="sexo" required>
+                                <option value="Macho">Macho</option>
+                                <option value="Hembra">Hembra</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Peso (kg)</label>
+                            <input type="number" name="peso" step="0.1">
+                        </div>
+                    </div>
+
+                    <label>Fecha de Nacimiento</label>
+                    <input type="date" name="fecha_nacimiento">
+                    
+
+                <div class="reg-card">
+                    <h2>Características</h2>
+                    
+                    <div class="form-row">
+                        <div>
+                            <label>Color</label>
+                            <select name="color_id" id="color"><option value="">-- Selecciona --</option></select>
+                        </div>
+                        <div>
+                            <label>Tipo de Pelo</label>
+                            <select name="tipo_pelo_id" id="tipo_pelo"><option value="">-- Selecciona --</option></select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div>
+                            <label>Patrón de Pelo</label>
+                            <select name="patron_pelo_id" id="patron_pelo"><option value="">-- Selecciona --</option></select>
+                        </div>
+                        <div>
+                            <label>Comportamiento</label>
+                            <select name="comportamiento_id" id="comportamiento"><option value="">-- Selecciona --</option></select>
+                        </div>
+                    </div>
+                </div>
+                    <h2>Detalles Médicos</h2>
+
+                    <label style="display:inline-flex; align-items:center; gap:10px; cursor:pointer;">
+                        <input type="checkbox" name="esterilizado" style="width:auto;"> 
+                        ¿Está esterilizado?
+                    </label>
+
+                    <div class="form-row">
+                        <div>
+                            <label>Microchip (Código)</label>
+                            <input type="text" name="microchip" placeholder="Ej: 123456789">
+                        </div>
+                        <div>
+                            <label>Tatuaje</label>
+                            <input type="text" name="tatuaje">
+                        </div>
+                    </div>
+
+                    <label>RUAC (Registro CDMX)</label>
+                    <input type="text" name="ruac">
+
+                    <label>Carnet de Vacunación (Foto/PDF)</label>
+                    <input type="file" name="carnet" accept="image/*,application/pdf">
+
+                    <label>Observaciones</label>
+                    <textarea name="observaciones" rows="3" placeholder="Alergias, señas particulares, etc."></textarea>
+
+                    <button type="submit" class="btn-primary" style="margin-top:20px; width:100%; padding:15px; font-size:1.1rem; cursor:pointer;">
+                        Guardar Mascota
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </section>
+
+    <script src="../js/session.js"></script>
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        let USER_ID = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 1. Obtener ID Usuario
+            const userStr = localStorage.getItem('usuario');
+            if(userStr) try { USER_ID = JSON.parse(userStr).id; } catch(e){}
+            
+            if(!USER_ID) {
+                alert("Debes iniciar sesión.");
+                window.location.href = 'initPag.html';
+                return;
+            }
+
+            // 2. Cargar Catálogos
+            await cargarCatalogos();
+        });
+
+        async function cargarCatalogos() {
+            try {
+                const res = await fetch(`${API_URL}/pets/catalogs`);
+                const data = await res.json();
+                
+                // Función auxiliar para llenar selects por ID
+                const fill = (id, arr) => {
+                    const sel = document.getElementById(id);
+                    if(!sel) return;
+                    sel.innerHTML = '<option value="">-- Selecciona --</option>';
+                    arr.forEach(i => {
+                        const opt = document.createElement('option');
+                        opt.value = i.id;
+                        opt.textContent = i.nombre;
+                        sel.appendChild(opt);
+                    });
+                };
+
+                // Llenar Especies (Especial porque no se envía, solo filtra)
+                const selEsp = document.getElementById('especie');
+                selEsp.innerHTML = '<option value="">-- Selecciona --</option>';
+                data.especies.forEach(e => {
+                    const opt = document.createElement('option');
+                    opt.value = e.id; 
+                    opt.textContent = e.nombre;
+                    selEsp.appendChild(opt);
+                });
+
+                fill('color', data.colores);
+                fill('tipo_pelo', data.tipos_pelo);
+                fill('patron_pelo', data.patrones);
+                fill('comportamiento', data.comportamientos);
+
+            } catch (e) { console.error(e); alert('Error cargando catálogos'); }
+        }
+
+        // Cargar Razas al cambiar Especie
+        document.getElementById('especie').addEventListener('change', async (e) => {
+            const espId = e.target.value;
+            const selRaza = document.getElementById('raza');
+            selRaza.innerHTML = '<option>Cargando...</option>';
+            selRaza.disabled = true;
+
+            if(!espId) { selRaza.innerHTML='<option>Selecciona especie</option>'; return; }
+
+            try {
+                const res = await fetch(`${API_URL}/pets/catalogs/razas/${espId}`);
+                const razas = await res.json();
+                
+                selRaza.innerHTML = '<option value="">-- Selecciona Raza --</option>';
+                razas.forEach(r => {
+                    const opt = document.createElement('option');
+                    opt.value = r.id;
+                    opt.textContent = r.nombre;
+                    selRaza.appendChild(opt);
+                });
+                selRaza.disabled = false;
+            } catch(e) { console.error(e); }
+        });
+
+        // Enviar Formulario
+        document.getElementById('regPetForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true; btn.textContent = "Guardando...";
+
+            const formData = new FormData(e.target);
+            formData.append('propietario_id', USER_ID);
+
+            try {
+                const res = await fetch(`${API_URL}/pets/register`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const r = await res.json();
+                
+                if(r.success) {
+                    alert('¡Mascota registrada!');
+                    window.location.href = 'listas.html';
+                } else {
+                    alert('Error: ' + r.message);
+                    btn.disabled = false; btn.textContent = "Guardar Mascota";
+                }
+            } catch(err) {
+                console.error(err);
+                alert('Error de conexión');
+                btn.disabled = false; btn.textContent = "Guardar Mascota";
+            }
+        });
+
+        function previewFile() {
+            const preview = document.getElementById('preview');
+            const file = document.getElementById('foto').files[0];
+            const reader = new FileReader();
+            reader.onloadend = function () { preview.src = reader.result; preview.style.display = 'block'; }
+            if(file) reader.readAsDataURL(file);
+        }
+    </script>
+</body>
+</html>

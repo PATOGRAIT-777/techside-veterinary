@@ -1,0 +1,128 @@
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #3366FF;
+  color: #333;
+}
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+h2 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  color: #22c55e;
+}
+p {
+  font-size: 1.1rem;
+  color: #fff;
+}
+button {
+  cursor: pointer;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.services, .promotions, .testimonials, .cta {
+  padding: 5rem 0;
+}
+.section-title {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.grid {
+  display: grid;
+  gap: 2rem;
+}
+.grid-4 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+.grid-3 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+
+.card {
+  background: linear-gradient(135deg,#22c55e,#3b82f6);
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  padding: 2rem 1rem;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+.card-icon {
+  font-size: 2rem;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg,#D1FAE5,#6EE7B7);
+  color: #fff;
+}
+
+.badge {
+  display: inline-block;
+  background: #f87171;
+  color: #fff;
+  padding: 0.3rem 0.7rem;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.price {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+.original-price {
+  text-decoration: line-through;
+  color: #999;
+  margin-left: 0.5rem;
+}
+
+.testimonial p {
+  font-style: italic;
+  color: #555;
+}
+.stars {
+  color: #facc15;
+  margin-bottom: 0.5rem;
+}
+
+.cta {
+  background: linear-gradient(135deg,#22c55e,#3b82f6);
+  color: #fff;
+  text-align: center;
+}
+.cta button {
+  background: #fff;
+  color: #22c55e;
+  margin: 0.5rem;
+}
+.cta button:hover {
+  background: #d1fae5;
+}
+.cta-buttons {
+  margin-top: 2rem;
+}
+.whatsapp {
+  background: transparent;
+  border: 2px solid #fff;
+  color: #fff;
+}
+.whatsapp:hover {
+  background: #fff;
+  color: #22c55e;
+}

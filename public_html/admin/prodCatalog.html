@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tienda — TechSide Vet</title>
+  
+  <link rel="stylesheet" href="../css/universalCss.css">
+  <link rel="stylesheet" href="../css/sidebar.css">
+  <style>
+      body { padding-top: 0; }
+      /* Ajuste para que el contenido no quede debajo del sidebar en desktop */
+      @media (min-width: 880px) {
+          .contenido-tienda { margin-left: 0px; transition: margin-left 0.3s; }
+          .sidebar.active ~ .contenido-tienda { margin-left: 300px; }
+      }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <div style="display:flex; align-items:center; gap:15px;">
+          <button id="menu-toggle" style="background:#16a34a; border:1px solid #16a34a; font-size:24px; color:#fff; padding:6px 10px; border-radius:6px">&#9776;</button>
+          <a class="brand" href="initPag.html">🐶 TechSide Vet</a>
+      </div>
+      
+      <nav class="main-nav">
+        <a href="initPag.html">Inicio</a>
+        <a class="active" href="prodCatalog.html">Tienda</a>
+        <a href="listas.html">Mis Mascotas</a>
+        <a href="regUser.html">Cuenta</a>
+      </nav>
+      <div class="header-actions">
+        <a href="cart.html" class="btn-ghost" style="position:relative;display:inline-flex;align-items:center;gap:8px">
+          🛒 <span id="cart-count" style="background:#ef4444;color:#fff;padding:2px 6px;border-radius:999px;font-weight:700">0</span>
+        </a>
+        <button class="btn-primary" onclick="openLogin()">Entrar</button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="sidebar" id="sidebar">
+    <div style="padding: 20px; text-align: right;">
+        <span onclick="document.getElementById('sidebar').classList.remove('active')" style="color:white; cursor:pointer; font-size: 24px;">&times;</span>
+    </div>
+    <ul class="sidebar-list">
+        <li><a href="#">Ofertas 🔥</a></li>
+        <li><a href="#">Destacados ⭐</a></li>
+        <hr>
+        <li><a href="#">🐶 Perros</a></li>
+        <li><a href="#">🐱 Gatos</a></li>
+        <li><a href="#">💊 Farmacia</a></li>
+        <li><a href="#">🛁 Higiene</a></li>
+    </ul>
+  </nav>
+
+  <style>
+    /* Override sidebar to be overlay on this page */
+    #sidebar{position:fixed;left:-320px;top:0;height:100%;width:300px;z-index:40;background:var(--surface,#0f172a);transition:left .22s ease}
+    #sidebar.active{left:0}
+    .contenido-tienda{transition:margin-left .2s}
+    /* prevent other CSS from pushing content when sidebar opens */
+    .sidebar.active ~ .contenido-tienda { margin-left: 0 !important }
+    .carrusel img{width:100%;height:100%;object-fit:cover}
+    .carrusel{height:320px;overflow:hidden;border-radius:8px}
+    .producto{border-radius:8px;padding:12px;background:var(--card,#fff);box-shadow:0 1px 4px rgba(0,0,0,0.06);margin-bottom:12px}
+    .discount-badge{position:absolute;top:8px;left:8px;background:#f97316;color:#fff;padding:4px 8px;border-radius:4px;font-weight:700}
+
+    /* Vertical category sections with horizontal scrollers */
+    #shop-sections-vertical{margin-top:20px;display:flex;flex-direction:column;gap:18px}
+    .section-row{background:linear-gradient(160deg,#0840c2 0%, var(--bg) 100%);padding:12px;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+    .section-row .row-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}
+    .section-row h4{margin:0}
+    .section-scroller{overflow-x:auto;display:flex;gap:12px;padding-bottom:8px;-webkit-overflow-scrolling:touch}
+    .section-card{min-width:160px;width:160px;flex:0 0 auto;background:linear-gradient(180deg,#071025 0%, var(--bg) 100%);border-radius:8px;padding:8px;box-shadow:0 1px 2px rgba(0,0,0,0.04);text-align:center}
+    .section-card img{width:100%;height:100px;object-fit:cover;border-radius:6px}
+    .section-card h5{font-size:14px;margin:8px 0 4px}
+    .section-card p{font-size:12px;color:var(--muted,#6b7280);margin:0}
+    .section-card .price{color:#22c55e;font-weight:700;margin-top:6px}
+    @media (min-width:1000px){
+      /* keep layout comfortable on wide screens */
+      .contenido-tienda{max-width:1100px}
+    }
+  </style>
+
+  <main class="contenido contenido-tienda container">
+      
+        <section class="carrusel-container">
+          <div class="carrusel">
+            <div class="carrusel-item active" style="display:block;height:100%">
+              <img src="../img/extras/doge.jpg" alt="Promo 1"> </div>
+            <div class="carrusel-item" style="height:100%">
+              <img src="../img/extras/Fairy Tail 2.png" alt="Promo 2">
+            </div>
+          </div>
+        </section>
+
+      <div style="text-align:center; margin: 30px 0;">
+          <h1>Catálogo de Productos</h1>
+          <p class="muted">Todo lo que tu mascota necesita, recomendado por veterinarios.</p>
+      </div>
+
+        <div class="productos">
+          <article class="producto" data-category="ofertas" style="position:relative" data-name="Croquetas Premium" data-price="850">
+            <div style="position:relative">
+            <img src="../img/extras/doge.jpg" alt="Croquetas" style="width:100%;height:160px;object-fit:cover;border-radius:6px">
+            <div class="discount-badge">-15%</div>
+            </div>
+            <h3>Croquetas Premium</h3>
+            <p class="muted">Adulto Raza Mediana</p>
+            <h2 style="color: #22c55e; margin: 10px 0;">$850.00</h2>
+            <div style="display:flex;gap:8px"> <input class="qty" type="number" min="1" value="1" style="width:80px"> <button class="btn-primary add-to-cart">Añadir</button> <button class="btn-ghost buy-now">Comprar ahora</button></div>
+          </article>
+
+          <article class="producto" data-category="farmacia" data-name="Pipeta Antipulgas" data-price="250">
+            <img src="../img/extras/doge.jpg" alt="Pipeta" style="width:100%;height:160px;object-fit:cover;border-radius:6px">
+            <h3>Pipeta Antipulgas</h3>
+            <p class="muted">Protección 3 meses</p>
+            <h2 style="color: #22c55e; margin: 10px 0;">$250.00</h2>
+            <div style="display:flex;gap:8px"> <input class="qty" type="number" min="1" value="1" style="width:80px"> <button class="btn-primary add-to-cart">Añadir</button> <button class="btn-ghost buy-now">Comprar ahora</button></div>
+          </article>
+
+           <article class="producto" data-category="juguetes" data-name="Juguete Mordedera" data-price="120">
+          <img src="../img/extras/doge.jpg" alt="Juguete" style="width:100%;height:160px;object-fit:cover;border-radius:6px">
+          <h3>Juguete Mordedera</h3>
+          <p class="muted">Alta resistencia</p>
+          <h2 style="color: #22c55e; margin: 10px 0;">$120.00</h2>
+          <div style="display:flex;gap:8px"> <input class="qty" type="number" min="1" value="1" style="width:80px"> <button class="btn-primary add-to-cart">Añadir</button> <button class="btn-ghost buy-now">Comprar ahora</button></div>
+        </article>
+        </div>
+
+        <!-- Vertical stacked sections with horizontal scrollers (replaces right-side fixed aside) -->
+        <section id="shop-sections-vertical">
+          <div class="section-row">
+            <div class="row-header">
+              <h4>Estética y baño</h4>
+              <a class="a-link-normal" href="estetica.html">Ver más</a>
+            </div>
+            <div class="section-scroller">
+              <div class="section-card">
+                <img src="../img/extras/doge.jpg" alt="A">
+                <h5>Shampoo profesional</h5>
+                <p class="muted">250 ml</p>
+                <div class="price">$120</div>
+              </div>
+              <div class="section-card">
+                <img src="../img/extras/doge.jpg" alt="B">
+                <h5>Cortaúñas</h5>
+                <p class="muted">Acero inoxidable</p>
+                <div class="price">$80</div>
+              </div>
+              <div class="section-card">
+                <img src="../img/extras/doge.jpg" alt="C">
+                <h5>Toalla microfibra</h5>
+                <p class="muted">Secado rápido</p>
+                <div class="price">$60</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-row">
+            <div class="row-header">
+              <h4>Alimentos</h4>
+              <a class="a-link-normal" href="alimentos.html">Ver más</a>
+            </div>
+            <div class="section-scroller">
+              <div class="section-card">
+                <img src="../img/extras/doge.jpg" alt="A">
+                <h5>Croquetas Premium</h5>
+                <p class="muted">Adulto raza mediana</p>
+                <div class="price">$850</div>
+              </div>
+              <div class="section-card">
+                <img src="../img/extras/doge.jpg" alt="B">
+                <h5>Snack dental</h5>
+                <p class="muted">Paquete 30pz</p>
+                <div class="price">$150</div>
+              </div>
+              <div class="section-card">
+                <img src="../img/extras/doge.jpg" alt="C">
+                <h5>Alimento húmedo</h5>
+                <p class="muted">80 g</p>
+                <div class="price">$30</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-row">
+            <div class="row-header">
+              <h4>Accesorios</h4>
+              <a class="a-link-normal" href="accesorios.html">Ver más</a>
+            </div>
+            <div class="section-scroller">
+              <div class="section-card">
+                <img src="../img/extras/doge.jpg" alt="A">
+                <h5>Juguete Mordedera</h5>
+                <p class="muted">Alta resistencia</p>
+                <div class="price">$120</div>
+              </div>
+              <div class="section-card">
+                <img src="../img/extras/doge.jpg" alt="B">
+                <h5>Correa reflectante</h5>
+                <p class="muted">Largo 1.5m</p>
+                <div class="price">$90</div>
+              </div>
+              <div class="section-card">
+                <img src="../img/extras/doge.jpg" alt="C">
+                <h5>Cama orthopédica</h5>
+                <p class="muted">Mediana</p>
+                <div class="price">$450</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-row">
+            <div class="row-header">
+              <h4>Farmacia</h4>
+              <a class="a-link-normal" href="farmacia.html">Ver más</a>
+            </div>
+            <div class="section-scroller">
+              <div class="section-card">
+                <img src="../img/extras/doge.jpg" alt="A">
+                <h5>Pipeta Antipulgas</h5>
+                <p class="muted">Protección 3 meses</p>
+                <div class="price">$250</div>
+              </div>
+              <div class="section-card">
+                <img src="../img/extras/doge.jpg" alt="B">
+                <h5>Vacuna</h5>
+                <p class="muted">Fiebre canina</p>
+                <div class="price">$320</div>
+              </div>
+              <div class="section-card">
+                <img src="../img/extras/doge.jpg" alt="C">
+                <h5>Suplemento</h5>
+                <p class="muted">Articulaciones</p>
+                <div class="price">$200</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+        <p>© <span id="year"></span> TechSide</p>
+        <small class="muted">Términos y condiciones · Política de privacidad</small>
+    </div>
+  </footer>
+
+  <div id="login-modal" class="login-modal" onclick="if(event.target===this)this.style.display='none'">
+    <div class="login-content">
+      <span class="close" onclick="this.parentElement.parentElement.style.display='none'">&times;</span>
+      <form class="login-form">
+        <h2>Ingresar</h2>
+        <input type="text" placeholder="Usuario"><input type="password" placeholder="Contraseña">
+        <button class="btn-primary">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Lógica del Menú
+    const toggleBtn = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+    
+    toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+    });
+
+    // Lógica del Login
+    function openLogin() { document.getElementById('login-modal').style.display = 'flex'; }
+
+    // Shopping cart (localStorage)
+    function getCart(){ return JSON.parse(localStorage.getItem('cart')||'[]'); }
+    function setCart(c){ localStorage.setItem('cart', JSON.stringify(c)); updateCartCount(); }
+    function updateCartCount(){ const c = getCart(); const qty = c.reduce((s,i)=>s+i.qty,0); document.getElementById('cart-count').textContent = qty; }
+
+    document.addEventListener('click', function(e){
+      if(e.target && e.target.classList.contains('add-to-cart')){
+        const art = e.target.closest('.producto');
+        const name = art.dataset.name || art.querySelector('h3')?.textContent || 'Producto';
+        const price = parseFloat(art.dataset.price||0);
+        const qtyEl = art.querySelector('.qty');
+        const qty = Math.max(1, parseInt(qtyEl?.value||1,10));
+        const cart = getCart();
+        const existing = cart.find(i=>i.name===name && i.price===price);
+        if(existing) existing.qty += qty; else cart.push({name,price,qty});
+        setCart(cart);
+        alert(qty + ' × ' + name + ' añadidos al carrito');
+      }
+      if(e.target && e.target.classList.contains('buy-now')){
+        const art = e.target.closest('.producto'); const name = art.dataset.name || art.querySelector('h3')?.textContent || 'Producto';
+        const price = parseFloat(art.dataset.price||0); const qty = Math.max(1, parseInt(art.querySelector('.qty')?.value||1,10));
+        localStorage.setItem('checkout_now', JSON.stringify([{name,price,qty}]));
+        location.href = 'cart.html';
+      }
+    });
+
+    // initialize cart count
+    updateCartCount();
+
+    // Carrusel Simple
+    let index = 0;
+    const items = document.querySelectorAll('.carrusel-item');
+    if(items.length > 0){
+        function showSlide() {
+            items.forEach(el => el.style.display = 'none');
+            items[index].style.display = 'block';
+            index = (index + 1) % items.length;
+            setTimeout(showSlide, 4000);
+        }
+        showSlide();
+    }
+  </script>
+  <script> document.getElementById('year')?.textContent = new Date().getFullYear(); </script>
+</body>
+</html>
+<script src="../js/session.js"></script>

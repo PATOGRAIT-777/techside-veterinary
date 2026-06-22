@@ -1,0 +1,97 @@
+.cat{
+    width: 300px;
+}
+
+.catlink{
+    color: aquamarine;
+    display: block;
+    padding: 1px 0;
+    text-decoration: none;
+}
+
+.catlink--inside{
+    border-radius: 6px;
+    padding-left: 20px;
+    text-align: left;
+}
+
+.catlink--inside:hover{
+    background: #313030;
+}
+
+.catlis{
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    border-radius: 0 16px 16px 0;
+    background-color: #1F1F1F;
+}
+
+.cate_item{
+    list-style: none;
+    width: 100%;
+    text-align: center;
+    overflow: hidden;
+}
+
+.cat_secc{
+    list-style: none;
+    width: 100%;
+    text-align: center;
+    overflow: hidden;
+}
+
+
+.cate_item--click{
+    cursor: pointer;
+};
+
+.cate_secc--click{
+    cursor: pointer;
+};
+    
+.cat_secc--click{
+    cursor: pointer;
+}
+
+.cate_button{
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    width: 70%;
+    margin: auto;
+}
+
+.seclis{
+    width: 80%;
+    margin-left: auto;
+    border-left: 2px solid #636363;
+    list-style: none;
+    transition: height .4s;
+    height: 0; 
+}
+
+.cat_prod{
+    width: 80%;
+    margin-left: auto;
+    border-left: 2px solid #636363;
+    list-style: none;
+    transition: height .4s;
+    height: 0;
+}
+
+/* 
+nav = cat
+list = catlis
+list_item = cate_item
+nav_link = cat_link
+list_Button = cate_button
+list_show = seclis
+list_inside = cat_secc
+list_show = cat_prod
+list_inside = cat_prod
+list_img, list_arrow, list_img = x
+arrow = active
+*/

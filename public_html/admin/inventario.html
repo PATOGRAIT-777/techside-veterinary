@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin — Inventario</title>
+  <link rel="stylesheet" href="../css/universalCss.css">
+  <link rel="stylesheet" href="../css/sidebar.css">
+  <link rel="stylesheet" href="../css/divs.css">
+  <style>
+    table{width:100%;border-collapse:collapse}
+    table th,table td{padding:8px;border:1px solid rgba(0,0,0,0.08);background:transparent;color:inherit}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="../initPag.html">🐶 TechSide Vet</a>
+      <nav class="main-nav">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="pacientes.html">Pacientes</a>
+        <a href="citas.html">Citas</a>
+        <a class="active" href="inventario.html">Inventario</a>
+        <a href="ordenes.html">Órdenes</a>
+      </nav>
+      <div class="header-actions">
+        <button class="btn-primary" onclick="openLogin()">Entrar</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container layout" style="display:flex;gap:20px;align-items:flex-start">
+    <aside class="sidebar" style="min-width:220px;max-width:260px">
+      <nav class="sidebar-list">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="pacientes.html">Pacientes</a>
+        <a href="citas.html">Citas</a>
+        <a class="active" href="inventario.html">Inventario</a>
+      </nav>
+    </aside>
+
+    <main class="main" style="flex:1">
+      <h1>Inventario</h1>
+      <p class="muted">Gestiona productos, stock y precios.</p>
+
+      <div style="margin-top:12px; display:flex; gap:12px; align-items:center">
+        <button id="toggle-new-product" class="btn-primary">Nuevo producto</button>
+        <select id="branch-filter" style="padding:8px;border-radius:6px;border:1px solid #ccc">
+          <option value="">Todas las sucursales</option>
+        </select>
+        <div style="display:flex;gap:8px;flex:1">
+          <input id="search-input" placeholder="Buscar producto..." style="padding:8px;flex:1;border-radius:6px;border:1px solid #ccc" />
+          <button id="search-btn" class="btn-ghost">Buscar</button>
+        </div>
+      </div>
+      <div id="new-product-form" style="display:none;margin-top:12px;padding:12px;background:transparent;border:1px solid rgba(0,0,0,0.06);border-radius:8px">
+        <h3>Agregar producto</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input id="np-sku" placeholder="SKU" style="padding:8px;border-radius:6px;border:1px solid #ccc;width:160px">
+          <input id="np-name" placeholder="Nombre" style="padding:8px;border-radius:6px;border:1px solid #ccc;flex:1">
+          <input id="np-price" type="number" placeholder="Precio" style="padding:8px;border-radius:6px;border:1px solid #ccc;width:140px">
+          <input id="np-stock" type="number" placeholder="Stock" style="padding:8px;border-radius:6px;border:1px solid #ccc;width:120px">
+          <select id="np-branch" style="padding:8px;border-radius:6px;border:1px solid #ccc;width:200px"><option value="">Sucursal</option></select>
+          <input id="np-section" placeholder="Sección" style="padding:8px;border-radius:6px;border:1px solid #ccc;width:160px">
+          <input id="np-discount" type="number" placeholder="Descuento %" style="padding:8px;border-radius:6px;border:1px solid #ccc;width:140px">
+        </div>
+        <div style="margin-top:8px"><button id="add-product-btn" class="btn-primary">Agregar</button></div>
+      </div>
+
+      <table id="inventory-table" style="margin-top:12px;width:100%;border-collapse:collapse">
+        <thead><tr><th>SKU</th><th>Producto</th><th>Sucursal</th><th>Sección</th><th>Precio</th><th>% Descto</th><th>Precio desc</th><th>Stock</th><th>Acciones</th></tr></thead>
+        <tbody>
+          <tr data-sku="SKU-001" data-branch="lindavista" data-section="Alimentos"><td>SKU-001</td><td>Croquetas Premium</td><td>Lindavista</td><td>Alimentos</td><td>$850</td><td>15</td><td>$722.50</td><td>12</td><td><button class="btn-ghost" onclick="openEditProduct('SKU-001')">Editar</button> · <button class="btn-ghost">Eliminar</button></td></tr>
+          <tr data-sku="SKU-002" data-branch="centro" data-section="Farmacia"><td>SKU-002</td><td>Pipeta Antipulgas</td><td>Centro</td><td>Farmacia</td><td>$250</td><td>0</td><td>$250.00</td><td>34</td><td><button class="btn-ghost" onclick="openEditProduct('SKU-002')">Editar</button> · <button class="btn-ghost">Eliminar</button></td></tr>
+        </tbody>
+      </table>
+
+      <!-- Product edit modal -->
+      <div id="product-edit-modal" class="login-modal" style="display:none" onclick="if(event.target===this) this.style.display='none'">
+        <div class="login-content">
+          <span class="close" onclick="document.getElementById('product-edit-modal').style.display='none'">&times;</span>
+          <h2>Editar producto</h2>
+          <form id="product-edit-form">
+            <label>Imagen
+              <input type="file" id="prod-img" accept="image/*">
+            </label>
+            <label>Precio
+              <input type="number" id="prod-price" step="0.01">
+            </label>
+            <label>Cantidad en inventario
+              <input type="number" id="prod-stock">
+            </label>
+            <label>Descuento (%)
+              <input type="number" id="prod-discount" min="0" max="100">
+            </label>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button type="button" class="btn-primary" onclick="saveProductChanges()">Guardar</button>
+              <button type="button" class="btn-ghost" onclick="document.getElementById('product-edit-modal').style.display='none'">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> TechSide</p>
+      <small class="muted">Términos y condiciones · Política de privacidad</small>
+    </div>
+  </footer>
+
+  <div id="login-modal" class="login-modal" onclick="closeOnOutsideClick(event)">
+    <div class="login-content">
+      <span class="close" onclick="document.getElementById('login-modal').style.display='none'">&times;</span>
+      <form class="login-form">
+        <h2>Ingresar</h2>
+        <input type="text" placeholder="Usuario" required>
+        <input type="password" placeholder="Contraseña" required>
+        <button class="btn-primary">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function openLogin() { document.getElementById('login-modal').style.display = 'flex'; }
+    function closeLogin() { document.getElementById('login-modal').style.display = 'none'; }
+    function closeOnOutsideClick(event) { const modal = document.getElementById('login-modal'); if (modal && !modal.querySelector('.login-content').contains(event.target)) closeLogin(); }
+    document.getElementById('year').textContent = new Date().getFullYear();
+    function openEditProduct(sku){
+      // load product info (placeholder)
+      document.getElementById('product-edit-modal').style.display='flex';
+      document.getElementById('prod-price').value = sku==='SKU-001'?850:250;
+      document.getElementById('prod-stock').value = sku==='SKU-001'?12:34;
+      document.getElementById('prod-discount').value = 0;
+      document.getElementById('product-edit-form').dataset.sku = sku;
+    }
+    // load branches for filter
+    (function(){
+      fetch('branches.json').then(r=>r.json()).then(j=>{
+        const sel = document.getElementById('branch-filter'); const npBranch = document.getElementById('np-branch'); (j.branches||[]).forEach(b=>{ const opt=document.createElement('option'); opt.value=b.id; opt.textContent=b.name; sel.appendChild(opt); const opt2=document.createElement('option'); opt2.value=b.id; opt2.textContent=b.name; npBranch.appendChild(opt2); });
+        sel.addEventListener('change', ()=>{
+          const v = sel.value; document.querySelectorAll('#inventory-table tbody tr').forEach(r=>{ if(!v) r.style.display=''; else r.style.display = (r.dataset.branch===v? '':'none'); });
+        });
+      }).catch(()=>{});
+    })();
+    // toggle new product form
+    document.getElementById('toggle-new-product').addEventListener('click', ()=>{ const f=document.getElementById('new-product-form'); f.style.display = (f.style.display==='none'?'block':'none'); });
+    document.getElementById('search-btn').addEventListener('click', ()=>{ const q = document.getElementById('search-input').value.toLowerCase(); document.querySelectorAll('#inventory-table tbody tr').forEach(r=>{ const name = r.children[1].textContent.toLowerCase(); r.style.display = name.includes(q)? '':'none'; }); });
+    // add product action (client-side placeholder)
+    document.getElementById('add-product-btn').addEventListener('click', ()=>{
+      const sku = document.getElementById('np-sku').value.trim(); const name = document.getElementById('np-name').value.trim(); const price = parseFloat(document.getElementById('np-price').value||0); const stock = parseInt(document.getElementById('np-stock').value||0,10); const branchSel = document.getElementById('np-branch').value || ''; const section = document.getElementById('np-section').value||''; const disc = parseFloat(document.getElementById('np-discount').value||0);
+      if(!sku||!name){ alert('SKU y nombre son requeridos'); return; }
+      const tbody = document.querySelector('#inventory-table tbody'); const discounted = price * (1 - (disc/100));
+      const tr = document.createElement('tr'); tr.dataset.sku = sku; tr.dataset.branch = branchSel; tr.dataset.section = section;
+      tr.innerHTML = `<td>${sku}</td><td>${name}</td><td>${branchSel||''}</td><td>${section}</td><td>$${price}</td><td>${disc}</td><td>$${discounted.toFixed(2)}</td><td>${stock}</td><td><button class="btn-ghost" onclick="openEditProduct('${sku}')">Editar</button> · <button class="btn-ghost">Eliminar</button></td>`;
+      tbody.appendChild(tr);
+      alert('Producto agregado (simulado).');
+    });
+    function saveProductChanges(){
+      const form = document.getElementById('product-edit-form');
+      const sku = form.dataset.sku;
+      const price = document.getElementById('prod-price').value;
+      const stock = document.getElementById('prod-stock').value;
+      const discount = document.getElementById('prod-discount').value;
+      // Update table as placeholder
+      const row = document.querySelector(`tr[data-sku="${sku}"]`);
+      if(row){ row.children[2].textContent = '$'+price; row.children[3].textContent = stock; }
+      document.getElementById('product-edit-modal').style.display='none';
+    }
+  </script>
+</body>
+</html>
+<script src="../js/session.js"></script>

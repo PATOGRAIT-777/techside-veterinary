@@ -1,0 +1,45 @@
+/* Contenedor */
+.carrusel-container {
+    margin-left: 0;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Carrusel */
+.carrusel {
+    position: relative;
+    max-width: 900px;
+    margin: auto;
+}
+
+.carrusel-item {
+    display: none;
+}
+
+.carrusel-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 20px;
+}
+
+
+.contenido {
+    margin: 40px auto;
+    max-width: 1000px;
+    text-align: center;
+}
+
+.productos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.producto {
+    background: #222;
+    color: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid #0af;
+}

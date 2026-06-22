@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AnimeAV1 — Inicio</title>
+  <link rel="stylesheet" href="../css/universalCss.css" type="text/css">
+  <link rel="stylesheet" href="../css/divs.css" type="text/css">
+  <link rel="stylesheet" href="../css/pInicio.css" type="text/css">
+</head>
+<body>
+
+    <div id="login-modal" class="login-modal" onclick="closeOnOutsideClick(event)">
+      <div class="login-content">
+        <span class="close" onclick="closeLogin()">&times;</span>
+        <img src="https://cdn.animeav1.com/backdrops/2067.jpg" alt="Banner Login" class="login-banner">
+        
+        <form id="login-form" class="login-form" action="#">
+          <h2>Ingresar</h2>
+          
+          <div id="login-message" style="margin-bottom: 15px; font-weight: bold; display:none;"></div>
+
+          <input type="text" name="email" placeholder="Correo Electrónico" required>
+          <input type="password" name="password" placeholder="Contraseña" required>
+          
+          <button type="submit" class="btn-primary">Entrar</button>
+        </form>
+      </div>
+    </div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="initPag.html">🐶 TechSide Vet</a>
+      <nav class="main-nav" aria-label="Navegación principal">
+        <a class="active" href="initPag.html">Inicio</a>
+        <a href="prodCatalog.html">Tienda</a>
+        <a href="horario.html">Disponibilidad</a>
+        <a href="listas.html">Mis mascotas</a>
+        <a href="regUser.html">Mi cuenta</a>
+      </nav>
+      <div class="header-actions">
+        <button class="btn-ghost" ><a href="formAgregar.html">Registrarse</a></button>
+        <button class="btn-primary" onclick="openLogin()">Entrar</button>
+      </div>
+    </div>
+  </header>
+
+        <section class="services">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Nuestros Servicios</h2>
+                    <p>Ofrecemos atención médica integral para todas las especies con equipos de última generación</p>
+                </div>
+                <div class="grid grid-4">
+                    <div class="card">
+                        <div class="card-icon">❤️</div>
+                        <h3>Consultas Generales</h3>
+                        <p>Revisiones completas para mantener la salud de tu mascota</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">🛡️</div>
+                        <h3>Vacunación</h3>
+                        <p>Programas de vacunación personalizados y seguros</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">⏰</div>
+                        <h3>Urgencias 24/7</h3>
+                        <p>Atención de emergencia disponible las 24 horas</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">🏆</div>
+                        <h3>Cirugías</h3>
+                        <p>Procedimientos quirúrgicos con tecnología avanzada</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="promotions">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Promociones Especiales</h2>
+                    <p>Aprovecha nuestras ofertas exclusivas para el cuidado de tu mascota</p>
+                </div>
+                <div class="grid grid-3">
+                    <div class="card">
+                        <div class="badge">20% OFF</div>
+                        <h3>Consulta + Vacunación</h3>
+                        <p>Paquete completo de revisión y vacunas</p>
+                        <div class="price">$120 <span class="original-price">$150</span></div>
+                        <button>Reservar Ahora</button>
+                    </div>
+                    <div class="card">
+                        <div class="badge">15% OFF</div>
+                        <h3>Baño y Corte Premium</h3>
+                        <p>Servicio completo de estética canina</p>
+                        <div class="price">$68 <span class="original-price">$80</span></div>
+                        <button>Reservar Ahora</button>
+                    </div>
+                    <div class="card">
+                        <div class="badge">25% OFF</div>
+                        <h3>Desparasitación Completa</h3>
+                        <p>Tratamiento interno y externo</p>
+                        <div class="price">$75 <span class="original-price">$100</span></div>
+                        <button>Reservar Ahora</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="testimonials">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Lo que dicen nuestros clientes</h2>
+                    <p>La satisfacción de nuestros clientes y sus mascotas es nuestra mayor recompensa</p>
+                </div>
+                <div class="grid grid-3">
+                    <div class="card testimonial">
+                        <div class="stars">★★★★★</div>
+                        <h3>María González</h3>
+                        <p>Dueño de Golden Retriever</p>
+                        <p>"Excelente atención, mi perro Max se siente como en casa aquí."</p>
+                    </div>
+                    <div class="card testimonial">
+                        <div class="stars">★★★★★</div>
+                        <h3>Carlos Rodríguez</h3>
+                        <p>Dueño de Gato Persa</p>
+                        <p>"Profesionales increíbles, salvaron la vida de mi gata Luna."</p>
+                    </div>
+                    <div class="card testimonial">
+                        <div class="stars">★★★★★</div>
+                        <h3>Ana Martínez</h3>
+                        <p>Dueño de Labrador</p>
+                        <p>"La mejor clínica veterinaria de la ciudad, sin duda."</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta">
+            <div class="container">
+                <h2>¿Listo para cuidar a tu mascota?</h2>
+                <p>Agenda una cita hoy mismo y descubre por qué somos la clínica veterinaria de confianza para miles de familias</p>
+                <div class="cta-buttons">
+                    <button>Agendar Cita Ahora</button>
+                    <button class="whatsapp">Contactar por WhatsApp</button>
+                </div>
+            </div>
+        </section>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> TechSide</p>
+      <small class="muted">Términos y condiciones · Política de privacidad</small>
+    </div>
+  </footer>
+
+  <script>
+    // Lógica visual del modal
+    function openLogin() {
+      document.getElementById('login-modal').style.display = 'flex';
+      const msg = document.getElementById('login-message');
+      if (msg) msg.style.display = 'none'; // Limpia el mensaje de error al abrir
+    }
+
+    function closeLogin() {
+      document.getElementById('login-modal').style.display = 'none';
+    }
+
+    function closeOnOutsideClick(event) {
+      const modal = document.getElementById('login-modal');
+      const box = modal.querySelector('.login-content');
+
+      if (box && !box.contains(event.target)) {
+        closeLogin();
+      }
+    }
+
+    const yearSpan = document.getElementById('year');
+    if (yearSpan) yearSpan.textContent = new Date().getFullYear();
+
+    // LÓGICA DE CONEXIÓN CON EL BACKEND DE TECHSIDE (NestJS)
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+      e.preventDefault(); // Evita que se recargue la página
+      
+      const form = e.target;
+      // Tu input se llama "email", pero el backend NestJS espera "emailOrPhone" (login.dto.ts)
+      const emailOrPhone = form.email.value;
+      const password = form.password.value;
+      const messageBox = document.getElementById('login-message');
+
+      // Limpia mensajes previos
+      messageBox.style.display = 'none';
+
+      try {
+        // Asegúrate de cambiar 'http://localhost:3000' por la URL de tu API si está en producción
+        const response = await fetch('http://localhost:3000/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            emailOrPhone: emailOrPhone, 
+            password: password
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // Éxito: Guardamos el token en LocalStorage
+          localStorage.setItem('accessToken', data.accessToken);
+          localStorage.setItem('user', JSON.stringify(data.user));
+
+          // Mostrar mensaje de éxito
+          messageBox.style.color = 'green';
+          messageBox.textContent = '¡Inicio de sesión exitoso!';
+          messageBox.style.display = 'block';
+
+          // Opcional: Redirigir al usuario o cerrar el modal después de 1 segundo
+          setTimeout(() => {
+            closeLogin();
+            // window.location.href = 'regUser.html'; // Descomenta para redirigir
+          }, 1000);
+
+        } else {
+          // Error desde el backend (Ej: credenciales incorrectas)
+          messageBox.style.color = 'red';
+          messageBox.textContent = Array.isArray(data.message) ? data.message[0] : (data.message || 'Error de autenticación');
+          messageBox.style.display = 'block';
+        }
+
+      } catch (error) {
+        // Error de red (el servidor no responde)
+        messageBox.style.color = 'red';
+        messageBox.textContent = 'Error de conexión con el servidor.';
+        messageBox.style.display = 'block';
+        console.error('Error:', error);
+      }
+    });
+  </script>
+  
+  <script src="../js/session.js"></script>
+</body>
+</html>

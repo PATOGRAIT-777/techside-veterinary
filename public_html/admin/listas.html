@@ -1,0 +1,188 @@
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mis mascotas — TechSide</title>
+  <link rel="stylesheet" href="../css/universalCss.css" type="text/css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="/">Clinica</a>
+      <nav class="main-nav" aria-label="Navegación principal">
+        <a  href="initPag.html">Inicio</a>
+        <a href="prodCatalog.html">Tienda</a>
+        <a href="horario.html">Disponibilidad</a>
+        <a class="active" href="listas.html">Mis mascotas</a>
+        <a href="regUser.html">Mi cuenta</a>
+      </nav>
+      <div class="header-actions">
+        <button class="btn-ghost">Registrarse</button>
+        <button class="btn-primary" onclick="openLogin()">Entrar</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <h1>Mis mascotas</h1>
+      <p class="muted">Tus mascotas guardadas, sus datos, etc.</p>
+    </div>
+  </section>
+
+  <main class="container layout">
+    <aside class="sidebar">
+      <div class="profile-card">
+        <div class="avatar">PA</div>
+        <div class="profile-info">
+          <strong>Patograit A.</strong>
+          <small>Usuario</small>
+        </div>
+      </div>
+      <nav class="account-nav">
+        <a href="regUser.html">Mi cuenta</a>
+        <a class="is-active" href="listas.html">Mis Mascotas</a>
+      </nav>
+    </aside>
+
+    <section class="main">
+      <article class="card">
+        <h2>Registrados</h2>
+        <div id="pets-grid" class="grid-cards">
+          <!-- Pet cards populated dynamically -->
+        </div>
+      </article>
+
+      <article class="card">
+          <a class="brand" href="regPet.html"><h2>Registrar Mascota</h2></a>
+        <div class="grid-cards">
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> TechSide</p>
+      <small class="muted">Términos y condiciones · Política de privacidad</small>
+    </div>
+  </footer>
+
+  <script> document.getElementById('year').textContent = new Date().getFullYear(); </script>
+  <!-- Pet detail modal (read-only view for clients) -->
+  <div id="pet-modal" class="login-modal" style="display:none" onclick="if(event.target===this) this.style.display='none'">
+    <div class="login-content">
+      <span class="close" onclick="document.getElementById('pet-modal').style.display='none'">&times;</span>
+      <div id="pet-view-form">
+        <h2 id="pet-modal-title">Detalle mascota</h2>
+        <div id="pet-fields"></div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button type="button" class="btn-ghost" onclick="document.getElementById('pet-modal').style.display='none'">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openPetDetail(id){
+      const pets = window.__pets_cache || JSON.parse(localStorage.getItem('pets_cache')||'[]');
+      const pet = pets.find(x=>x.id===id);
+      if(!pet) return;
+      document.getElementById('pet-modal-title').textContent = (pet.name||'Sin nombre') + ' — ' + (pet.species||'N/D');
+      const container = document.getElementById('pet-fields'); container.innerHTML='';
+      // display fields as read-only text
+      const fields = [
+        {k:'ruac',label:'Clave RUAC'},
+        {k:'name',label:'Nombre'},
+        {k:'species',label:'Especie'},
+        {k:'age',label:'Edad'},
+        {k:'gender',label:'Género'},
+        {k:'sterilized',label:'¿Esterilizado?'},
+        {k:'microchipped',label:'¿Tiene microchip?'},
+        {k:'microchipNumber',label:'Número de chip'},
+        {k:'size',label:'Tamaño'},
+        {k:'primaryColor',label:'Color primario'},
+        {k:'secondaryColor',label:'Color secundario'},
+        {k:'coverage',label:'Cobertura corporal'},
+        {k:'weight',label:'Peso (kg)'},
+        {k:'photo',label:'URL Foto'},
+        {k:'provenance',label:'Procedencia'},
+        {k:'outdoorSupervision',label:'Supervisión en exterior'},
+        {k:'behavior',label:'Comportamiento'},
+        {k:'vaccinationCard',label:'Cartilla de vacunación'},
+        {k:'lastRabies',label:'Última vacuna de rabia'},
+        {k:'disabled',label:'¿Discapacitada?'},
+        {k:'disabilityType',label:'Tipo de discapacidad'},
+        {k:'dewormed',label:'¿Desparasitada?'},
+        {k:'lastDeworm',label:'Última desparasitación'},
+        {k:'homeLocation',label:'Ubicación en el hogar'},
+        {k:'idMethod',label:'Forma de identificación'}
+      ];
+      fields.forEach(f=>{
+        const row = document.createElement('div'); row.style.marginBottom='6px';
+        const lbl = document.createElement('div'); lbl.style.fontSize='0.9em'; lbl.style.color='#444'; lbl.textContent = f.label;
+        const val = document.createElement('div'); val.style.fontWeight='600'; val.style.color='#111';
+        const v = (pet[f.k]===true)?'Sí':(pet[f.k]===false?'No':(pet[f.k]||'—'));
+        val.textContent = v;
+        row.appendChild(lbl); row.appendChild(val); container.appendChild(row);
+      });
+
+      // show last appointment summary (if exists)
+      const appointments = JSON.parse(localStorage.getItem('appointments')||'[]');
+      const appt = appointments.filter(a=>a.petId===id || a.pet===pet.name).slice(-1)[0];
+      if(appt){
+        const info = document.createElement('div'); info.style.marginTop='8px'; info.innerHTML = `<strong>Próxima/última cita:</strong> ${appt.date||appt.day||'N/D'} ${appt.time||appt.hour||''} — ${appt.branch||appt.branchName||'N/D'} / ${appt.doctor||'N/D'}<br><strong>Procedimiento:</strong> ${appt.procedure||appt.padecimiento||'N/D'}<br><strong>Precio:</strong> ${appt.price?('$'+appt.price):'N/D'}`;
+        container.appendChild(info);
+      }
+
+      document.getElementById('pet-modal').style.display='flex';
+      // store current pet id for reference (read-only)
+      document.getElementById('pet-view-form').dataset.petId = id;
+    }
+  </script>
+  <script>
+    // Populate user info and pets dynamically (ready for DB)
+    (function(){
+      const userName = localStorage.getItem('userName') || 'Usuario Ejemplo';
+      const avatar = localStorage.getItem('userAvatar') || '../img/extras/doge.jpg';
+      // Insert avatar/name into header (if present in sidebar)
+      document.querySelectorAll('.profile-info strong').forEach(el=>el.textContent = userName);
+      document.querySelectorAll('.avatar').forEach(av=>{ if(av.innerHTML.trim()==='PA'){ av.style.backgroundImage = `url(${avatar})`; av.style.backgroundSize='cover'; av.textContent=''; }});
+
+      fetch('pets.json').then(r=>r.json()).then(pets=>{
+        const grid = document.getElementById('pets-grid');
+        // cache for modal editing
+        window.__pets_cache = pets;
+        pets.forEach(p=>{
+          const a = document.createElement('div'); a.className='card-item';
+          a.tabIndex = 0;
+          a.dataset.petId = p.id;
+          // try to find an appointment for this pet
+          const appointments = JSON.parse(localStorage.getItem('appointments')||'[]');
+          const appt = appointments.find(a0=> a0.petId===p.id || a0.pet===p.name);
+          const apptInfo = appt ? `<div class="pet-apt"><small>${appt.branch||appt.branchName||''} • ${appt.date||appt.day||''} ${appt.time||appt.hour||''}</small></div>` : '';
+          const scheduleBtn = `<div style="margin-top:6px"><a class="btn-primary" href="citas.html#pet-${p.id}" onclick="event.stopPropagation()">Agendar cita</a></div>`;
+          a.innerHTML = `<img src="${p.image}" alt="${p.name}"><div class="card-body"><h3>${p.name}</h3><small>${p.age} · ${p.status || ''}</small>${apptInfo}${scheduleBtn}</div>`;
+          a.addEventListener('click', (e)=>{ if(e.target.closest && (e.target.closest('a') || e.target.closest('button'))) return; e.preventDefault(); openPetDetail(p.id); });
+          grid.appendChild(a);
+        });
+      }).catch(err=>{
+        console.error(err);
+        // fallback to local cache
+        const grid = document.getElementById('pets-grid');
+        const pets = JSON.parse(localStorage.getItem('pets_cache')||'[]');
+        window.__pets_cache = pets;
+        pets.forEach(p=>{
+          const a = document.createElement('div'); a.className='card-item'; a.tabIndex=0;
+          a.dataset.petId = p.id;
+          const scheduleBtn = `<div style="margin-top:6px"><a class="btn-primary" href="citas.html#pet-${p.id}" onclick="event.stopPropagation()">Agendar cita</a></div>`;
+          a.innerHTML = `<img src="${p.image}" alt="${p.name}"><div class="card-body"><h3>${p.name}</h3><small>${p.age} · ${p.status}</small>${scheduleBtn}</div>`;
+          a.addEventListener('click', (e)=>{ if(e.target.closest && (e.target.closest('a') || e.target.closest('button'))) return; e.preventDefault(); openPetDetail(p.id); });
+          grid.appendChild(a);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
+<script src="../js/session.js"></script>

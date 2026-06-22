@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mi Mascota — Expediente</title>
+  <link rel="stylesheet" href="../css/universalCss.css">
+  <style>
+    .container-small{max-width:900px;margin:18px auto}
+    .card{background:var(--card,#fff);padding:14px;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.06);margin-bottom:12px}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .muted{color:var(--muted,#6b7280)}
+    .visits .visit{border-top:1px solid rgba(0,0,0,0.04);padding:10px 0}
+    .hero{margin-bottom:8px}
+    .btn-link{background:transparent;border:none;color:var(--primary,#16a34a);cursor:pointer;padding:0}
+    @media(max-width:800px){.grid-2{grid-template-columns:1fr}}
+  </style>
+  <script src="../js/session.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="initPag.html">🐶 TechSide Vet</a>
+      <nav class="main-nav">
+        <a href="initPag.html">Inicio</a>
+        <a href="prodCatalog.html">Tienda</a>
+        <a href="listas.html">Mis Mascotas</a>
+        <a href="regUser.html">Cuenta</a>
+      </nav>
+      <div class="header-actions">
+        <a href="cart.html" class="btn-ghost" style="position:relative;display:inline-flex;align-items:center;gap:8px">🛒 <span id="cart-count" style="background:#ef4444;color:#fff;padding:2px 6px;border-radius:999px;font-weight:700">0</span></a>
+        <button class="btn-primary" onclick="openLogin()">Entrar</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container container-small">
+    <h1 class="hero">Expediente de mascota (Cliente)</h1>
+    <p class="muted">Introduce la clave RUAC para ver la ficha de tu mascota. Si estás identificado y tienes mascotas, aparecerán automáticamente.</p>
+
+    <div class="card">
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="ruac-input" placeholder="Clave RUAC" style="flex:1;padding:8px;border-radius:6px;border:1px solid rgba(0,0,0,0.08)">
+        <button id="btn-view" class="btn-primary">Ver ficha</button>
+        <a id="btn-schedule" class="btn-ghost" href="citas.html">Agendar cita</a>
+      </div>
+    </div>
+
+    <div id="pet-card" style="display:none">
+      <div class="card" id="pet-info">
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <img id="pet-photo" src="../img/extras/doge.jpg" alt="foto" style="width:140px;height:120px;object-fit:cover;border-radius:8px">
+          <div style="flex:1">
+            <h2 id="pet-name">Nombre</h2>
+            <div class="muted" id="pet-meta">Especie · Edad · Sexo</div>
+            <div style="margin-top:6px">
+              <strong>Procedencia:</strong> <span id="pet-origin"></span> · <strong>Identificación:</strong> <span id="pet-idform"></span>
+            </div>
+            <div style="margin-top:6px" class="muted">Tamaño: <span id="pet-size"></span> · Peso: <span id="pet-weight"></span> kg</div>
+          </div>
+          <div style="text-align:right">
+            <a id="link-edit" class="btn-ghost" style="display:none">Administrar (solo admin)</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Datos de salud</h3>
+        <div class="grid-2">
+          <div><strong>Cartilla de vacunación:</strong> <span id="pet-vax" class="muted"></span></div>
+          <div><strong>Última rabia:</strong> <span id="pet-last-rabia" class="muted"></span></div>
+          <div><strong>Desparasitada:</strong> <span id="pet-deworm" class="muted"></span></div>
+          <div><strong>Última desparasitación:</strong> <span id="pet-last-dew" class="muted"></span></div>
+        </div>
+      </div>
+
+      <div class="card visits">
+        <h3>Historial de consultas (solo visual)</h3>
+        <div id="visits-list">
+          <p class="muted">No hay visitas registradas.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Información adicional</h3>
+        <div><strong>Comportamiento:</strong> <span id="pet-behavior" class="muted"></span></div>
+        <div><strong>Discapacitada:</strong> <span id="pet-disabled" class="muted"></span></div>
+        <div><strong>Ubicación hogar:</strong> <span id="pet-home" class="muted"></span></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> TechSide</p>
+      <small class="muted">Términos y condiciones · Política de privacidad</small>
+    </div>
+  </footer>
+
+  <script> document.getElementById('year').textContent = new Date().getFullYear();</script>
+
+  <script>
+
+    // cart count
+    function getCart(){ return JSON.parse(localStorage.getItem('cart')||'[]'); }
+    function updateCartCount(){ document.getElementById('cart-count').textContent = getCart().reduce((s,i)=>s+i.qty,0); }
+    updateCartCount();
+
+    function openLogin(){ document.getElementById('login-modal')?.style.display='flex'; }
+
+    document.getElementById('btn-view').addEventListener('click', ()=>{
+      const ruac = document.getElementById('ruac-input').value.trim(); if(!ruac) return alert('Ingresa RUAC');
+      showPet(ruac);
+    });
+
+    // If URL param ruac present, auto-load
+    (function(){ const p = new URLSearchParams(window.location.search); if(p.get('ruac')){ document.getElementById('ruac-input').value = p.get('ruac'); document.getElementById('btn-view').click(); } })();
+
+    function showPet(ruac){
+      const pets = JSON.parse(localStorage.getItem('pets')||'{}'); const visits = JSON.parse(localStorage.getItem('visits')||'[]');
+      const p = pets[ruac]; if(!p) return alert('Ficha no encontrada');
+      document.getElementById('pet-card').style.display='block';
+      document.getElementById('pet-photo').src = p.photo || '../img/extras/doge.jpg';
+      document.getElementById('pet-name').textContent = p.name || 'Sin nombre';
+      document.getElementById('pet-meta').textContent = (p.specie||'') + ' · ' + (p.age||'') + ' · ' + (p.gender||'');
+      document.getElementById('pet-origin').textContent = p.origin||''; document.getElementById('pet-idform').textContent = p.idForm||'';
+      document.getElementById('pet-size').textContent = p.size||''; document.getElementById('pet-weight').textContent = p.weight||'';
+      document.getElementById('pet-vax').textContent = p.cartilla||'No'; document.getElementById('pet-last-rabia').textContent = p.lastRabia||'N/D';
+      document.getElementById('pet-deworm').textContent = p.dewormed||'No'; document.getElementById('pet-last-dew').textContent = p.lastDeworm||'N/D';
+      document.getElementById('pet-behavior').textContent = p.behavior||''; document.getElementById('pet-disabled').textContent = p.disabled||'No';
+      document.getElementById('pet-home').textContent = p.homeLocation||'';
+
+      // visits
+      const list = visits.filter(v=>v.ruac===ruac).sort((a,b)=>b.date.localeCompare(a.date));
+      const el = document.getElementById('visits-list'); el.innerHTML='';
+      if(!list.length) el.innerHTML = '<p class="muted">Sin visitas registradas.</p>';
+      list.forEach(v=>{
+        const docs = JSON.parse(localStorage.getItem('doctors')||'[]'); const doc = docs.find(d=>d.id===v.doctorId) || {};
+        const d = document.createElement('div'); d.className='visit';
+        d.innerHTML = `<div><strong>${new Date(v.date).toLocaleString()}</strong> — ${doc.name||'Médico'}</div>
+          <div><strong>Procedimiento:</strong> ${escapeHtml(v.procedure)}</div>
+          <div><strong>Diagnóstico:</strong> ${escapeHtml(v.diag)}</div>
+          <div class="muted">${escapeHtml(v.padecimiento)}</div>`;
+        el.appendChild(d);
+      });
+
+      // set schedule link with ruac
+      document.getElementById('btn-schedule').href = 'citas.html?ruac='+encodeURIComponent(ruac);
+    }
+
+    function escapeHtml(s){ if(!s) return ''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    // if user has saved pets (session), show first
+    (function(){
+      const userPets = JSON.parse(localStorage.getItem('user_pets')||'[]');
+      if(userPets.length){ document.getElementById('ruac-input').value = userPets[0]; document.getElementById('btn-view').click(); }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mi Cuenta — TechSide</title>
+  <link rel="stylesheet" href="../css/userSet.css">
+  <link rel="stylesheet" href="../css/universalCss.css">
+  
+  <style>
+    /* CORRECCIÓN 1: Forzar estilo visual para campos no editables */
+    input[readonly] {
+      background-color: #e9ecef !important;
+      color: #6c757d !important;
+      cursor: not-allowed;
+      border: 1px solid #ced4da;
+    }
+    
+    /* Pequeña mejora para validación de contraseña */
+    .error-msg { color: #dc3545; font-size: 0.85rem; display: block; margin-top: 5px; }
+    .success-msg { color: #198754; font-size: 0.85rem; display: block; margin-top: 5px; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="/">Clinica</a>
+      <nav class="main-nav" aria-label="Navegación principal">
+        <a class="active" href="initPag.html">Inicio</a>
+        <a href="prodCatalog.html">Tienda</a>
+        <a href="horario.html">Disponibilidad</a>
+        <a href="listas.html">Mis mascotas</a>
+        <a href="regUser.html">Mi cuenta</a>
+      </nav>
+      <div class="header-actions">
+        <button class="btn-ghost">Registrarse</button>
+        <button class="btn-primary" onclick="openLogin()">Entrar</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <h1>Mi cuenta</h1>
+      <p class="muted">Gestiona tu perfil, dirección y seguridad.</p>
+    </div>
+  </section>
+
+  <main class="container layout">
+    <aside class="sidebar">
+      <div class="profile-card">
+        <div class="avatar" id="sidebar-avatar">US</div>
+        <div class="profile-info">
+          <strong id="sidebar-name">Cargando...</strong>
+          <small>Cliente</small>
+        </div>
+      </div>
+
+      <nav class="account-nav">
+        <a href="#perfil" class="is-active">Perfil</a>
+        <a href="listas.html">Mis mascotas</a>
+        <a href="#historial">Historial</a>
+        <a href="#ajustes">Ajustes</a>
+        <button id="logoutBtn" class="btn-ghost" style="width:100%;text-align:left" onclick="cerrarSesion()">Cerrar sesión</button>
+      </nav>
+    </aside>
+
+    <section class="main">
+      
+      <article id="perfil" class="card">
+        <h2>Datos Personales y Ubicación</h2>
+        <form id="form-perfil" class="form-grid" autocomplete="off">
+          
+          <label>
+            Nombre Completo
+            <input type="text" name="nombre_completo" required placeholder="Cargando..." />
+          </label>
+
+          <label>
+            Correo Electrónico
+            <input type="email" name="email" readonly />
+          </label>
+
+          <label>
+            Teléfono Principal
+            <input type="tel" name="telefono" placeholder="Ej: 5512345678" />
+          </label>
+
+          <label>
+            Teléfono Secundario
+            <input type="tel" name="telefono_secundario" placeholder="Opcional" />
+          </label>
+
+          <label class="full" style="margin-top: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem;">
+            <strong>Dirección de Domicilio</strong>
+          </label>
+
+          <label>
+            Código Postal
+            <input type="text" name="codigo_postal" readonly />
+          </label>
+
+          <label>
+            Estado
+            <select name="estado" id="estado">
+              <option value="">Cargando catálogo...</option>
+            </select>
+          </label>
+
+          <label>
+            Municipio
+            <select name="municipio" id="municipio">
+              <option value="">Selecciona estado primero...</option>
+            </select>
+          </label>
+
+          <label>
+            Colonia
+            <select name="colonia" id="colonia">
+              <option value="">Cargando colonias...</option>
+            </select>
+          </label>
+
+          <label class="full">
+            Calle
+            <input type="text" name="calle" placeholder="Ej: Av. Reforma" />
+          </label>
+
+          <label>
+            Número Exterior
+            <input type="text" name="num_exterior" placeholder="Ej: 104" />
+          </label>
+
+          <label>
+            Número Interior
+            <input type="text" name="num_interior" placeholder="Ej: Depto 2" />
+          </label>
+
+          <label class="full" style="margin-top: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem;">
+            <strong>Identificación Oficial</strong>
+          </label>
+
+          <label>
+            Tipo de Documento
+            <select name="id_type" id="id_type">
+              <option value="">-- Seleccionar --</option>
+              <option value="INE">INE / IFE</option>
+              <option value="Pasaporte">Pasaporte</option>
+              <option value="Licencia">Licencia de Conducir</option>
+            </select>
+          </label>
+
+          <label>
+            Número de ID
+            <input type="text" name="id_number" placeholder="Ej: Folio o Pasaporte" />
+          </label>
+
+          <div class="form-actions full">
+            <button type="submit" class="btn-primary">Guardar cambios</button>
+            <button type="button" class="btn-ghost">Cancelar</button>
+          </div>
+        </form>
+      </article>
+
+      <article id="ajustes" class="card">
+  <h2>Seguridad</h2>
+  <form class="form-grid" action="/api/change-password">
+    <label>
+      Contraseña actual
+      <input type="password" name="current_password" required placeholder="Tu contraseña actual">
+    </label>
+
+    <label>
+      Nueva contraseña
+      <input type="password" name="new_password" required placeholder="Mínimo 8 caracteres">
+    </label>
+
+    <label>
+      Repetir nueva contraseña
+      <input type="password" name="confirm_password" required placeholder="Confirma la nueva contraseña">
+    </label>
+
+    <div class="form-actions full">
+      <button type="submit" class="btn-primary">Actualizar contraseña</button>
+    </div>
+  </form>
+</article>
+
+      <article id="listas" class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h2>Mis mascotas</h2>
+            <a href="regPet.html" class="btn-ghost" style="font-size:0.8rem; padding:4px 8px;">+ Agregar</a>
+        </div>
+        
+        <div id="pets-container" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 10px;">
+            <p class="muted" style="font-style:italic;">Cargando mascotas...</p>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> TechSide</p>
+      <small class="muted">Términos y condiciones · Política de privacidad</small>
+    </div>
+  </footer>
+
+<script>
+
+  
+  // IMPORTANTE: Rutas corregidas
+  // auth.js -> /api/auth
+  // mxDivisions.js -> /api/mxDivisions  <-- ESTO ES LO QUE FALLABA
+const API_URL = 'http://localhost:3000/api';
+  let USER_ID_REAL = null;
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    // 1. VERIFICAR SESIÓN
+    const userStr = localStorage.getItem('usuario');
+    if (userStr) {
+      try {
+        const u = JSON.parse(userStr);
+        USER_ID_REAL = u.id;
+      } catch (e) { console.error(e); }
+    }
+
+    if (!USER_ID_REAL) {
+      alert("Sesión expirada o no válida.");
+      window.location.href = 'initPag.html';
+      return;
+    }
+
+    // 2. CONFIGURAR LOGOUT (Cerrar Sesión)
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        if(confirm("¿Seguro que quieres cerrar sesión?")) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('usuario');
+            window.location.href = 'initPag.html';
+        }
+    });
+
+    // 3. CARGAR DATOS
+    await cargarEstados();
+    await cargarDatosReales();  // Perfil
+    await cargarMascotas();     // <--- NUEVA FUNCIÓN
+
+    configurarFormularioPerfil();
+    configurarFormularioPassword();
+  });
+
+  // --- CATALOGOS (Rutas corregidas a /mxDivisions) ---
+  async function cargarEstados() {
+    try {
+      const res = await fetch(`${API_URL}/mxDivisions/states`);
+      if(!res.ok) throw new Error('Error 404 en estados');
+      const estados = await res.json();
+      llenarSelect('estado', estados);
+    } catch (e) { console.error("Error cargando estados:", e); }
+  }
+
+  document.getElementById('estado').addEventListener('change', async (e) => {
+    const val = e.target.value;
+    if(!val) return;
+    const res = await fetch(`${API_URL}/mxDivisions/municipalities/${val}`);
+    const data = await res.json();
+    llenarSelect('municipio', data);
+  });
+
+  document.getElementById('municipio').addEventListener('change', async (e) => {
+    const edo = document.getElementById('estado').value;
+    const mun = e.target.value;
+    if(!mun) return;
+
+    const res = await fetch(`${API_URL}/mxDivisions/colonias/${edo}/${mun}`);
+    const data = await res.json();
+    
+    const sel = document.getElementById('colonia');
+    sel.innerHTML = '<option value="">-- Selecciona --</option>';
+    data.forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = d.colonia;
+      opt.textContent = d.colonia;
+      opt.dataset.cp = d.codigo_postal;
+      sel.appendChild(opt);
+    });
+  });
+
+  document.getElementById('colonia').addEventListener('change', (e) => {
+     const opt = e.target.options[e.target.selectedIndex];
+     if(opt && opt.dataset.cp) document.querySelector('[name="codigo_postal"]').value = opt.dataset.cp;
+  });
+
+  async function cargarMascotas() {
+    const container = document.getElementById('pets-container');
+    try {
+        const res = await fetch(`${API_URL}/auth/my-pets?id=${USER_ID_REAL}`);
+        const mascotas = await res.json();
+
+        container.innerHTML = ''; // Limpiar "Cargando..."
+
+        if (mascotas.length === 0) {
+            container.innerHTML = '<p class="muted">No tienes mascotas registradas aún.</p>';
+            return;
+        }
+
+        mascotas.forEach(pet => {
+            // Calcular edad simple
+            let edadTexto = "Edad desconocida";
+            if (pet.fecha_nacimiento) {
+                const nac = new Date(pet.fecha_nacimiento);
+                const hoy = new Date();
+                const anios = hoy.getFullYear() - nac.getFullYear();
+                edadTexto = anios + (anios === 1 ? " año" : " años");
+            }
+
+            // Usar foto de la BD o una por defecto
+            // Nota: Agregamos 'http://localhost:3000' porque la URL en BD suele ser relativa (/uploads/...)
+            const fotoUrl = pet.foto_url 
+                ? `http://localhost:3000${pet.foto_url}` 
+                : '../img/extras/doge.jpg'; // Imagen por defecto
+
+            // Crear HTML de la tarjeta
+            const card = document.createElement('a');
+            card.href = `listas.html`; // O a un detalle de mascota específico
+            card.style.cssText = "display:block; text-decoration:none; color:inherit; background: linear-gradient(160deg, #0840c2 0%, var(--bg) 100%); padding:10px; border-radius:8px; border:1px solid #eee;";
+            
+            card.innerHTML = `
+              <div style="display:flex; align-items:center; gap:12px">
+                <img src="${fotoUrl}" alt="${pet.nombre}" style="width:60px; height:60px; object-fit:cover; border-radius:50%; border:2px solid white; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+                <div>
+                  <div style="font-weight:700; font-size:1.1rem;">${pet.nombre}</div>
+                  <div class="muted" style="font-size:0.9rem;">${edadTexto} · ${pet.sexo || ''}</div>
+                </div>
+              </div>
+            `;
+            container.appendChild(card);
+        });
+
+    } catch (error) {
+        console.error("Error mascotas:", error);
+        container.innerHTML = '<p style="color:red">Error al cargar mascotas.</p>';
+    }
+  }
+
+
+  // --- PERFIL DE USUARIO ---
+  async function cargarDatosReales() {
+    try {
+      // Petición al backend
+      const res = await fetch(`${API_URL}/auth/profile?id=${USER_ID_REAL}`);
+      
+      if (!res.ok) throw new Error('Error cargando perfil (Revisa authController)');
+      const datos = await res.json();
+      
+      currentPasswordHash = datos.password_hash;
+
+      // Llenar formulario
+      document.getElementById('sidebar-name').textContent = datos.nombre_completo;
+      setVal('nombre_completo', datos.nombre_completo);
+      setVal('email', datos.email);
+      setVal('telefono', datos.telefono);
+      setVal('telefono_secundario', datos.telefono_secundario);
+      setVal('calle', datos.calle);
+      setVal('num_exterior', datos.num_exterior);
+      setVal('num_interior', datos.num_interior);
+      setVal('codigo_postal', datos.ubicacion.codigo_postal);
+      setVal('id_type', datos.id_type);
+      setVal('id_number', datos.id_number);
+
+      // Pre-selección de Selects
+      setVal('estado', datos.ubicacion.estado);
+
+      if(datos.ubicacion.estado) {
+         const r = await fetch(`${API_URL}/mxDivisions/municipalities/${datos.ubicacion.estado}`);
+         const d = await r.json();
+         llenarSelect('municipio', d);
+         setVal('municipio', datos.ubicacion.municipio);
+      }
+
+      if(datos.ubicacion.estado && datos.ubicacion.municipio) {
+         const r = await fetch(`${API_URL}/mxDivisions/colonias/${datos.ubicacion.estado}/${datos.ubicacion.municipio}`);
+         const d = await r.json();
+         const sel = document.getElementById('colonia');
+         sel.innerHTML = '<option value="">-- Selecciona --</option>';
+         d.forEach(x => {
+            const opt = document.createElement('option');
+            opt.value = x.colonia;
+            opt.textContent = x.colonia;
+            opt.dataset.cp = x.codigo_postal;
+            sel.appendChild(opt);
+         });
+         setVal('colonia', datos.ubicacion.colonia);
+      }
+
+    } catch (error) {
+      console.error(error);
+      alert("No se pudo cargar el perfil.");
+    }
+  }
+
+  // --- GUARDAR ---
+  function configurarFormularioPerfil() {
+    const form = document.querySelector('form[action="/api/update-user"]');
+    if(!form) return;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        id: USER_ID_REAL,
+        nombre_completo: form.nombre_completo.value,
+        telefono: form.telefono.value,
+        telefono_secundario: form.telefono_secundario.value,
+        calle: form.calle.value,
+        num_exterior: form.num_exterior.value,
+        num_interior: form.num_interior.value,
+        id_type: form.id_type.value,
+        id_number: form.id_number.value,
+        estado: form.estado.value,
+        municipio: form.municipio.value,
+        colonia: form.colonia.value
+      };
+
+      try {
+        const res = await fetch(`${API_URL}/auth/update-user`, {
+            method: 'PUT',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(data)
+        });
+        const r = await res.json();
+        if(r.success) alert('Guardado correctamente');
+        else alert('Error: ' + r.message);
+      } catch(e) { alert('Error de conexión'); }
+    });
+  }
+
+  function configurarFormularioPassword() {
+    const form = document.querySelector('form[action="/api/change-password"]');
+    if(!form) return;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Obtenemos los valores usando los names corregidos
+        const cur = form.current_password.value;
+        const nue = form.new_password.value;
+        const con = form.confirm_password.value;
+
+        // Validación local básica
+        if(nue !== con) {
+            alert('Las nuevas contraseñas no coinciden');
+            return;
+        }
+        if(nue.length < 6) { // Opcional
+             alert('La contraseña es muy corta');
+             return;
+        }
+
+        try {
+            const res = await fetch(`${API_URL}/auth/change-password`, {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                // Enviamos los datos con los nombres exactos que espera el controlador
+                body: JSON.stringify({
+                    id: USER_ID_REAL, 
+                    current_password: cur, 
+                    new_password: nue
+                })
+            });
+
+            const r = await res.json();
+            
+            if(r.success) { 
+                alert('¡Contraseña actualizada con éxito!'); 
+                form.reset(); 
+            } else { 
+                alert('Error: ' + r.message); // Aquí saldrá si la contraseña actual es incorrecta
+            }
+        } catch(e) { 
+            console.error(e);
+            alert('Error de conexión con el servidor'); 
+        }
+    });
+  }
+
+  function setVal(name, val) {
+    const el = document.querySelector(`[name="${name}"]`);
+    if(el && val) el.value = val;
+  }
+  function llenarSelect(id, arr) {
+    const s = document.getElementById(id);
+    s.innerHTML = '<option value="">-- Selecciona --</option>';
+    arr.forEach(x => {
+        const o = document.createElement('option');
+        o.value = x; o.textContent = x;
+        s.appendChild(o);
+    });
+  }
+</script>
+</body>
+</html>

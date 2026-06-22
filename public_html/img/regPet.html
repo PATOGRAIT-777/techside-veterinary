@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Registrar Mascotas — TechSide</title>
+        <link rel="stylesheet" href="../css/universalCss.css" type="text/css">
+        <link rel="stylesheet" href="../css/divs.css" type="text/css">
+        <link rel="stylesheet" href="../css/pInicio.css" type="text/css">
+        <link rel="stylesheet" href="../css/initSes.css" type="text/css">
+        <style>
+            /* Labels: white and slightly larger */
+            .reg-card label { color: #fff; font-size: 13pt; }
+            .reg-card label span { color: inherit; }
+            /* Inputs, selects and textareas: match the site's input style (initSes.css) */
+            .reg-card input, .reg-card select, .reg-card textarea, .reg-card input[type="text"], .reg-card input[type="number"], .reg-card input[type="date"], .reg-card input[type="file"] {
+                padding: 0.9rem 1rem;
+                border: 1px solid #fff;
+                border-radius: 0.5rem;
+                font-size: 1rem;
+                color: #fff;
+                background: linear-gradient(180deg,#071025 0%, var(--bg) 100%);
+                width: 100%;
+                box-sizing: border-box;
+            }
+            /* Checkboxes styled to match inputs and larger */
+            .reg-card input[type=checkbox] { width:14px; height:14px; vertical-align:middle; margin-right:8px; accent-color: #0b76ef; }
+                /* Small helper to hide dependent blocks; make children full-width blocks so layout doesn't break */
+            .dependent { display:none; margin-top:6px; }
+                .dependent > * { display:block; width:100%; margin-top:6px; }
+
+                /* Ensure all direct children of .reg-card use full width and labels are block-level */
+                .reg-card > * { width:100%; }
+                .reg-card label { display:block; text-align:left; }
+                .reg-card .dependent { display:none; flex-direction:column; gap:8px; }
+        </style>
+    </head>
+
+    <div id="login-modal" class="login-modal" onclick="closeOnOutsideClick(event)">
+        <div class="login-content">
+            <span class="close" onclick="document.getElementById('login-modal').style.display = 'none'">&times;</span>
+            <img src="https://cdn.animeav1.com/backdrops/2067.jpg" alt="Banner Login" class="login-banner">
+            <form class="login-form">
+                <h2>Iniciar Sesión</h2>
+                <input type="text" placeholder="Usuario">
+                <input type="password" placeholder="Contraseña">
+                <button type="submit">Entrar</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openLogin() {
+            document.getElementById('login-modal').style.display = 'flex';
+        }
+
+        function closeLogin() {
+            document.getElementById('login-modal').style.display = 'none';
+        }
+
+        // Cierra si se hace clic fuera del cuadro de login
+        function closeOnOutsideClick(event) {
+            const modal = document.getElementById('login-modal');
+            const box = modal.querySelector('.login-box');
+
+            if (!box.contains(event.target)) {
+                closeLogin();
+            }
+        }
+
+        function regValNum(event) {
+            const numeros = "1234567890";
+            const tecla = String.fromCharCode(event.which || event.keyCode);
+            if (numeros.indexOf(tecla) === -1) {
+                alert("Por favor, ingresa solo números");
+                return false;
+            }
+            return true;
+        }
+
+        function regValText(event) {
+            const letras = "abcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZ ";
+            const tecla = String.fromCharCode(event.which || event.keyCode);
+            if (letras.indexOf(tecla) === -1) {
+                alert("Por favor, ingresa solo texto");
+                return false;
+            }
+            return true;
+        }
+    </script>
+    <body>
+        <header class="site-header">
+            <div class="container header-inner">
+                <a class="brand" href="/">Clinica</a>
+                <nav class="main-nav" aria-label="Navegación principal">
+                    <a href="initPag.html">Inicio</a>
+                    <a href="prodCatalog.html">Tienda</a>
+                    <a href="horario.html">Disponibilidad</a>
+                    <a href="listas.html">Mis mascotas</a>
+                    <a href="regUser.html">Mi cuenta</a>
+                </nav>
+                <div class="header-actions">
+                    <a class="active" href="initPag.html">Registrarse</a>
+                    <!--<button class="btn-ghost">Registrarse</button>-->
+                    <button class="btn-primary" onclick="location.href='formAgregar.html'">Entrar</button>
+                </div>
+            </div>
+        </header>
+
+        <section id="reg-section">
+            <div class="reg-container">
+
+                                <!-- Un solo formulario que engloba ambas tarjetas -->
+                                <form id="regPetForm" method="post" action="desplegar.jsp" class="form-size" style="display:flex;flex-wrap:wrap;gap:2rem;justify-content:center;width:100%;">
+
+                    <!-- Primera tarjeta -->
+                    <div class="reg-card">
+                                                <h2>Datos generales</h2>
+
+                                                <select id="tipo" name="tipo" required>
+                                                        <option value="">-- Selecciona tipo --</option>
+                                                        <option value="perro">🐶 Perro</option>
+                                                        <option value="gato">🐱 Gato</option>
+                                                        <option value="ave">🦜 Ave</option>
+                                                        <option value="reptil">🦎 Reptil</option>
+                                                </select>
+
+                                                <!-- Raza / Especie (pobladas desde razas.json) -->
+                                                <select id="raza" name="raza" class="hidden">
+                                                    <option value="">-- Selecciona raza --</option>
+                                                </select>
+                                                <select id="especie" name="especie" class="hidden" required>
+                                                    <option value="">-- Selecciona especie --</option>
+                                                </select>
+
+                                                <!-- Campos solicitados para BD -->
+                                                <input type="text" id="ruac" name="ruac" placeholder="Clave RUAC (opcional)">
+                                                <input type="text" id="nombre" name="nombre" placeholder="Nombre" required>
+                                                <!-- `especie` is now a select populated by script above -->
+                                                <input type="number" id="edad" name="edad" placeholder="Edad" required>
+                                                <select id="genero" name="genero">
+                                                    <option value="">-- Género --</option>
+                                                    <option value="hembra">Hembra</option>
+                                                    <option value="macho">Macho</option>
+                                                </select>
+                                                
+                                                <label><input type="checkbox" id="chk_microchip" name="microchip"> Tiene microchip</label>
+                                                <div id="microchip-details" class="dependent">
+                                                    <label>Fecha colocación microchip (opcional): <input type="date" id="fechaMicrochip" name="fechaMicrochip"></label>
+                                                    <input type="text" id="numeroChip" name="numeroChip" placeholder="Número de chip">
+                                                </div>
+                                                <select id="tamano" name="tamano">
+                                                    <option value="">-- Tamaño --</option>
+                                                    <option value="chico">Chico</option>
+                                                    <option value="mediano">Mediano</option>
+                                                    <option value="grande">Grande</option>
+                                                    <option value="muy_grande">Muy grande</option>
+                                                </select>
+                                                <input type="text" id="colorPrimario" name="colorPrimario" placeholder="Color primario">
+                                                <input type="text" id="colorSecundario" name="colorSecundario" placeholder="Color secundario">
+                                                <input type="text" id="patron" name="patron" placeholder="Patrón de cobertura corporal (pelaje/plumas/escamas)">
+                                                <input type="number" step="0.1" id="peso" name="peso" placeholder="Peso (kg)">
+                                                <label>Foto principal (URL o subir):</label>
+                                                <input type="file" id="fotoFile" name="fotoFile" accept="image/*">
+                                                <select id="procedencia" name="procedencia">
+                                                    <option value="">-- Procedencia --</option>
+                                                    <option value="Adopcion">Adopción</option>
+                                                    <option value="Rescatada">Rescatada</option>
+                                                    <option value="Donada">Donada</option>
+                                                    <option value="Heredada">Heredada</option>
+                                                    <option value="Adquirida">Adquirida</option>
+                                                    <option value="Comprada">Comprada</option>
+                                                </select>
+                                                <label><input type="checkbox" id="supervisionExterior" name="supervisionExterior"> Supervisión en exterior</label>
+
+                                                <select id="ubicacionHogar" name="ubicacionHogar">
+                                                    <option value="">-- Ubicación en el hogar --</option>
+                                                    <option value="Interior">Interior</option>
+                                                    <option value="Exterior">Exterior</option>
+                                                </select>
+                                                <select id="formaIdentificacion" name="formaIdentificacion">
+                                                    <option value="">-- Forma de identificación --</option>
+                                                    <option value="Collar">Collar</option>
+                                                    <option value="Placa">Placa de identificación</option>
+                                                    <option value="Microchip">Microchip</option>
+                                                </select>
+
+
+
+                    </div>
+
+                    <!-- Segunda tarjeta -->
+                    <div class="reg-card">
+                        <h2>Historial médico</h2>                                                
+                                                <select id="comportamiento" name="comportamiento">
+                                                    <option value="">-- Comportamiento --</option>
+                                                    <option value="Amigable">Amigable</option>
+                                                    <option value="Agresivo">Agresivo</option>
+                                                    <option value="Neutral">Neutral</option>
+                                                </select>
+
+                                                                                                <label><input type="checkbox" id="chk_esterilizado" name="esterilizado"> Esterilizado</label>
+                                                                                                <div id="esterilizado-details" class="dependent">
+                                                                                                    <label>Fecha de esterilización (opcional): <input type="date" id="fechaEsterilizacion" name="fechaEsterilizacion"></label>
+                                                                                                </div>
+
+                                                
+                                                                                                <label><input type="checkbox" id="chk_discapacitada" name="discapacitada"> Discapacitada</label>
+                                                                                                <div id="discapacitada-details" class="dependent">
+                                                                                                    <input type="text" id="tipoDiscapacidad" name="tipoDiscapacidad" placeholder="Tipo de discapacidad">
+                                                                                                </div>
+                                                
+                                                <label>Última vacuna de la rabia:</label>
+                                                <input type="date" id="ultimaRabia" name="ultimaRabia">
+                                                                                                <label><input type="checkbox" id="chk_cartillaVacunacion" name="cartillaVacunacion"> Tiene cartilla de vacunación</label>
+                                                                                                <!-- Last rabies vaccine remains visible always -->
+                                                                                                <div id="cartilla-details" class="dependent">
+                                                                                                    <label>Cuadro de vacunación (archivo o texto):</label>
+                                                                                                    <input type="file" name="vacunasFile">
+                                                                                                    <input type="text" name="vacunasText" placeholder="Vacunas y fechas">
+                                                                                                </div>
+                                                                                                <label><input type="checkbox" id="chk_desparacitada" name="desparacitada"> Desparasitada</label>
+                                                                                                <div id="desparacitada-details" class="dependent">
+                                                                                                    <label>Fecha de última desparasitación:</label>
+                                                                                                    <input type="date" name="desparasitacion">
+                                                                                                </div>
+
+                                                                                                <label><input type="checkbox" id="chk_alergias" name="chk_alergias"> Alergias</label>
+                                                                                                <div id="alergias-details" class="dependent">
+                                                                                                    <textarea id="alergias" name="alergias" placeholder="Describe alergias conocidas" rows="3"></textarea>
+                                                                                                </div>
+                                                                                                <label><input type="checkbox" id="chk_condiciones" name="chk_condiciones"> Condiciones crónicas / enfermedades</label>
+                                                                                                <div id="condiciones-details" class="dependent">
+                                                                                                    <textarea id="condiciones" name="condiciones" placeholder="Enfermedades crónicas, observaciones" rows="3"></textarea>
+                                                                                                </div>
+                                                                                                <label><input type="checkbox" id="chk_medicamentos" name="chk_medicamentos"> Medicamentos actuales</label>
+                                                                                                <div id="medicamentos-details" class="dependent">
+                                                                                                    <textarea id="medicamentos" name="medicamentos" placeholder="Medicamentos y dosis" rows="2"></textarea>
+                                                                                                </div>
+                                                <label>Imagen de tu mascota:</label>
+                                                <input type="file" name="foto_mascota">
+
+                                                <div style="margin-top:12px">
+                                                    <button type="submit" class="reg-btn-submit">Registrar Mascota</button>
+                                                </div>
+                    </div>
+
+                </form>
+            </div>
+        </section>
+
+
+
+
+
+                <footer class="site-footer">
+        <div class="container footer-inner">
+            <p>© <span id="year"></span> TechSide</p>
+            <small class="muted">Términos y condiciones · Política de privacidad</small>
+        </div>
+    </footer>
+
+        <script> document.getElementById('year').textContent = new Date().getFullYear();</script>
+        <script>
+            // Cargar razas/especies desde JSON (archivo admin/razas.json)
+            fetch('razas.json')
+                .then(r => r.json())
+                .then(razasData => {
+                    const razas = razasData;
+
+                    const campos = {
+                        "perro": ["nombre", "raza", "sexo", "fechaNacimiento", "tamano", "tipoPelo", "colorPelo", "comidas", "medicinas"],
+                        "gato": ["nombre", "raza", "sexo", "fechaNacimiento", "colorOjos", "tipoPelo", "comidas", "medicinas"],
+                        "ave": ["nombre", "especie", "sexo", "fechaNacimiento", "envergadura", "colorPlumas", "comidas", "medicinas"],
+                        "reptil": ["nombre", "especie", "sexo", "fechaNacimiento", "longitud", "temperaturaHabitat", "comidas", "medicinas"]
+                    };
+
+                    const tipo = document.getElementById('tipo');
+                    const raza = document.getElementById('raza');
+                    const especie = document.getElementById('especie');
+
+                    tipo.addEventListener('change', () => {
+                        const seleccion = tipo.value;
+
+                        // Ocultar todos los campos primero
+                        Object.values(campos).flat().forEach(id => {
+                            const campo = document.getElementById(id);
+                            if (campo)
+                                campo.classList.add('hidden');
+                        });
+
+                        // Mostrar los campos correspondientes al tipo seleccionado
+                        if (campos[seleccion]) {
+                            campos[seleccion].forEach(id => {
+                                const campo = document.getElementById(id);
+                                if (campo)
+                                    campo.classList.remove('hidden');
+                            });
+                        }
+
+                        // Manejo de raza/especie desde JSON
+                        if (seleccion === "perro" || seleccion === "gato") {
+                            raza.classList.remove('hidden');
+                            raza.innerHTML = '<option value="">-- Selecciona raza --</option>';
+                            (razas[seleccion] || []).forEach(r => {
+                                const option = document.createElement('option');
+                                option.value = r;
+                                option.textContent = r;
+                                raza.appendChild(option);
+                            });
+                            especie.classList.add('hidden');
+                            especie.innerHTML = '<option value="">-- Selecciona especie --</option>';
+                        } else if (seleccion === "ave" || seleccion === "reptil") {
+                            especie.classList.remove('hidden');
+                            especie.innerHTML = '<option value="">-- Selecciona especie --</option>';
+                            (razas[seleccion] || []).forEach(r => {
+                                const option = document.createElement('option');
+                                option.value = r;
+                                option.textContent = r;
+                                especie.appendChild(option);
+                            });
+                            raza.classList.add('hidden');
+                            raza.innerHTML = '<option value="">-- Selecciona raza --</option>';
+                        } else {
+                            // Ninguna opción seleccionada
+                            raza.classList.add('hidden');
+                            raza.innerHTML = '<option value="">-- Selecciona raza --</option>';
+                            especie.classList.add('hidden');
+                            especie.innerHTML = '<option value="">-- Selecciona especie --</option>';
+                        }
+                    });
+                })
+                .catch(err => console.error('Error cargando razas.json:', err));
+
+                                // --- Owners list (public) ---
+                                (function(){
+                                        const role = localStorage.getItem('role') || 'guest';
+                                        const ownerSearch = document.getElementById('ownerSearch');
+                                        const ownersList = document.getElementById('ownersList');
+                                        const noOwnerCheckbox = document.getElementById('noOwner');
+
+                                        // Try to populate owners datalist if the datalist exists
+                                        if(ownersList){
+                                            fetch('owners.json').then(r=>r.json()).then(data=>{
+                                                (data || []).forEach(o => { const opt=document.createElement('option'); opt.value = o.name; ownersList.appendChild(opt); });
+                                            }).catch(()=>{
+                                                ['María G.','Carlos R.','Luis P.'].forEach(n=>{ const opt=document.createElement('option'); opt.value=n; ownersList.appendChild(opt); });
+                                            });
+                                        }
+
+                                        // If the ownerSearch input exists, show it (for non-admin users)
+                                        if(ownerSearch){ ownerSearch.style.display = 'block'; }
+
+                                        // If a noOwner checkbox exists, wire its change handler defensively
+                                        if(noOwnerCheckbox && ownerSearch){
+                                            noOwnerCheckbox.addEventListener('change', ()=>{
+                                                if(noOwnerCheckbox.checked){ ownerSearch.disabled = true; ownerSearch.value = ''; }
+                                                else ownerSearch.disabled = false;
+                                            });
+                                        }
+                                })();
+
+                                // Toggle dependent fields when checkboxes change
+                                (function(){
+                                        const toggles = [
+                                            ['chk_microchip','microchip-details'],
+                                            ['chk_esterilizado','esterilizado-details'],
+                                            ['chk_discapacitada','discapacitada-details'],
+                                            ['chk_cartillaVacunacion','cartilla-details'],
+                                            ['chk_desparacitada','desparacitada-details'],
+                                            ['chk_alergias','alergias-details'],
+                                            ['chk_condiciones','condiciones-details'],
+                                            ['chk_medicamentos','medicamentos-details']
+                                        ];
+                                        toggles.forEach(([chkId, targetId])=>{
+                                            const chk = document.getElementById(chkId);
+                                            const target = document.getElementById(targetId);
+                                            if(!chk || !target) return;
+                                            // initialize
+                                            target.style.display = chk.checked ? 'block' : 'none';
+                                            chk.addEventListener('change', ()=>{ target.style.display = chk.checked ? 'block' : 'none'; });
+                                        });
+                                })();
+
+            // Arreglar cierre del modal cuando se hace clic fuera del cuadro de login
+            function openLogin() { document.getElementById('login-modal').style.display = 'flex'; }
+            function closeLogin() { document.getElementById('login-modal').style.display = 'none'; }
+            function closeOnOutsideClick(event) {
+                const modal = document.getElementById('login-modal');
+                const box = modal && modal.querySelector('.login-content');
+                if (modal && box && !box.contains(event.target)) {
+                    closeLogin();
+                }
+            }
+        </script>
+
+    </body>
+</html>
+    <script src="../js/session.js"></script>

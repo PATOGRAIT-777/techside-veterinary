@@ -1,0 +1,9 @@
+ID_alergia,nombre,agente_causal,sintomas,tratamiento,tipo
+1,Dermatitis alérgica por pulgas (DAP),Saliva de pulgas,"Causa más común de alergia en gatos, prurito severo","Control de pulgas (pipetas, collares, limpieza del entorno), corticoides o antihistamínicos según gravedad",Parasitarias/Alérgicas
+2,Alergia alimentaria,"Proteínas alimentarias (pollo, pescado, res, lácteos)","Se manifiesta con vómitos, diarrea o problemas cutáneos","Dieta hipoalergénica o de eliminación, evitar el alimento causante",Alimentaria
+3,Dermatitis atópica felina,"Alergenos ambientales (ácaros, pólenes, polvo)","Prurito crónico, lesiones en piel y orejas","Control ambiental, inmunoterapia, antihistamínicos, baños medicados",Ambiental
+4,Asma felino (alergia respiratoria),"Inhalación de alérgenos (polvo, humo, pólenes)","Causa tos, sibilancias y dificultad respiratoria","Broncodilatadores e inhaladores con corticoides, evitar alérgenos",Respiratoria
+5,Alergia de contacto,"Plásticos, detergentes, productos químicos","Zonas de piel enrojecida o con pérdida de pelo","Evitar el contacto con el agente, cremas calmantes o corticoides tópicos",Contacto
+6,Reacciones adversas a fármacos,"Medicamentos (ej. antibióticos, AINEs, vacunas)","Desde urticaria hasta shock anafiláctico","Suspender el fármaco, administrar antihistamínicos o corticoides; en casos graves, atención veterinaria urgente",Medicamentosas
+7,Hipersensibilidad a picaduras de insectos,"Abejas, avispas, mosquitos","Inflamación localizada o reacciones graves","Compresas frías, corticoides o antihistamínicos; en casos severos, tratamiento de emergencia",Insectos
+

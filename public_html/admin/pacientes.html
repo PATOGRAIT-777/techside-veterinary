@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin — Pacientes</title>
+  <link rel="stylesheet" href="../css/universalCss.css">
+  <link rel="stylesheet" href="../css/sidebar.css">
+  <link rel="stylesheet" href="../css/divs.css">
+  <style>
+    table{width:100%;border-collapse:collapse}
+    table th,table td{padding:8px;border:1px solid rgba(0,0,0,0.08);background:transparent;color:inherit}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="../initPag.html">🐶 TechSide Vet</a>
+    </div>
+  </header>
+
+  <div class="container layout" style="display:flex;gap:20px;align-items:flex-start">
+      <aside class="sidebar" style="min-width:220px;max-width:260px">
+      <nav class="sidebar-list">
+        <a href="dashboard.html">Dashboard</a>
+        <a class="active" href="pacientes.html">Pacientes</a>
+        <a href="citas.html">Citas</a>
+        <a href="inventario.html">Inventario</a>
+        <a href="ordenes.html">Órdenes</a>
+      </nav>
+    </aside>
+
+    <main class="main" style="flex:1">
+      <h1>Información de pacientes</h1>
+      <p class="muted">Lista de mascotas registradas y acceso a su historial clínico.</p>
+
+      <div style="margin-top:16px">
+        <button class="btn-primary" onclick="location.href='regPet.html'">Registrar nueva mascota</button>
+      </div>
+
+      <table style="margin-top:12px; width:100%; border-collapse:collapse">
+        <thead>
+          <tr><th>Nombre</th><th>Raza</th><th>Edad</th><th>Dueño</th><th>Fecha cita</th><th>Hora cita</th><th>Historial médico</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Firulais</td>
+            <td>Labrador</td>
+            <td>3 años</td>
+            <td>María G.</td>
+            <td>2026-01-10</td>
+            <td>09:30</td>
+            <td><button class="btn-ghost" onclick="openPatientModal('Firulais','María G.','3 años')">Ver</button></td>
+          </tr>
+          <tr>
+            <td>Misu</td>
+            <td>Persa</td>
+            <td>5 años</td>
+            <td>Carlos R.</td>
+            <td>2026-01-12</td>
+            <td>10:00</td>
+            <td><button class="btn-ghost" onclick="openPatientModal('Misu','Carlos R.','5 años')">Ver</button></td>
+          </tr>
+        </tbody>
+      </table>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> TechSide</p>
+      <small class="muted">Términos y condiciones · Política de privacidad</small>
+    </div>
+  </footer>
+
+  <div id="login-modal" class="login-modal" onclick="closeOnOutsideClick(event)">
+    <div class="login-content">
+      <span class="close" onclick="document.getElementById('login-modal').style.display='none'">&times;</span>
+      <form class="login-form">
+        <h2>Ingresar</h2>
+        <input type="text" placeholder="Usuario" required>
+        <input type="password" placeholder="Contraseña" required>
+        <button class="btn-primary">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Patient detail modal -->
+  <div id="patient-modal" class="login-modal" onclick="closeOnOutsideClickPatient(event)" style="display:none">
+    <div class="login-content">
+      <span class="close" onclick="document.getElementById('patient-modal').style.display='none'">&times;</span>
+      <div id="patient-details" style="max-height:60vh;overflow:auto">
+        <h2>Historial médico</h2>
+        <div id="patient-info">Cargando...</div>
+        <div id="patient-files" style="margin-top:12px">Archivos: (si existen se mostrarán aquí)</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openLogin() { document.getElementById('login-modal').style.display = 'flex'; }
+    function closeLogin() { document.getElementById('login-modal').style.display = 'none'; }
+    function closeOnOutsideClick(event) { const modal = document.getElementById('login-modal'); if (modal && !modal.querySelector('.login-content').contains(event.target)) closeLogin(); }
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    function openPatientModal(nombre, dueño, edad) {
+      const modal = document.getElementById('patient-modal');
+      const appointments = JSON.parse(localStorage.getItem('appointments')||'[]');
+      // try to find pet record by name and owner
+      const pets = window.__pets_cache || JSON.parse(localStorage.getItem('pets_cache')||'[]');
+      const pet = pets.find(p=> (p.name===nombre && (p.owner===dueño || p.ownerName===dueño)) ) || pets.find(p=>p.name===nombre) || null;
+      const visits = appointments.filter(a=> a.owner===dueño || a.pet===nombre || a.petId=== (pet && pet.id) ).length;
+      const history = appointments.filter(a=> a.owner===dueño || a.pet===nombre || a.petId=== (pet && pet.id)).sort((a,b)=> (a.date||a.day||'').localeCompare(b.date||b.day||''));
+      let sucursal='N/D', doctor='N/D', padecimientos='N/D';
+      const last = history.slice(-1)[0] || null;
+      if(last){ sucursal = last.branch || last.branchName || 'N/D'; doctor = last.doctor || 'N/D'; padecimientos = last.procedure || last.padecimiento || 'N/D'; }
+
+      // build detailed patient info including full pet registration when available
+      let infoHtml = `
+        <p><strong>Nombre:</strong> ${nombre}</p>
+        <p><strong>Dueño:</strong> ${dueño}</p>
+        <p><strong>Edad:</strong> ${edad}</p>
+        <p><strong>Sucursal registrada:</strong> ${sucursal}</p>
+        <p><strong>Doctor última cita:</strong> ${doctor}</p>
+        <p><strong>Padecimientos / Procedimiento:</strong> ${padecimientos}</p>
+        <p><strong>Veces asistió a cita:</strong> ${visits}</p>
+      `;
+      if(pet){
+        infoHtml += '<hr><h3>Ficha completa de la mascota</h3>';
+        const keys = ['ruac','name','species','age','gender','sterilized','microchipped','microchipNumber','size','primaryColor','secondaryColor','coverage','weight','provenance','outdoorSupervision','behavior','vaccinationCard','lastRabies','disabled','disabilityType','dewormed','lastDeworm','homeLocation','idMethod'];
+        keys.forEach(k=>{ if(pet[k]!==undefined){ infoHtml += `<p><strong>${k}:</strong> ${pet[k]}</p>`; }});
+      }
+
+      if(history.length>0){
+        infoHtml += '<hr><h3>Historial de citas</h3><ul>';
+        history.forEach(h=>{ infoHtml += `<li>${h.date||h.day||'N/D'} ${h.time||h.hour||''} — ${h.branch||h.branchName||'N/D'} / ${h.doctor||'N/D'} — ${h.procedure||h.padecimiento||h.reason||'N/D'}</li>`; });
+        infoHtml += '</ul>';
+      }
+
+      document.getElementById('patient-info').innerHTML = infoHtml;
+      modal.style.display = 'flex';
+    }
+
+    function closeOnOutsideClickPatient(event) {
+      const modal = document.getElementById('patient-modal');
+      if (!modal) return;
+      const box = modal.querySelector('.login-content');
+      if (box && !box.contains(event.target)) modal.style.display = 'none';
+    }
+  </script>
+</body>
+</html>
+<script src="../js/session.js"></script>

@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin — Dashboard</title>
+  <link rel="stylesheet" href="../css/universalCss.css">
+  <link rel="stylesheet" href="../css/sidebar.css">
+  <link rel="stylesheet" href="../css/divs.css">
+  <style>
+    .admin-cards{display:flex;gap:16px;flex-wrap:wrap}
+    .card-metric{flex:1 1 200px;padding:18px;background:#1f2937;color:#fff;border-radius:8px}
+    table{width:100%;border-collapse:collapse}
+    table th,table td{padding:8px;border:1px solid rgba(0,0,0,0.08);background:transparent;color:inherit}
+    .main{padding:20px}
+  </style>
+  </head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="../initPag.html">🐶 TechSide Vet</a>
+      <nav class="main-nav">
+        <a href="../initPag.html">Inicio</a>
+        <a href="dashboard.html" class="active">Dashboard</a>
+        <a href="pacientes.html">Pacientes</a>
+        <a href="citas.html">Citas</a>
+        <a href="inventario.html">Inventario</a>
+        <a href="ordenes.html">Órdenes</a>
+          <a href="dashboard.html">Dashboard</a>
+          <a href="citas.html">Citas</a>
+          <a href="expedientes.html">Expedientes</a>
+          <a href="listas.html">Mis mascotas</a>
+          <a href="regPetAdmin.html">Registrar mascota</a>
+          <a href="pacientes.html">Pacientes</a>
+          <a href="horario.html">Horario</a>
+          <a href="inventario.html">Inventario</a>
+          <a href="ordenes.html">Órdenes</a>
+          <a href="prodCatalog.html">Tienda</a>
+          <a href="regUser.html">Mi cuenta</a>
+      </nav>
+      <div class="header-actions">
+        <button class="btn-ghost"><a href="formAgregar.html">Registrarse</a></button>
+        <button class="btn-primary" onclick="openLogin()">Entrar</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container layout" style="display:flex;gap:20px;align-items:flex-start">
+    <aside class="sidebar" style="min-width:220px;max-width:260px">
+      <nav class="sidebar-list">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="pacientes.html">Pacientes</a>
+        <a href="citas.html">Citas</a>
+        <a href="inventario.html">Inventario</a>
+        <a href="ordenes.html">Órdenes</a>
+      </nav>
+    </aside>
+
+    <main class="main" style="flex:1">
+      <h1>Panel administrativo</h1>
+      <p class="muted">Vista rápida de actividad y métricas.</p>
+
+      <div class="admin-cards">
+        <div class="card-metric">
+          <h3>Citas hoy</h3>
+          <p style="font-size:24px">12</p>
+        </div>
+        <div class="card-metric">
+          <h3>Pacientes</h3>
+          <p style="font-size:24px">248</p>
+        </div>
+        <div class="card-metric">
+          <h3>Pedidos pendientes</h3>
+          <p style="font-size:24px">5</p>
+        </div>
+        <div class="card-metric">
+          <h3>Productos en stock</h3>
+          <p style="font-size:24px">134</p>
+        </div>
+      </div>
+
+      <section style="margin-top:24px">
+        <h2>Próximas citas</h2>
+        <table>
+          <thead><tr><th>Hora</th><th>Paciente</th><th>Dueño</th><th>Servicio</th><th>Sucursal</th><th>Doctor</th><th>Padecimiento</th><th>Estado</th></tr></thead>
+          <tbody id="dashboard-appointments-body">
+            <tr><td>09:30</td><td>Firulais</td><td>María G.</td><td>Consulta</td><td>Lindavista</td><td>Dr. Pérez</td><td>Otitis</td><td>Confirmada</td></tr>
+            <tr><td>10:00</td><td>Misu</td><td>Carlos R.</td><td>Vacunación</td><td>Centro</td><td>Dra. López</td><td>Vacunación</td><td>Pendiente</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> TechSide</p>
+      <small class="muted">Términos y condiciones · Política de privacidad</small>
+    </div>
+  </footer>
+
+  <div id="login-modal" class="login-modal" onclick="closeOnOutsideClick(event)">
+    <div class="login-content">
+      <span class="close" onclick="document.getElementById('login-modal').style.display='none'">&times;</span>
+      <form class="login-form">
+        <h2>Ingresar</h2>
+        <input type="text" placeholder="Usuario" required>
+        <input type="password" placeholder="Contraseña" required>
+        <button class="btn-primary">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function openLogin() { document.getElementById('login-modal').style.display = 'flex'; }
+    function closeLogin() { document.getElementById('login-modal').style.display = 'none'; }
+    function closeOnOutsideClick(event) {
+      const modal = document.getElementById('login-modal');
+      if (modal && !modal.querySelector('.login-content').contains(event.target)) closeLogin();
+    }
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

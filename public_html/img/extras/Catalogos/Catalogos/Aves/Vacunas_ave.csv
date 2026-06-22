@@ -1,0 +1,35 @@
+﻿Id_vacAve,Laboratorio,Nombre_vac,Cura,Tipo_vac
+1,Lapisa,Gallimune 302 ENC+BI+EDS,"Newcastle, Bronquitis infecciosa y el síndrome de baja postura",Biológicos Aviares
+2,Lapisa,Volvac AE+FP MLV,Encefalomielitis Aviar + Viruela Aviar,Biológicos Aviares
+3,Lapisa,Volvac Influenza FP Recombinante,Viruela + Influenza Aviar,Biológicos Aviares
+4,Lapisa,Volvac ND+IB MLV,Newcastle + Bronquitis Infecciosa,Biológicos Aviares
+5,Lapisa,Minazel plus,micotoxicosis,Adsorbente de Micotoxinas
+6,Lapisa,Lapigen 100,"E. coli, E. aerogenes, Salmonella spp y P. aeruginosa",Antibioticos inyectables
+7,Lapisa,Lapigen 50,"E. coli, E. aerogenes, Salmonella spp y P. aeruginosa",Antibioticos inyectables
+8,Lapisa,Minoxel,colibacilosis,Antibioticos inyectables
+9,Lapisa,Minoxel 8G,colibacilosis,Antibioticos inyectables
+10,Lapisa,Diramox Soluble,nfecciones secundarias a una enfermedad viral.,Antibioticos solubles
+11,Lapisa,Espectolin Polvo Soluble,Escherichia coli y Mycoplasma gallisepticum.,Antibioticos solubles
+12,Lapisa,Ne-O-Tetra,"diarreas, estados de estrés, baja de postura.",Antibioticos solubles
+13,Lapisa,Primecin Soluble,"Pasteurella, Mycoplasma, E. coli, Salmonella, Haemophilus, Staphylococcus, Streptococcus, Pseudomonas y Corynebacterium.",Antibioticos solubles
+14,Lapisa,Sulfatropin Plus,"colibacilosis, ECR, tifus aviar, pulorosis, salmonelosis, coriza infecciosa, cólera aviar.",Antibioticos solubles
+15,Lapisa,Diramox Premix,s infecciones bacterianas susceptibles a la amoxicilina en aves de engorda. Así como coadyuvante en infecciones secundarias a una enfermedad viral.,Antibióticos en Premezcla
+16,Lapisa,Diramox Premix 50%,"enfermedades bacterianas en aves (engorda y reproductoras), causadas por Salmonella spp, Escherichia coli, Pasteurella spp, Haemophilus spp, Streptococcus spp y Clostridium spp",Antibióticos en Premezcla
+17,Lapisa,Flortec Premix,"Florfenicol, así como coadyuvante en infecciones bacterianas secundarias a una enfermedad viral.",Antibióticos en Premezcla
+18,Lapisa,Flortec Premix 8%,"Salmonella spp, Escherichia coli, Pasteurella haemolytica, Pasteurella multocida, Streptococcus spp y Mycoplasma spp.",Antibióticos en Premezcla
+19,Lapisa,Kitacron Feed 110,Para el tratamiento de enfermedades bacterianas causadas por gérmenes sensibles a la kitasamicina.,Antibióticos en Premezcla
+20,Lapisa,Lapi-Resp FT,"Salmonella spp, Escherichia coli, Mannheimia haemolytica, Pasteurella multocida, Streptococcus spp y Mycoplasma spp",Antibióticos en Premezcla
+21,Lapisa,Neumo 200,Para el tratamiento de enfermedades causadas por gérmenes sensibles a la acción de la oxitetraciclina,Antibióticos en Premezcla
+22,Lapisa,Neumoclor 200,"gérmenes susceptibles a la clortetraciclina, así como coadyuvante en infecciones secundarias a una enfermedad viral.",Antibióticos en Premezcla
+23,Lapisa,Primecin Premix,"Mycoplasma gallisepticum, Mycoplasma synoviae, Haemophilus paragallinarum, Pasteurella multocida, así como enfermedades del tracto digestivo causadas por gérmenes Gram positivos y Gram negativos",Antibióticos en Premezcla
+24,Lapisa,Sulfatropin Premezcla,Para el tratamiento de las infecciones causadas por las bacterias sensibles a la acción de la fórmula en aves de granja y de combate.,Antibióticos en Premezcla
+25,Lapisa,Tiaprem,"Mycoplasma gallisepticum, sinovitis infecciosa causada por Mycoplasma synoviae y otras infecciones causadas por microorganismos susceptibles a la fórmula",Antibióticos en Premezcla
+26,Lapisa,Tiaprem 50%,"Mycoplasma gallisepticum, la sinovitis infecciosa causada por Mycoplasma synoviae.",Antibióticos en Premezcla
+27,Lapisa,Expectoral,"Expectorante coadyuvante en la prevención y tratamiento de las infecciones respiratorias en pollos de engorda, reproductoras y gallinas de postura.",Farmacéuticos
+28,Lapisa,Electrolife,"Coadyuvante en el tratamiento de deshidratación, diarreas, y convalecencias.",Farmacéuticos
+29,Lapisa,Vitamix,"Para la prevención y corrección de deficiencias vitamínicas incluidas en la fórmula, así como estados de estrés o convalecencia de alguna enfermedad en aves.",Farmacéuticos
+30,Lapisa,Garra Ban Mo 29,"Boophilus spp, Amblyomma sp, Dermacentor spp, Anocentor sp; moscas: Haematobia sp, Stomoxys sp; piojos: Haematopinus spp, Lignogatus sp, Solenopotes sp; Melophagus spp, Damalinia spp.",Larvicidas y Mosquicidas
+31,Lapisa,Larvakill Premix,"Regulador sintético del crecimiento de insectos con actividad contra dípteros (moscas, mosquitos, moscas de la fruta).",Larvicidas y Mosquicidas
+32,Lapisa,Lomo Pon S,"Haematobia sp, Stomoxys sp, mosca doméstica, tábanos y mosquitos, piojos: Haematopinus spp, Lignogatus sp, Solenopotes sp, Melophagus spp; Damalinia spp",Larvicidas y Mosquicidas
+33,Lapisa,Ticoff,"mosca del establo, mosca de la paleta, mosca de la cara, así como tábanos, piojos y ácaros.",Larvicidas y Mosquicidas
+34,Lapisa,Trak,"Boophilus spp, Amblyomma spp, Damalinia sp, Haematopinus spp, Solenoptes sp, Linognathus spp, Trichodectes sp, Demodex sp, Otodectes sp, Dermacentor sp, Rhipicephalus sp, Otobius sp, Sarcoptes spp, Psoroptes sp y Chorioptes sp.",Larvicidas y Mosquicidas

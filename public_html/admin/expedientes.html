@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Expedientes — TechSide Vet</title>
+  <link rel="stylesheet" href="../css/universalCss.css">
+  <link rel="stylesheet" href="../css/sidebar.css">
+  <style>
+    .layout-two{display:flex;gap:20px;align-items:flex-start}
+    .panel{background:var(--card,#fff);padding:14px;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+    .left{flex:0 0 420px}
+    .right{flex:1}
+    .field{display:flex;flex-direction:column;margin-bottom:8px}
+    .field label{font-weight:600;margin-bottom:4px}
+    .row{display:flex;gap:8px}
+    .row .field{flex:1}
+    .muted{color:var(--muted,#6b7280)}
+    .visit-item{border-top:1px dashed rgba(0,0,0,0.06);padding:8px 0}
+    .small{font-size:13px}
+    .stats{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+    .stat{background:linear-gradient(160deg,#0840c2 0%, var(--bg) 100%);padding:8px;border-radius:6px}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+        <a class="brand" href="initPag.html">🐶 TechSide Vet</a>
+        <nav class="main-nav" aria-label="Navegación principal">
+          <a href="dashboard.html">Dashboard</a>
+          <a href="citas.html">Citas</a>
+          <a href="expedientes.html" class="active">Expedientes</a>
+          <a href="listas.html">Mis mascotas</a>
+          <a href="regPetAdmin.html">Registrar mascota</a>
+          <a href="pacientes.html">Pacientes</a>
+          <a href="horario.html">Horario</a>
+          <a href="inventario.html">Inventario</a>
+          <a href="ordenes.html">Órdenes</a>
+          <a href="prodCatalog.html">Tienda</a>
+          <a href="regUser.html">Usuarios</a>
+      </nav>
+      <div class="header-actions">
+        <a href="cart.html" class="btn-ghost" style="position:relative;display:inline-flex;align-items:center;gap:8px">🛒 <span id="cart-count" style="background:#ef4444;color:#fff;padding:2px 6px;border-radius:999px;font-weight:700">0</span></a>
+        <button class="btn-primary" onclick="openLogin()">Entrar</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="margin-top:20px">
+    <h1>Expedientes de mascotas</h1>
+    <p class="muted">Registra datos personales, físicos y el historial clínico.</p>
+
+    <div class="layout-two">
+      <aside class="left panel">
+        <h3>Ficha básica</h3>
+        <div class="field"><label>Clave RUAC</label><input id="ruac" placeholder="Alfanumérico"></div>
+        <div class="field"><label>Nombre</label><input id="pet-name"></div>
+        <div class="row">
+          <div class="field"><label>Especie</label><select id="specie"><option>Perro</option><option>Gato</option><option>Ave</option><option>Reptil</option><option>Otro</option></select></div>
+          <div class="field"><label>Edad</label><input id="age"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Género</label><select id="gender"><option>Macho</option><option>Hembra</option></select></div>
+          <div class="field"><label>¿Esteril?</label><select id="steril"><option>No</option><option>Sí</option></select></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Microchip</label><select id="has-chip"><option>No</option><option>Sí</option></select></div>
+          <div class="field"><label>Número de chip</label><input id="chip-number"></div>
+        </div>
+
+        <h3 style="margin-top:12px">Características físicas</h3>
+        <div class="row">
+          <div class="field"><label>Tamaño</label><select id="size"><option>Chico</option><option>Mediano</option><option>Grande</option><option>Muy grande</option></select></div>
+          <div class="field"><label>Peso (kg)</label><input id="weight" type="number" step="0.1"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Color primario</label><input id="color-primary"></div>
+          <div class="field"><label>Color secundario</label><input id="color-secondary"></div>
+        </div>
+        <div class="field"><label>Cobertura corporal</label><input id="cover"></div>
+
+        <h3 style="margin-top:12px">Información adicional</h3>
+        <div class="row">
+          <div class="field"><label>Procedencia</label><select id="origin"><option>Adopción</option><option>Rescatada</option><option>Donada</option><option>Heredada</option><option>Comprada</option></select></div>
+          <div class="field"><label>Supervisión exterior</label><select id="external"><option>Sí</option><option>No</option></select></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Comportamiento</label><select id="behavior"><option>Amigable</option><option>Aggresivo</option><option>Neutral</option></select></div>
+          <div class="field"><label>Discapacitada</label><select id="disabled"><option>No</option><option>Sí</option></select></div>
+        </div>
+
+        <div class="row">
+          <div class="field"><label>Desparasitada</label><select id="dewormed"><option>Sí</option><option>No</option></select></div>
+          <div class="field"><label>Última desparasitación</label><input id="last-deworm" type="date"></div>
+        </div>
+
+        <div class="field"><label>Ubicación en el hogar</label><select id="home-location"><option>Interior</option><option>Exterior</option></select></div>
+        <div class="field"><label>Forma de identificación</label><input id="id-form"></div>
+        <div class="field"><label>Fotografía (URL)</label><input id="photo-url"></div>
+
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn-primary" id="save-pet">Guardar ficha</button>
+          <button class="btn-ghost" id="load-pet">Cargar por RUAC</button>
+        </div>
+
+      </aside>
+
+      <section class="right">
+        <div class="panel">
+          <h3>Registrar consulta (Doctor)</h3>
+          <div class="field"><label>Doctor (inicia sesión)</label>
+            <select id="doctor-select"></select>
+          </div>
+          <div class="field"><label>Signos</label><input id="signs"></div>
+          <div class="field"><label>Síntomas</label><textarea id="symptoms" rows="2"></textarea></div>
+          <div class="row">
+            <div class="field"><label>Prediagnóstico</label><input id="predi"></div>
+            <div class="field"><label>Diagnóstico</label><input id="diag"></div>
+          </div>
+          <div class="field"><label>Procedimiento (select)</label>
+            <select id="procedure-select">
+              <option>Vacunación</option>
+              <option>Cirugía</option>
+              <option>Consulta</option>
+              <option>Desparasitación</option>
+              <option>Consulta dental</option>
+            </select>
+          </div>
+          <div class="field"><label>Descripción del padecimiento (max 300)</label><textarea id="padecimiento" maxlength="300" rows="3"></textarea></div>
+          <div class="field"><label>Medicamentos y tratamiento</label><textarea id="treatment" rows="2"></textarea></div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn-primary" id="save-visit">Guardar visita</button>
+            <button class="btn-ghost" id="clear-visit">Limpiar</button>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:12px">
+          <h3>Historial de visitas</h3>
+          <div id="visits-list"></div>
+        </div>
+
+        <div class="panel" style="margin-top:12px">
+          <h3>Reportes rápidos</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <label class="small">Sucursal:</label>
+            <select id="report-branch"></select>
+            <label class="small">Especialidad:</label>
+            <select id="report-specialty"></select>
+            <label class="small">Desde</label>
+            <input type="date" id="report-from">
+            <label class="small">Hasta</label>
+            <input type="date" id="report-to">
+            <button class="btn-ghost" id="generate-reports">Generar</button>
+          </div>
+
+          <div class="stats" style="margin-top:8px">
+            <div class="stat"><strong id="doctors-today">0</strong><div class="small">Doctores hoy</div></div>
+            <div class="stat"><strong id="doctors-branches">0</strong><div class="small">Sucursales con doctores</div></div>
+            <div class="stat"><strong id="multi-clinic-patients">0</strong><div class="small">Pacientes en &gt;1 clínica</div></div>
+          </div>
+
+          <div style="margin-top:10px">
+            <h4 class="small">Doctores que trabajan hoy</h4>
+            <div id="doctors-today-list" class="small muted"></div>
+          </div>
+
+          <div style="margin-top:10px">
+            <h4 class="small">Doctores por sucursal</h4>
+            <div id="doctors-by-branch-list" class="small muted"></div>
+          </div>
+
+          <div style="margin-top:10px">
+            <h4 class="small">Consultas por doctor (periodo)</h4>
+            <div id="consults-per-doc"></div>
+          </div>
+
+          <div style="margin-top:10px">
+            <h4 class="small">Doctores ausentes esta semana</h4>
+            <div id="absent-week"></div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> TechSide</p>
+      <small class="muted">Términos y condiciones · Política de privacidad</small>
+    </div>
+  </footer>
+
+  <script>
+    // cart count reuse
+    function getCart(){ return JSON.parse(localStorage.getItem('cart')||'[]'); }
+    function updateCartCount(){ const c = getCart(); const qty = c.reduce((s,i)=>s+i.qty,0); document.getElementById('cart-count').textContent = qty; }
+    updateCartCount();
+
+    // sample data helpers
+    const sampleDoctors = JSON.parse(localStorage.getItem('doctors')||'null') || [
+      {id:1,name:'Dr. Ana Pérez',branch:'Centro',specialty:'Medicina general',workdays:[1,2,3,4,5]},
+      {id:2,name:'Dr. Luis Gómez',branch:'Sur',specialty:'Cirugía',workdays:[1,3,5]},
+      {id:3,name:'Dra. María Ruiz',branch:'Centro',specialty:'Dermatología',workdays:[2,3,4]},
+      {id:4,name:'Dr. Pablo Díaz',branch:'Norte',specialty:'Medicina general',workdays:[1,2,3,4,5]}
+    ];
+    if(!localStorage.getItem('doctors')) localStorage.setItem('doctors', JSON.stringify(sampleDoctors));
+
+    function populateDoctorsSelect(){
+      const sel = document.getElementById('doctor-select'); sel.innerHTML = '';
+      const docs = JSON.parse(localStorage.getItem('doctors')||'[]');
+      docs.forEach(d=>{ const o = document.createElement('option'); o.value=d.id; o.textContent = d.name + ' — ' + d.branch + ' ('+d.specialty+')'; sel.appendChild(o); });
+    }
+    populateDoctorsSelect();
+
+    // Save pet ficha
+    document.getElementById('save-pet').addEventListener('click', ()=>{
+      const ruac = document.getElementById('ruac').value.trim(); if(!ruac){ alert('Clave RUAC requerida'); return; }
+      const pets = JSON.parse(localStorage.getItem('pets')||'{}');
+      pets[ruac] = {
+        ruac,
+        name: document.getElementById('pet-name').value,
+        specie: document.getElementById('specie').value,
+        age: document.getElementById('age').value,
+        gender: document.getElementById('gender').value,
+        steril: document.getElementById('steril').value,
+        hasChip: document.getElementById('has-chip').value,
+        chipNumber: document.getElementById('chip-number').value,
+        size: document.getElementById('size').value,
+        weight: document.getElementById('weight').value,
+        colorPrimary: document.getElementById('color-primary').value,
+        colorSecondary: document.getElementById('color-secondary').value,
+        cover: document.getElementById('cover').value,
+        origin: document.getElementById('origin').value,
+        external: document.getElementById('external').value,
+        behavior: document.getElementById('behavior').value,
+        disabled: document.getElementById('disabled').value,
+        dewormed: document.getElementById('dewormed').value,
+        lastDeworm: document.getElementById('last-deworm').value,
+        homeLocation: document.getElementById('home-location').value,
+        idForm: document.getElementById('id-form').value,
+        photo: document.getElementById('photo-url').value,
+        visits: JSON.parse(localStorage.getItem('visits')||'[]').filter(v=>v.ruac===ruac)
+      };
+      localStorage.setItem('pets', JSON.stringify(pets));
+      alert('Ficha guardada: '+ruac);
+      refreshReports();
+    });
+
+    document.getElementById('load-pet').addEventListener('click', ()=>{
+      const ruac = document.getElementById('ruac').value.trim(); if(!ruac) return alert('Indica RUAC');
+      const pets = JSON.parse(localStorage.getItem('pets')||'{}');
+      const p = pets[ruac]; if(!p) return alert('No se encontró ficha');
+      document.getElementById('pet-name').value = p.name||'';
+      document.getElementById('specie').value = p.specie||'Perro';
+      document.getElementById('age').value = p.age||'';
+      document.getElementById('gender').value = p.gender||'Macho';
+      document.getElementById('steril').value = p.steril||'No';
+      document.getElementById('has-chip').value = p.hasChip||'No';
+      document.getElementById('chip-number').value = p.chipNumber||'';
+      document.getElementById('size').value = p.size||'Mediano';
+      document.getElementById('weight').value = p.weight||'';
+      document.getElementById('color-primary').value = p.colorPrimary||'';
+      document.getElementById('color-secondary').value = p.colorSecondary||'';
+      document.getElementById('cover').value = p.cover||'';
+      document.getElementById('origin').value = p.origin||'Adopción';
+      document.getElementById('external').value = p.external||'No';
+      document.getElementById('behavior').value = p.behavior||'Amigable';
+      document.getElementById('disabled').value = p.disabled||'No';
+      document.getElementById('dewormed').value = p.dewormed||'Sí';
+      document.getElementById('last-deworm').value = p.lastDeworm||'';
+      document.getElementById('home-location').value = p.homeLocation||'Interior';
+      document.getElementById('id-form').value = p.idForm||'';
+      document.getElementById('photo-url').value = p.photo||'';
+      renderVisits(ruac);
+    });
+
+    // Save visit
+    document.getElementById('save-visit').addEventListener('click', ()=>{
+      const ruac = document.getElementById('ruac').value.trim(); if(!ruac){ alert('Indica RUAC'); return; }
+      const visit = {
+        id: Date.now(), ruac, date: new Date().toISOString(), doctorId: parseInt(document.getElementById('doctor-select').value,10), signs:document.getElementById('signs').value,
+        symptoms:document.getElementById('symptoms').value,predi:document.getElementById('predi').value,diag:document.getElementById('diag').value,
+        procedure:document.getElementById('procedure-select').value,padecimiento:document.getElementById('padecimiento').value,
+        treatment:document.getElementById('treatment').value
+      };
+      const visits = JSON.parse(localStorage.getItem('visits')||'[]'); visits.push(visit); localStorage.setItem('visits', JSON.stringify(visits));
+      // attach to pet
+      const pets = JSON.parse(localStorage.getItem('pets')||'{}'); if(pets[ruac]){
+        pets[ruac].visits = visits.filter(v=>v.ruac===ruac);
+        localStorage.setItem('pets', JSON.stringify(pets));
+      }
+      alert('Visita registrada');
+      renderVisits(ruac);
+      refreshReports();
+    });
+
+    document.getElementById('clear-visit').addEventListener('click', ()=>{
+      ['signs','symptoms','predi','diag','padecimiento','treatment'].forEach(id=>document.getElementById(id).value='');
+    });
+
+    function renderVisits(ruac){
+      const container = document.getElementById('visits-list'); container.innerHTML='';
+      const visits = JSON.parse(localStorage.getItem('visits')||'[]').filter(v=>v.ruac===ruac).sort((a,b)=>b.date.localeCompare(a.date));
+      if(!visits.length) container.innerHTML='<p class="muted">Sin registros</p>';
+      visits.forEach(v=>{
+        const docs = JSON.parse(localStorage.getItem('doctors')||'[]'); const doc = docs.find(d=>d.id===v.doctorId) || {};
+        const div = document.createElement('div'); div.className='visit-item';
+        div.innerHTML = `<div class="small"><strong>${new Date(v.date).toLocaleString()}</strong> — ${doc.name||'Doctor no asignado'}</div>
+          <div><strong>Diagnóstico:</strong> ${escapeHtml(v.diag)}</div>
+          <div><strong>Procedimiento:</strong> ${escapeHtml(v.procedure)}</div>
+          <div class="muted small">${escapeHtml(v.padecimiento)}</div>
+          <div style="margin-top:6px"><button class="btn-ghost" data-id="${v.id}" onclick="editVisit(${v.id})">Editar</button> <button class="btn-ghost" data-id="${v.id}" onclick="deleteVisit(${v.id})">Eliminar</button></div>`;
+        container.appendChild(div);
+      });
+    }
+
+    // Edit a visit: load into form and set editing state
+    window.editVisit = function(id){
+      const visits = JSON.parse(localStorage.getItem('visits')||'[]');
+      const v = visits.find(x=>x.id===id); if(!v) return alert('Visita no encontrada');
+      document.getElementById('doctor-select').value = v.doctorId;
+      document.getElementById('signs').value = v.signs||'';
+      document.getElementById('symptoms').value = v.symptoms||'';
+      document.getElementById('predi').value = v.predi||'';
+      document.getElementById('diag').value = v.diag||'';
+      document.getElementById('procedure-select').value = v.procedure||'Consulta';
+      document.getElementById('padecimiento').value = v.padecimiento||'';
+      document.getElementById('treatment').value = v.treatment||'';
+      // mark editing
+      document.getElementById('save-visit').dataset.editingId = id;
+      document.getElementById('save-visit').textContent = 'Actualizar visita';
+    }
+
+    window.deleteVisit = function(id){
+      if(!confirm('Eliminar visita?')) return;
+      let visits = JSON.parse(localStorage.getItem('visits')||'[]');
+      visits = visits.filter(v=>v.id!==id);
+      localStorage.setItem('visits', JSON.stringify(visits));
+      // detach from pets
+      const pets = JSON.parse(localStorage.getItem('pets')||'{}');
+      Object.keys(pets).forEach(k=>{ pets[k].visits = visits.filter(v=>v.ruac===k); });
+      localStorage.setItem('pets', JSON.stringify(pets));
+      const ruac = document.getElementById('ruac').value.trim(); if(ruac) renderVisits(ruac);
+      refreshReports();
+    }
+
+    // Override save-visit to support update
+    const saveVisitBtn = document.getElementById('save-visit');
+    saveVisitBtn.addEventListener('click', ()=>{
+      const editingId = saveVisitBtn.dataset.editingId;
+      if(editingId){
+        // update existing
+        const id = parseInt(editingId,10);
+        const visits = JSON.parse(localStorage.getItem('visits')||'[]');
+        const v = visits.find(x=>x.id===id); if(!v) return alert('Visita no encontrada');
+        v.doctorId = parseInt(document.getElementById('doctor-select').value,10);
+        v.signs = document.getElementById('signs').value;
+        v.symptoms = document.getElementById('symptoms').value;
+        v.predi = document.getElementById('predi').value;
+        v.diag = document.getElementById('diag').value;
+        v.procedure = document.getElementById('procedure-select').value;
+        v.padecimiento = document.getElementById('padecimiento').value;
+        v.treatment = document.getElementById('treatment').value;
+        localStorage.setItem('visits', JSON.stringify(visits));
+        // update pet mapping
+        const pets = JSON.parse(localStorage.getItem('pets')||'{}'); if(pets[v.ruac]) pets[v.ruac].visits = visits.filter(x=>x.ruac===v.ruac); localStorage.setItem('pets', JSON.stringify(pets));
+        alert('Visita actualizada');
+        delete saveVisitBtn.dataset.editingId; saveVisitBtn.textContent = 'Guardar visita';
+        const ruac = document.getElementById('ruac').value.trim(); if(ruac) renderVisits(ruac);
+        refreshReports();
+        return;
+      }
+      // if not editing, original handler already appends visit — but to avoid double-binding, call original logic: replicate add flow
+      const ruac = document.getElementById('ruac').value.trim(); if(!ruac){ alert('Indica RUAC'); return; }
+      const visit = {
+        id: Date.now(), ruac, date: new Date().toISOString(), doctorId: parseInt(document.getElementById('doctor-select').value,10), signs:document.getElementById('signs').value,
+        symptoms:document.getElementById('symptoms').value,predi:document.getElementById('predi').value,diag:document.getElementById('diag').value,
+        procedure:document.getElementById('procedure-select').value,padecimiento:document.getElementById('padecimiento').value,
+        treatment:document.getElementById('treatment').value
+      };
+      const visits = JSON.parse(localStorage.getItem('visits')||'[]'); visits.push(visit); localStorage.setItem('visits', JSON.stringify(visits));
+      const pets = JSON.parse(localStorage.getItem('pets')||'{}'); if(pets[ruac]){ pets[ruac].visits = visits.filter(v=>v.ruac===ruac); localStorage.setItem('pets', JSON.stringify(pets)); }
+      alert('Visita registrada'); renderVisits(ruac); refreshReports();
+    });
+
+    function escapeHtml(s){ if(!s) return ''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    // Reports
+    function refreshReports(){
+      const docs = JSON.parse(localStorage.getItem('doctors')||'[]');
+      // doctors today
+      const today = (new Date()).getDay(); // 0-6 Sun-Sat; our sample uses 1-5 for Mon-Fri — map
+      const weekday = (today===0)?7:today; // 1..7
+      const docsToday = docs.filter(d=>d.workdays && d.workdays.includes(weekday)).length;
+      document.getElementById('doctors-today').textContent = docsToday;
+
+      // doctors per branch (counts)
+      const byBranch = docs.reduce((acc,d)=>{ acc[d.branch]=(acc[d.branch]||0)+1; return acc; },{});
+      document.getElementById('doctors-branches').textContent = Object.keys(byBranch).length;
+
+      // patients attended in more than one clinic
+      const visits = JSON.parse(localStorage.getItem('visits')||'[]');
+      const patientsBranches = {};
+      visits.forEach(v=>{ const docsList = JSON.parse(localStorage.getItem('doctors')||'[]'); const doc = docsList.find(x=>x.id===v.doctorId); const branch = doc?doc.branch:'?'; patientsBranches[v.ruac] = patientsBranches[v.ruac] || new Set(); patientsBranches[v.ruac].add(branch); });
+      const multi = Object.values(patientsBranches).filter(s=>s.size>1).length;
+      document.getElementById('multi-clinic-patients').textContent = multi;
+
+      // consults per doctor last 30 days
+      const since = Date.now() - (30*24*60*60*1000);
+      const counts = {};
+      visits.filter(v=>new Date(v.date).getTime()>=since).forEach(v=>{ counts[v.doctorId]=(counts[v.doctorId]||0)+1; });
+      const consultsDiv = document.getElementById('consults-per-doc'); consultsDiv.innerHTML='';
+      docs.forEach(d=>{ const c = counts[d.id]||0; const el = document.createElement('div'); el.className='small'; el.textContent = d.name + ': ' + c + ' consultas'; consultsDiv.appendChild(el); });
+
+      // absent this week (doctors without any visit entries this week)
+      const weekStart = (function(){const now=new Date(); const day=now.getDay(); const diff = now.getDate() - day + (day===0?-6:1); const monday = new Date(now.setDate(diff)); monday.setHours(0,0,0,0); return monday.getTime(); })();
+      const seenThisWeek = new Set(visits.filter(v=>new Date(v.date).getTime()>=weekStart).map(v=>v.doctorId));
+      const absent = docs.filter(d=>!seenThisWeek.has(d.id)).map(d=>d.name + ' ('+d.branch+')');
+      document.getElementById('absent-week').innerHTML = absent.slice(0,10).map(a=>'<div class="small">'+a+'</div>').join('') || '<div class="muted small">Ninguno</div>';
+    }
+
+    // Populate report filters
+    function populateReportFilters(){
+      const docs = JSON.parse(localStorage.getItem('doctors')||'[]');
+      const branches = Array.from(new Set(docs.map(d=>d.branch))).sort();
+      const branchSel = document.getElementById('report-branch'); branchSel.innerHTML = '<option value="">Todas</option>';
+      branches.forEach(b=>{ const o = document.createElement('option'); o.value=b; o.textContent=b; branchSel.appendChild(o); });
+      const specs = Array.from(new Set(docs.map(d=>d.specialty))).sort(); const specSel = document.getElementById('report-specialty'); specSel.innerHTML = '<option value="">Todas</option>';
+      specs.forEach(s=>{ const o = document.createElement('option'); o.value=s; o.textContent=s; specSel.appendChild(o); });
+    }
+    populateReportFilters();
+
+    document.getElementById('generate-reports').addEventListener('click', ()=>{
+      const branch = document.getElementById('report-branch').value;
+      const specialty = document.getElementById('report-specialty').value;
+      const from = document.getElementById('report-from').value;
+      const to = document.getElementById('report-to').value;
+      generateReports({branch,specialty,from,to});
+    });
+
+    function generateReports(filters){
+      const docs = JSON.parse(localStorage.getItem('doctors')||'[]');
+      const visits = JSON.parse(localStorage.getItem('visits')||'[]');
+      // doctors today list (respect filters)
+      const today = (new Date()).getDay(); const weekday = (today===0)?7:today;
+      const docsTodayList = docs.filter(d=>d.workdays && d.workdays.includes(weekday) && (!filters.branch||d.branch===filters.branch) && (!filters.specialty||d.specialty===filters.specialty));
+      document.getElementById('doctors-today-list').innerHTML = docsTodayList.map(d=>d.name+' ('+d.branch+')').join('<br>') || '<div class="muted small">Ninguno</div>';
+
+      // doctors by branch
+      const byBranch = {};
+      docs.filter(d=>(!filters.specialty || d.specialty===filters.specialty) && (!filters.branch || d.branch===filters.branch)).forEach(d=>{ byBranch[d.branch]=byBranch[d.branch]||[]; byBranch[d.branch].push(d.name+' ('+d.specialty+')'); });
+      const branchDiv = document.getElementById('doctors-by-branch-list'); branchDiv.innerHTML='';
+      Object.keys(byBranch).forEach(b=>{ const el = document.createElement('div'); el.className='small'; el.innerHTML = '<strong>'+b+':</strong> '+byBranch[b].join(', '); branchDiv.appendChild(el); });
+
+      // consults per doc in date range
+      const start = filters.from? new Date(filters.from).getTime() : Date.now()-(30*24*60*60*1000);
+      const end = filters.to? (new Date(filters.to).getTime() + (24*60*60*1000)-1) : Date.now();
+      const countsRange = {};
+      visits.filter(v=>{ const t = new Date(v.date).getTime(); return t>=start && t<=end; }).forEach(v=>{ countsRange[v.doctorId] = (countsRange[v.doctorId]||0)+1; });
+      const consultsDiv = document.getElementById('consults-per-doc'); consultsDiv.innerHTML='';
+      docs.filter(d=>(!filters.branch||d.branch===filters.branch) && (!filters.specialty||d.specialty===filters.specialty)).forEach(d=>{ const c = countsRange[d.id]||0; const el = document.createElement('div'); el.className='small'; el.textContent = d.name + ': ' + c + ' consultas'; consultsDiv.appendChild(el); });
+
+      // update summary boxes
+      document.getElementById('doctors-today').textContent = docsTodayList.length;
+      document.getElementById('doctors-branches').textContent = Object.keys(byBranch).length;
+      // multi-clinic patients
+      const patientsBranches = {};
+      visits.forEach(v=>{ const doc = docs.find(x=>x.id===v.doctorId); const branch = doc?doc.branch:'?'; patientsBranches[v.ruac] = patientsBranches[v.ruac]||new Set(); patientsBranches[v.ruac].add(branch); });
+      document.getElementById('multi-clinic-patients').textContent = Object.values(patientsBranches).filter(s=>s.size>1).length;
+
+      // absent this week
+      const weekStart = (function(){const now=new Date(); const day=now.getDay(); const diff = now.getDate() - day + (day===0?-6:1); const monday = new Date(now.setDate(diff)); monday.setHours(0,0,0,0); return monday.getTime(); })();
+      const seenThisWeek = new Set(visits.filter(v=>new Date(v.date).getTime()>=weekStart).map(v=>v.doctorId));
+      const absent = docs.filter(d=>!seenThisWeek.has(d.id) && (!filters.branch||d.branch===filters.branch) && (!filters.specialty||d.specialty===filters.specialty)).map(d=>d.name+' ('+d.branch+')');
+      document.getElementById('absent-week').innerHTML = absent.slice(0,10).map(a=>'<div class="small">'+a+'</div>').join('') || '<div class="muted small">Ninguno</div>';
+    }
+
+    // initial generate with defaults
+    generateReports({});
+
+    refreshReports();
+
+    // initial simple load if ruac present
+    const params = new URLSearchParams(window.location.search); if(params.get('ruac')){ document.getElementById('ruac').value = params.get('ruac'); document.getElementById('load-pet').click(); }
+
+    function openLogin(){ document.getElementById('login-modal')?.style.display = 'flex'; }
+  </script>
+
+  <div id="login-modal" class="login-modal" onclick="if(event.target===this)this.style.display='none'" style="display:none">
+    <div class="login-content">
+      <span class="close" onclick="this.parentElement.parentElement.style.display='none'">&times;</span>
+      <form class="login-form">
+        <h2>Doctor — Iniciar sesión</h2>
+        <select id="login-doctor">
+          <option value="">Seleccione</option>
+        </select>
+        <button type="button" class="btn-primary" onclick="document.getElementById('login-modal').style.display='none'">Entrar</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
+<script src="../js/session.js"></script>

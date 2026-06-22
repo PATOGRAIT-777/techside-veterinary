@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Estética y Baño — TechSide</title>
+  <link rel="stylesheet" href="../css/universalCss.css">
+  <link rel="stylesheet" href="../css/pInicio.css" type="text/css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="initPag.html">🐶 TechSide Vet</a>
+      <nav class="main-nav" aria-label="Navegación principal">
+        <a href="prodCatalog.html">Tienda</a>        
+        <a href="horario.html">Disponibilidad</a>
+        <a href="listas.html">Mis mascotas</a>
+      </nav>
+      <div class="header-actions">
+        <a href="cart.html" class="btn-ghost" style="position:relative;display:inline-flex;align-items:center;gap:8px">
+          🛒 <span id="cart-count" style="background:#ef4444;color:#fff;padding:2px 6px;border-radius:999px;font-weight:700">0</span>
+        </a>
+        <button class="btn-primary" onclick="openLogin()">Entrar</button>
+      </div>
+    </div>
+  </header>
+  
+  <main class="container" style="padding:20px">
+    <h1>Estética y baño</h1>
+    <p class="muted">Accesorios y productos para cuidado e higiene.</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <article class="producto" style="width:180px;height:220px;padding:0;border-radius:6px;overflow:hidden">
+        <img src="../img/extras/doge.jpg" style="width:100%;height:160px;object-fit:cover;display:block">
+        <div style="padding:8px;text-align:center"><h3 style="margin:0;font-size:14px">Shampoo medicado</h3><div class="muted" style="font-size:12px">Cuidado dermatológico</div><div style="margin-top:6px;color:#22c55e;font-weight:700">$180.00</div></div>
+      </article>
+      <article class="producto" style="width:180px;height:220px;padding:0;border-radius:6px;overflow:hidden">
+        <img src="../img/extras/doge.jpg" style="width:100%;height:160px;object-fit:cover;display:block">
+        <div style="padding:8px;text-align:center"><h3 style="margin:0;font-size:14px">Cortauñas</h3><div class="muted" style="font-size:12px">Acero inoxidable</div><div style="margin-top:6px;color:#22c55e;font-weight:700">$75.00</div></div>
+      </article>
+      <article class="producto" style="width:180px;height:220px;padding:0;border-radius:6px;overflow:hidden">
+        <img src="../img/extras/doge.jpg" style="width:100%;height:160px;object-fit:cover;display:block">
+        <div style="padding:8px;text-align:center"><h3 style="margin:0;font-size:14px">Toalla absorbente</h3><div class="muted" style="font-size:12px">Microfibra</div><div style="margin-top:6px;color:#22c55e;font-weight:700">$99.00</div></div>
+      </article>
+    </div>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> TechSide</p>
+      <small class="muted">Términos y condiciones · Política de privacidad</small>
+    </div>
+  </footer>
+  <script> document.getElementById('year').textContent = new Date().getFullYear(); </script>
+</body>
+</html>
+<script src="../js/session.js"></script>

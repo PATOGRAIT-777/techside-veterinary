@@ -1,0 +1,152 @@
+body{margin:0}
+.encabezado {
+    position: absolute;
+    float: top; 
+    width: 100%; 
+    height: 108px; 
+    left: 0;
+    right: 0;
+    top: 0;
+    background-color: #000000;
+    font: "Bauhaus 93";
+    font-size: 50pt; 
+    color:#BF1111;
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;    
+    justify-content: flex-start;
+    align-items: center;
+}
+.cuerpo1 {
+    position: absolute;
+    padding: 0px;
+    float: top; 
+    width: 100%; 
+    height: 90%;     
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #1F1F1F;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;    
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.menu {
+    position: absolute;
+    padding: 0px;
+    float: top; 
+    width: 121px; 
+    height: 52px;
+    left: 1.5%;
+    top: 25px;
+    background-color: transparent;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;    
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.shopName {
+    position: absolute;
+    padding: 0px; 
+    width: auto; 
+    height: 50px;
+    left: 15.76%;
+    top: 25px;
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;    
+    justify-content: flex-start;
+    align-items: flex-start;
+    background-color: transparent;
+}
+
+
+
+.config{
+    height: 43px;
+    width: 43px;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+
+form{
+    width: 80%;
+    text-align: center;
+}
+label{
+    align:left;
+}
+iframe{
+    width: 99.5%;
+    height: 99.5%;
+    border: 0;
+}
+
+/*Sub divisiones*/
+
+.selectbox{
+    width: 340px;
+    height: 45px;
+    border-bottom-right-radius: 8px; 
+    border-bottom-left-radius: 8px;
+    border-top-right-radius: 8px; 
+    border-top-left-radius: 8px;    
+    font-family: "Berlin Sans FB";
+    font-size: 25px; 
+    color:#ffffff;
+    background: #111111;
+    top: 10px;
+}
+
+.select{
+    
+}
+
+
+.right {
+    font: "Bauhaus 93";
+    font-size: 50pt; 
+    color:#BF1111;
+    position: absolute;
+    padding: 0px;
+    float: top; 
+    width: 50%; 
+    right: 0;
+    top: 0;
+    background-color: transparent;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;    
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.left {
+    font: "Bauhaus 93";
+    font-size: 50pt; 
+    color:#BF1111;
+    position: absolute;
+    padding: 0px;
+    float: top; 
+    width: 50%; 
+    left: 0;
+    top: 0;
+    background-color: transparent;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;    
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+

@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>— TechSide</title>
+  <link rel="stylesheet" href="../css/userSet.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="/">Clinica</a>
+      <nav class="main-nav" aria-label="Navegación principal">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="citas.html">Citas</a>
+        <a href="expedientes.html">Expedientes</a>
+        <a href="listas.html">Mis mascotas</a>
+        <a href="regPetAdmin.html">Registrar mascota</a>
+        <a href="pacientes.html">Pacientes</a>
+        <a href="horario.html">Horario</a>
+        <a href="inventario.html">Inventario</a>
+        <a href="ordenes.html">Órdenes</a>
+        <a href="prodCatalog.html">Tienda</a>
+        <a href="regUser.html" class="active">Mi cuenta</a>
+      </nav>
+      <div class="header-actions">
+        <button class="btn-ghost">Registrarse</button>
+        <button class="btn-primary" onclick="openLogin()">Entrar</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero pequeño / breadcrumbs -->
+  <section class="hero">
+    <div class="container">
+      <h1>Mi cuenta</h1>
+      <p class="muted">Gestiona tu perfil, contraseñas, mascotas y ajustes.</p>
+    </div>
+  </section>
+
+  <!-- Contenido principal: sidebar + main -->
+  <main class="container layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="profile-card">
+        <div class="avatar">PA</div>
+        <div class="profile-info">
+          <strong>Patograit A.</strong>
+          <small>Usuario</small>
+        </div>
+      </div>
+
+      <nav class="account-nav">
+        <a href="#perfil" class="is-active">Perfil</a>
+        <a href="listas.html">Mis mascotas</a>
+        <a href="#historial">Historial</a>
+        <a href="#ajustes">Ajustes</a>
+        <button id="logoutBtn" class="btn-ghost" style="width:100%;text-align:left">Cerrar sesión</button>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <section class="main">
+      <!-- Perfil / formulario -->
+      <article id="perfil" class="card">
+        <h2>Información del perfil</h2>
+        <form class="form-grid" autocomplete="off">
+          <label>
+            Nombre
+            <input type="text" name="nombre" value="Patograit A." />
+          </label>
+
+          <label>
+            Email
+            <input type="email" name="email" value="usuario@ejemplo.com" />
+          </label>
+
+          <label>
+            Cambiar avatar
+            <input type="file" name="avatar" accept="image/*" />
+          </label>
+
+          <label class="full">
+            Biografía
+            <textarea name="bio" rows="4">Gusta ver anime y coleccionar listas.</textarea>
+          </label>
+
+          <!-- Datos adicionales agregados para permitir edición de campos usados en registro -->
+          <label>
+            Fecha de nacimiento
+            <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" />
+          </label>
+
+          <label>
+            Género
+            <select name="genero" id="genero">
+              <option value="">-- Selecciona --</option>
+              <option value="mujer">Mujer</option>
+              <option value="hombre">Hombre</option>
+              <option value="otro">Otro</option>
+              <option value="prefiere_no_decir">Prefiere no decir</option>
+            </select>
+          </label>
+
+          <label>
+            Estado civil
+            <select name="estado_civil" id="estado_civil">
+              <option value="">-- Selecciona --</option>
+              <option>Soltero/a</option>
+              <option>Casado/a</option>
+              <option>Unión libre</option>
+              <option>Viudo/a</option>
+            </select>
+          </label>
+
+          <label>
+            Ocupación
+            <input type="text" name="ocupacion" id="ocupacion" placeholder="Ocupación" />
+          </label>
+
+          <label>
+            Empresa
+            <input type="text" name="empresa" id="empresa" placeholder="Empresa (opcional)" />
+          </label>
+
+          <label class="full"><input type="checkbox" name="accept_terms" id="accept_terms"> Acepto los términos y condiciones (registro)</label>
+
+          <div class="form-actions full">
+            <button type="submit" class="btn-primary">Guardar cambios</button>
+            <button type="button" class="btn-ghost">Cancelar</button>
+          </div>
+        </form>
+      </article>
+
+      <!-- Seguridad -->
+      <article id="ajustes" class="card">
+        <h2>Seguridad</h2>
+        <form class="form-grid">
+          <label>
+            Contraseña actual
+            <input type="password" name="current" />
+          </label>
+
+          <label>
+            Nueva contraseña
+            <input type="password" name="newpass" />
+          </label>
+
+          <label>
+            Repetir nueva contraseña
+            <input type="password" name="newpass2" />
+          </label>
+
+          <div class="form-actions full">
+            <button type="submit" class="btn-primary">Actualizar contraseña</button>
+          </div>
+        </form>
+      </article>
+
+      <!-- Mis listas / ejemplo -->
+      <article id="listas" class="card">
+        <h2>Mis mascotas</h2>
+        <a href="listas.html" style="display:block;text-decoration:none;color:inherit">
+          <div style="display:flex;align-items:center;gap:12px">
+            <img id="mini-avatar" src="../img/extras/doge.jpg" alt="avatar" style="width:72px;height:72px;object-fit:cover;border-radius:6px">
+            <div>
+              <div id="mini-name" style="font-weight:700">Firulais</div>
+              <div id="mini-age" class="muted">3 años</div>
+              <div id="mini-status" style="margin-top:6px;color:#16a34a">con cita</div>
+            </div>
+          </div>
+        </a>
+      </article>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> TechSide</p>
+      <small class="muted">Términos y condiciones · Política de privacidad</small>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    document.querySelectorAll('.account-nav a').forEach(a => {
+      a.addEventListener('click', e => {
+        document.querySelectorAll('.account-nav a').forEach(x => x.classList.remove('is-active'));
+        e.currentTarget.classList.add('is-active');
+      });
+    });
+
+    // Logout simple handler
+    document.getElementById('logoutBtn').addEventListener('click', ()=>{
+      localStorage.removeItem('isLoggedIn'); localStorage.removeItem('userName'); localStorage.removeItem('userAvatar');
+      location.href = 'initPag.html';
+    });
+  </script>
+    <script src="../js/session.js"></script>
+  </body>
+</html>

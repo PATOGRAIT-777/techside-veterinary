@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Registrarse — TechSide</title>
+  <link rel="stylesheet" href="../css/universalCss.css" type="text/css">
+  <link rel="stylesheet" href="../css/divs.css" type="text/css">
+  <link rel="stylesheet" href="../css/initSes.css" type="text/css">
+</head>
+
+<style>
+  /* Ensure form fields align and fill container */
+  .form-size label, .form-size input, .form-size select, .form-size textarea { width:100%; box-sizing:border-box }
+  .form-size { display:grid; grid-template-columns: 1fr 1fr; gap:12px }
+  .form-size .full { grid-column:1 / -1 }
+  @media (max-width:880px){ .form-size{grid-template-columns:1fr} }
+  .form-message { margin-bottom:12px; padding:8px; border-radius:4px; display:none }
+  .form-message.success { background:#e6ffed; color:#065f46; border:1px solid #bbf7d0 }
+  .form-message.error { background:#fff1f2; color:#7f1d1d; border:1px solid #fecaca }
+</style>
+
+    <div id="login-modal" class="login-modal" onclick="closeOnOutsideClick(event)">
+      <div class="login-content">
+        <span class="close" onclick="document.getElementById('login-modal').style.display='none'">&times;</span>
+        <img src="https://cdn.animeav1.com/backdrops/2067.jpg" alt="Banner Login" class="login-banner">
+        <form class="login-form">
+          <h2>Iniciar Sesión</h2>
+          <input type="text" placeholder="Usuario">
+          <input type="password" placeholder="Contraseña">
+          <button type="submit">Entrar</button>
+        </form>
+      </div>
+    </div>
+
+    <script> 
+        function openLogin() {
+          document.getElementById('login-modal').style.display = 'flex';
+        }
+
+        function closeLogin() {
+          document.getElementById('login-modal').style.display = 'none';
+        }
+
+        // Cierra si se hace clic fuera del cuadro de login
+        function closeOnOutsideClick(event) {
+          const modal = document.getElementById('login-modal');
+          const box = modal.querySelector('.login-box');
+
+          if (!box.contains(event.target)) {
+            closeLogin();
+          }
+        }
+        
+        function regValNum(event) {
+        const numeros = "1234567890";
+        const tecla = String.fromCharCode(event.which || event.keyCode);
+        if (numeros.indexOf(tecla) === -1) { alert("Por favor, ingresa solo números"); return false; }
+        return true;
+        }
+
+        function regValText(event) {
+        const letras = "abcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZ ";
+        const tecla = String.fromCharCode(event.which || event.keyCode);
+        if (letras.indexOf(tecla) === -1) { alert("Por favor, ingresa solo texto"); return false; }
+        return true;
+        }
+    </script>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="/">Clinica</a>
+      <nav class="main-nav" aria-label="Navegación principal">
+        <a href="initPag.html">Inicio</a>
+
+    </div>
+  </header>
+
+        <section id="reg-section">
+              <div class="reg-container">
+
+                <!-- Registro -->
+                <div class="reg-card">
+                  <h2>Regístrate</h2>
+                  <div id="register-message" class="form-message" aria-live="polite"></div>
+                  <form method="post" action="#register" class="form-size" enctype="multipart/form-data">
+                    <input type="hidden" name="role" value="cliente">
+
+                    <label>
+                      Usuario
+                      <input type="text" name="usr" placeholder="Usuario (alias)" onkeypress="return regValText(event)" required>
+                    </label>
+
+                    <label>
+                      Nombre(s)
+                      <input type="text" name="nombre" placeholder="Nombre(s)" onkeypress="return regValText(event)" required>
+                    </label>
+
+                    <label>
+                      Apellidos
+                      <input type="text" name="apellidos" placeholder="Apellidos" onkeypress="return regValText(event)" required>
+                    </label>
+
+                    <label>
+                      CURP
+                      <input type="text" name="curp" placeholder="CURP (Ej. GARC850101HDFABC01)" required>
+                    </label>
+
+                    <label>
+                      RFC (opcional)
+                      <input type="text" name="rfc" placeholder="RFC" >
+                    </label>
+
+                    <label>
+                      Correo electrónico
+                      <input type="email" name="email" placeholder="correo@servidor.com" required>
+                    </label>
+
+                    <label>
+                      Teléfono principal
+                      <input type="tel" name="telefono" placeholder="55 1234 5678" onkeypress="return regValNum(event)" required>
+                    </label>
+
+                    <label>
+                      Teléfono secundario
+                      <input type="tel" name="telefono2" placeholder="(opcional)" onkeypress="return regValNum(event)">
+                    </label>
+
+                    <fieldset>
+                      <legend>Dirección</legend>
+                      <label>
+                        Calle y número exterior
+                        <input type="text" name="calle_num" placeholder="Calle y No. exterior" required>
+                      </label>
+                      <label>
+                        Número interior
+                        <input type="text" name="num_int" placeholder="No. interior (opcional)">
+                      </label>
+                      <label>
+                        Estado
+                        <select id="mx_state" name="estado" required disabled>
+                          <option value="">Cargando estados...</option>
+                        </select>
+                      </label>
+                      <label>
+                        Alcaldía / Municipio
+                        <select id="mx_municipio" name="municipio" required disabled>
+                          <option value="">-- Selecciona municipio --</option>
+                        </select>
+                      </label>
+                      <label>
+                        Colonia
+                        <select id="mx_colonia" name="colonia" required disabled>
+                          <option value="">-- Selecciona colonia --</option>
+                        </select>
+                      </label>
+                      <label>
+                        Código Postal
+                        <input type="text" name="cp" placeholder="Código Postal" onkeypress="return regValNum(event)" required readonly>
+                      </label>
+                    </fieldset>
+
+                    <label>
+                      Tipo de identificación
+                      <select name="id_type" required>
+                        <option value="INE">INE/IFE</option>
+                        <option value="Pasaporte">Pasaporte</option>
+                        <option value="Otro">Otro</option>
+                      </select>
+                    </label>
+
+                    <label>
+                      Número de identificación
+                      <input type="text" name="id_number" placeholder="Número de ID" required>
+                    </label>
+
+                    <label>
+                      Comprobante de domicilio (archivo)
+                      <input type="file" name="proof_address" accept="image/*,application/pdf" >
+                    </label>
+
+                    <label>
+                      Identificación oficial (archivo)
+                      <input type="file" name="proof_id" accept="image/*,application/pdf" >
+                    </label>
+
+                    <div style="display:grid;grid-template-columns:1fr;gap:8px">
+                      <div>
+                        <label>Persona de contacto 1</label>
+                        <input type="text" name="contact_name_1" placeholder="Nombre" onkeypress="return regValText(event)">
+                        <select name="contact_rel_1">
+                          <option value="">Parentesco</option>
+                          <option>Familiar</option>
+                          <option>Vecino</option>
+                          <option>Amigo</option>
+                        </select>
+                        <input type="tel" name="contact_phone_1" placeholder="Teléfono" onkeypress="return regValNum(event)">
+                      </div>
+                      <div>
+                        <label>Persona de contacto 2</label>
+                        <input type="text" name="contact_name_2" placeholder="Nombre" onkeypress="return regValText(event)">
+                        <select name="contact_rel_2">
+                          <option value="">Parentesco</option>
+                          <option>Familiar</option>
+                          <option>Vecino</option>
+                          <option>Amigo</option>
+                        </select>
+                        <input type="tel" name="contact_phone_2" placeholder="Teléfono" onkeypress="return regValNum(event)">
+                      </div>
+                      <div>
+                        <label>Persona de contacto 3</label>
+                        <input type="text" name="contact_name_3" placeholder="Nombre" onkeypress="return regValText(event)">
+                        <select name="contact_rel_3">
+                          <option value="">Parentesco</option>
+                          <option>Familiar</option>
+                          <option>Vecino</option>
+                          <option>Amigo</option>
+                        </select>
+                        <input type="tel" name="contact_phone_3" placeholder="Teléfono" onkeypress="return regValNum(event)">
+                      </div>
+                    </div>
+
+                    <!-- Sección adicional para datos usados en registro (no modificar las existentes) -->
+                    <fieldset class="full">
+                      <legend>Datos adicionales</legend>
+                      <label class="full">
+                        Contraseña
+                        <input type="password" name="password" id="password" placeholder="Contraseña (mín. 8 caracteres)" required>
+                      </label>
+                      <label class="full">
+                        Confirmar contraseña
+                        <input type="password" name="password_confirm" id="password_confirm" placeholder="Confirmar contraseña" required>
+                      </label>
+                      <label>
+                        Fecha de nacimiento
+                        <input type="date" name="fecha_nacimiento" id="fecha_nacimiento">
+                      </label>
+                      <label>
+                        Género
+                        <select name="genero" id="genero">
+                          <option value="">-- Selecciona --</option>
+                          <option value="mujer">Mujer</option>
+                          <option value="hombre">Hombre</option>
+                          <option value="otro">Otro</option>
+                          <option value="prefiere_no_decir">Prefiere no decir</option>
+                        </select>
+                      </label>
+                      <label>
+                      <label>
+                      <label class="full"><input type="checkbox" name="accept_terms" id="accept_terms" required> Acepto los términos y condiciones</label>
+                    </fieldset>
+
+                    <button type="submit" class="reg-btn-submit">Registrarse</button>
+                  </form>
+                </div>
+
+                <!-- Inicio de sesión -->
+                <div class="reg-card">
+                  <h2>Inicia Sesión</h2>
+                  <div id="login-message" class="form-message" aria-live="polite"></div>
+                  <form method="post" action="#login">
+                    <input type="text" name="usr" placeholder="Correo" required>
+                    <input type="password" name="pass" placeholder="Contraseña" required>
+                    <button type="submit" class="reg-btn-submit">Ingresar</button>
+                  </form>
+                  Si ya tienes una cuenta inicia sesion
+                </div>
+
+              </div>
+            </section>
+
+            
+
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> TechSide</p>
+      <small class="muted">Términos y condiciones · Política de privacidad</small>
+    </div>
+  </footer>
+  
+  <script src="../js/formAgregar.js"></script> <script src="../js/session.js"></script>     <script src="../js/authLogic.js"></script>
+</body>
+</html>

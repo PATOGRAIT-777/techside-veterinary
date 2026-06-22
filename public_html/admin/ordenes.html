@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin — Órdenes</title>
+  <link rel="stylesheet" href="../css/universalCss.css">
+  <link rel="stylesheet" href="../css/sidebar.css">
+  <link rel="stylesheet" href="../css/divs.css">
+  <style>
+    table{width:100%;border-collapse:collapse}
+    table th,table td{padding:8px;border:1px solid rgba(0,0,0,0.08);background:transparent;color:inherit}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="../initPag.html">🐶 TechSide Vet</a>
+      <nav class="main-nav">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="pacientes.html">Pacientes</a>
+        <a href="citas.html">Citas</a>
+        <a href="inventario.html">Inventario</a>
+        <a class="active" href="ordenes.html">Gestión de pedidos</a>
+      </nav>
+      <div class="header-actions">
+        <button class="btn-primary" onclick="openLogin()">Entrar</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container layout" style="display:flex;gap:20px;align-items:flex-start">
+    <aside class="sidebar" style="min-width:220px;max-width:260px">
+      <nav class="sidebar-list">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="pacientes.html">Pacientes</a>
+        <a href="citas.html">Citas</a>
+        <a href="inventario.html">Inventario</a>
+        <a class="active" href="ordenes.html">Órdenes</a>
+      </nav>
+    </aside>
+
+    <main class="main" style="flex:1">
+      <h1>Órdenes</h1>
+      <p class="muted">Pedidos realizados por clientes.</p>
+
+      <div style="margin-top:12px;display:flex;gap:12px;align-items:center">
+        <label style="display:flex;flex-direction:column"><span class="muted">Sucursal</span><select id="branch-orders"><option value="">Todas</option></select></label>
+      </div>
+      <table style="margin-top:12px;width:100%;border-collapse:collapse">
+        <thead><tr>
+          <th onclick="sortTable(0)" style="cursor:pointer">ID ▾</th>
+          <th onclick="sortTable(1)" style="cursor:pointer">Cliente ▾</th>
+          <th onclick="sortTable(2)" style="cursor:pointer">Total ▾</th>
+          <th onclick="sortTable(3)" style="cursor:pointer">Fecha ▾</th>
+          <th onclick="sortTable(4)" style="cursor:pointer">Sucursal ▾</th>
+          <th onclick="sortTable(5)" style="cursor:pointer">Estado ▾</th>
+          <th>Acciones</th>
+        </tr></thead>
+        <tbody>
+              <tr data-branch="lindavista" data-branch-name="Lindavista">
+                <td>#1001</td>
+                <td>María G.</td>
+                <td>$850</td>
+                <td>2026-01-02</td>
+                <td>Lindavista</td>
+                <td>
+                  <select aria-label="Estado orden">
+                    <option>En preparación</option>
+                    <option>Producto no disponible</option>
+                    <option>Agotado</option>
+                    <option>Enviado</option>
+                    <option>Retraso</option>
+                  </select>
+                </td>
+                <td></td>
+              </tr>
+              <tr data-branch="centro" data-branch-name="Centro">
+                <td>#1002</td>
+                <td>Carlos R.</td>
+                <td>$250</td>
+                <td>2026-01-03</td>
+                <td>Centro</td>
+                <td>
+                  <select aria-label="Estado orden">
+                    <option>En preparación</option>
+                    <option>Producto no disponible</option>
+                    <option>Agotado</option>
+                    <option selected>Enviado</option>
+                    <option>Retraso</option>
+                  </select>
+                </td>
+                <td></td>
+              </tr>
+        </tbody>
+      </table>
+
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function openLogin() { document.getElementById('login-modal').style.display = 'flex'; }
+    function closeLogin() { document.getElementById('login-modal').style.display = 'none'; }
+    function closeOnOutsideClick(event) { const modal = document.getElementById('login-modal'); if (modal && !modal.querySelector('.login-content').contains(event.target)) closeLogin(); }
+    document.getElementById('year').textContent = new Date().getFullYear();
+    // enhanced sort: handles numeric, currency ($), ids (#) and dates (YYYY-MM-DD)
+    function sortTable(colIndex){
+      const table = document.querySelector('table'); const tbody = table.tBodies[0]; const rows = Array.from(tbody.querySelectorAll('tr'));
+      const parse = (s)=>{
+        const x = s.trim(); if(!x) return '';
+        // ID like #1001
+        if(/^#?\d+$/.test(x)) return parseInt(x.replace('#',''),10);
+        // currency
+        if(/^\$?\d+[.,]?\d*/.test(x)) return parseFloat(x.replace(/[^0-9.,]/g,''));
+        // date ISO
+        if(/^\d{4}-\d{2}-\d{2}$/.test(x)) return new Date(x).getTime();
+        return x.toString().toLowerCase();
+      };
+      const sorted = rows.sort((a,b)=>{ const A = parse(a.children[colIndex].textContent); const B = parse(b.children[colIndex].textContent); if(typeof A === 'number' && typeof B === 'number') return A - B; if(typeof A === 'number') return -1; if(typeof B === 'number') return 1; if(A < B) return -1; if(A > B) return 1; return 0; });
+      tbody.innerHTML=''; sorted.forEach(r=>tbody.appendChild(r));
+    }
+
+    // populate branch filter and wire filtering
+    (function(){
+      const sel = document.getElementById('branch-orders');
+      fetch('branches.json').then(r=>r.json()).then(data=>{
+        const branches = (data.branches||[]).map(b=>b.name);
+        branches.forEach(n=>{ const o=document.createElement('option'); o.value=n; o.textContent=n; sel.appendChild(o); });
+      }).catch(()=>{
+        // fallback: collect from table rows
+        const names = new Set(); document.querySelectorAll('tbody tr').forEach(tr=>{ const n=tr.dataset.branchName||tr.querySelector('td:nth-child(5)')?.textContent?.trim(); if(n) names.add(n); });
+        names.forEach(n=>{ const o=document.createElement('option'); o.value=n; o.textContent=n; sel.appendChild(o); });
+      });
+      sel.addEventListener('change', ()=>{
+        const v = sel.value; document.querySelectorAll('tbody tr').forEach(tr=>{ if(!v) tr.style.display=''; else { const rowBranch = (tr.dataset.branchName||tr.dataset.branch||tr.querySelector('td:nth-child(5)')?.textContent||'').trim(); tr.style.display = (rowBranch===v)?'':'none'; } });
+      });
+    })();
+  </script>
+</body>
+</html>
+<script src="../js/session.js"></script>
