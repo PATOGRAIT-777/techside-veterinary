@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>— TechSide</title>
+  <title>Mi Cuenta — TechSide</title>
   <link rel="stylesheet" href="../css/userSet.css">
 </head>
 <body>
@@ -24,13 +24,14 @@
         <a href="regUser.html" class="active">Mi cuenta</a>
       </nav>
       <div class="header-actions">
-        <button class="btn-ghost">Registrarse</button>
-        <button class="btn-primary" onclick="openLogin()">Entrar</button>
+        <div id="auth-buttons">
+          <button class="btn-ghost">Registrarse</button>
+          <button class="btn-primary" onclick="openLogin()">Entrar</button>
+        </div>
       </div>
     </div>
   </header>
 
-  <!-- Hero pequeño / breadcrumbs -->
   <section class="hero">
     <div class="container">
       <h1>Mi cuenta</h1>
@@ -38,15 +39,13 @@
     </div>
   </section>
 
-  <!-- Contenido principal: sidebar + main -->
   <main class="container layout">
-    <!-- Sidebar -->
     <aside class="sidebar">
       <div class="profile-card">
-        <div class="avatar">PA</div>
+        <div class="avatar" id="sidebar-avatar">--</div>
         <div class="profile-info">
-          <strong>Patograit A.</strong>
-          <small>Usuario</small>
+          <strong id="sidebar-name">Cargando...</strong>
+          <small id="sidebar-role">Usuario</small>
         </div>
       </div>
 
@@ -55,37 +54,34 @@
         <a href="listas.html">Mis mascotas</a>
         <a href="#historial">Historial</a>
         <a href="#ajustes">Ajustes</a>
-        <button id="logoutBtn" class="btn-ghost" style="width:100%;text-align:left">Cerrar sesión</button>
+        <button id="logoutBtn" class="btn-ghost" style="width:100%;text-align:left; color: #dc2626;">Cerrar sesión</button>
       </nav>
     </aside>
 
-    <!-- Main -->
     <section class="main">
-      <!-- Perfil / formulario -->
       <article id="perfil" class="card">
         <h2>Información del perfil</h2>
-        <form class="form-grid" autocomplete="off">
+        <form id="perfil-form" class="form-grid" autocomplete="off">
           <label>
-            Nombre
-            <input type="text" name="nombre" value="Patograit A." />
+            Nombre Completo
+            <input type="text" name="nombre" placeholder="Cargando..." />
           </label>
 
           <label>
             Email
-            <input type="email" name="email" value="usuario@ejemplo.com" />
+            <input type="email" name="email" disabled placeholder="No se puede cambiar el email" />
           </label>
 
           <label>
             Cambiar avatar
-            <input type="file" name="avatar" accept="image/*" />
+            <input type="file" name="avatar" accept="image/*" disabled title="Función en desarrollo" />
           </label>
 
           <label class="full">
             Biografía
-            <textarea name="bio" rows="4">Gusta ver anime y coleccionar listas.</textarea>
+            <textarea name="bio" rows="4"></textarea>
           </label>
 
-          <!-- Datos adicionales agregados para permitir edición de campos usados en registro -->
           <label>
             Fecha de nacimiento
             <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" />
@@ -95,10 +91,9 @@
             Género
             <select name="genero" id="genero">
               <option value="">-- Selecciona --</option>
-              <option value="mujer">Mujer</option>
-              <option value="hombre">Hombre</option>
-              <option value="otro">Otro</option>
-              <option value="prefiere_no_decir">Prefiere no decir</option>
+              <option value="Femenino">Femenino</option>
+              <option value="Masculino">Masculino</option>
+              <option value="Otro">Otro</option>
             </select>
           </label>
 
@@ -106,10 +101,10 @@
             Estado civil
             <select name="estado_civil" id="estado_civil">
               <option value="">-- Selecciona --</option>
-              <option>Soltero/a</option>
-              <option>Casado/a</option>
-              <option>Unión libre</option>
-              <option>Viudo/a</option>
+              <option value="Soltero/a">Soltero/a</option>
+              <option value="Casado/a">Casado/a</option>
+              <option value="Unión libre">Unión libre</option>
+              <option value="Viudo/a">Viudo/a</option>
             </select>
           </label>
 
@@ -123,58 +118,36 @@
             <input type="text" name="empresa" id="empresa" placeholder="Empresa (opcional)" />
           </label>
 
-          <label class="full"><input type="checkbox" name="accept_terms" id="accept_terms"> Acepto los términos y condiciones (registro)</label>
-
           <div class="form-actions full">
-            <button type="submit" class="btn-primary">Guardar cambios</button>
+            <button type="submit" class="btn-primary" id="save-profile-btn">Guardar cambios</button>
             <button type="button" class="btn-ghost">Cancelar</button>
           </div>
         </form>
       </article>
 
-      <!-- Seguridad -->
-      <article id="ajustes" class="card">
+      <article id="ajustes" class="card" style="display: none;">
         <h2>Seguridad</h2>
         <form class="form-grid">
           <label>
             Contraseña actual
             <input type="password" name="current" />
           </label>
-
           <label>
             Nueva contraseña
             <input type="password" name="newpass" />
           </label>
-
           <label>
             Repetir nueva contraseña
             <input type="password" name="newpass2" />
           </label>
-
           <div class="form-actions full">
-            <button type="submit" class="btn-primary">Actualizar contraseña</button>
+            <button type="button" class="btn-primary" onclick="alert('Funcionalidad en desarrollo')">Actualizar contraseña</button>
           </div>
         </form>
-      </article>
-
-      <!-- Mis listas / ejemplo -->
-      <article id="listas" class="card">
-        <h2>Mis mascotas</h2>
-        <a href="listas.html" style="display:block;text-decoration:none;color:inherit">
-          <div style="display:flex;align-items:center;gap:12px">
-            <img id="mini-avatar" src="../img/extras/doge.jpg" alt="avatar" style="width:72px;height:72px;object-fit:cover;border-radius:6px">
-            <div>
-              <div id="mini-name" style="font-weight:700">Firulais</div>
-              <div id="mini-age" class="muted">3 años</div>
-              <div id="mini-status" style="margin-top:6px;color:#16a34a">con cita</div>
-            </div>
-          </div>
-        </a>
       </article>
     </section>
   </main>
 
-  <!-- Footer -->
   <footer class="site-footer">
     <div class="container footer-inner">
       <p>© <span id="year"></span> TechSide</p>
@@ -184,19 +157,141 @@
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
-    document.querySelectorAll('.account-nav a').forEach(a => {
-      a.addEventListener('click', e => {
-        document.querySelectorAll('.account-nav a').forEach(x => x.classList.remove('is-active'));
-        e.currentTarget.classList.add('is-active');
-      });
+
+    // 1. VERIFICAR SESIÓN
+    const token = localStorage.getItem('accessToken');
+    const userData = JSON.parse(localStorage.getItem('user') || '{}');
+
+    if (!token) {
+      // Si no hay token, lo mandamos al index para que inicie sesión
+      window.location.href = 'initPag.html';
+    } else {
+      // Ocultar botones de login del header porque ya hay sesión
+      const authButtons = document.getElementById('auth-buttons');
+      if(authButtons) authButtons.style.display = 'none';
+
+      // 2. CONFIGURAR INTERFAZ DE ADMIN
+      const roleDisplay = document.getElementById('sidebar-role');
+      if (userData.rol) {
+        // Poner la primera letra en mayúscula (Admin, Medico, Cliente)
+        roleDisplay.textContent = userData.rol.charAt(0).toUpperCase() + userData.rol.slice(1);
+      }
+    }
+
+    // 3. CARGAR PERFIL DESDE EL BACKEND
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const response = await fetch('http://localhost:3000/personas/me', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          const profile = await response.json();
+          
+          // Llenar Formulario
+          document.querySelector('[name="nombre"]').value = profile.nombreCompleto || '';
+          document.querySelector('[name="email"]').value = userData.email || '';
+          
+          if(profile.fechaNacimiento) {
+             // Formatear a YYYY-MM-DD para el input tipo date
+             document.querySelector('[name="fecha_nacimiento"]').value = new Date(profile.fechaNacimiento).toISOString().split('T')[0];
+          }
+          // Si tu backend retorna estos campos, se asignan
+          if(profile.genero) document.querySelector('[name="genero"]').value = profile.genero;
+          if(profile.estadoCivil) document.querySelector('[name="estado_civil"]').value = profile.estadoCivil;
+          if(profile.ocupacion) document.querySelector('[name="ocupacion"]').value = profile.ocupacion;
+          
+          // Actualizar Sidebar
+          const nameDisplay = document.getElementById('sidebar-name');
+          const avatarDisplay = document.getElementById('sidebar-avatar');
+
+          if (profile.nombreCompleto) {
+            const primerNombre = profile.nombreCompleto.split(' ')[0];
+            nameDisplay.textContent = primerNombre;
+            avatarDisplay.textContent = primerNombre.substring(0, 2).toUpperCase();
+          }
+        }
+      } catch (error) {
+        console.error("Error al cargar el perfil:", error);
+      }
     });
 
-    // Logout simple handler
-    document.getElementById('logoutBtn').addEventListener('click', ()=>{
-      localStorage.removeItem('isLoggedIn'); localStorage.removeItem('userName'); localStorage.removeItem('userAvatar');
-      location.href = 'initPag.html';
+    // 4. ACTUALIZAR PERFIL (PATCH)
+    const perfilForm = document.getElementById('perfil-form');
+    perfilForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('save-profile-btn');
+      btn.textContent = 'Guardando...';
+      btn.disabled = true;
+
+      const formData = new FormData(perfilForm);
+      
+      // Creamos el payload que espera tu backend (revisa tu DTO de Personas)
+      const payload = {
+        nombreCompleto: formData.get('nombre'),
+        // Descomenta los demás si tu controlador PATCH /personas/me los acepta:
+        // fechaNacimiento: formData.get('fecha_nacimiento') ? new Date(formData.get('fecha_nacimiento')).toISOString() : undefined,
+        // genero: formData.get('genero') || undefined,
+        // estadoCivil: formData.get('estado_civil') || undefined,
+      };
+
+      // Limpiamos los nulos o vacíos
+      Object.keys(payload).forEach(key => (payload[key] === undefined || payload[key] === "") && delete payload[key]);
+
+      try {
+        const response = await fetch('http://localhost:3000/personas/me', {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+          alert('¡Perfil actualizado con éxito!');
+          location.reload();
+        } else {
+          const errorData = await response.json();
+          alert('Error: ' + (errorData.message || 'No se pudo actualizar'));
+        }
+      } catch (error) {
+        console.error('Error al actualizar:', error);
+        alert('Error de conexión con el servidor.');
+      } finally {
+        btn.textContent = 'Guardar cambios';
+        btn.disabled = false;
+      }
+    });
+
+    // 5. CERRAR SESIÓN
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('user');
+      window.location.href = 'initPag.html';
+    });
+
+    // 6. LÓGICA VISUAL DE TABS (PESTAÑAS)
+    document.querySelectorAll('.account-nav a').forEach(a => {
+      a.addEventListener('click', e => {
+        const href = e.currentTarget.getAttribute('href');
+        if(href.startsWith('#')) {
+          e.preventDefault();
+          // Quitar clases activas del menú
+          document.querySelectorAll('.account-nav a').forEach(x => x.classList.remove('is-active'));
+          e.currentTarget.classList.add('is-active');
+
+          // Ocultar todos los artículos
+          document.querySelectorAll('.main article').forEach(article => article.style.display = 'none');
+          
+          // Mostrar el artículo seleccionado
+          document.getElementById(href.substring(1)).style.display = 'block';
+        }
+      });
     });
   </script>
-    <script src="../js/session.js"></script>
-  </body>
+</body>
 </html>

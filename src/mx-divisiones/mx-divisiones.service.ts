@@ -7,22 +7,24 @@ export class MxDivisionesService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(): Promise<MxDivision[]> {
-    return this.prisma.mxDivision.findMany({
-      where: { activo: true },
-    });
+    // MxDivision ahora es un catálogo SEPOMEX, ya no usamos "activo: true"
+    return this.prisma.mxDivision.findMany();
   }
 
   async findById(id: string): Promise<MxDivision> {
-    const division = await this.prisma.mxDivision.findFirst({
-      where: { id, activo: true },
+    // Buscamos por ID sin el filtro "activo"
+    const division = await this.prisma.mxDivision.findUnique({
+      where: { id },
     });
+    
     if (!division) {
-      throw new NotFoundException('Sucursal no encontrada');
+      throw new NotFoundException('Código Postal o División no encontrada');
     }
     return division;
   }
 
   async findSucursales(): Promise<Pick<Sucursal, 'id' | 'nombre'>[]> {
+    // La tabla Sucursales SÍ conserva su campo "activo", así que lo mantenemos igual
     return this.prisma.sucursal.findMany({
       where: { activo: true },
       select: { id: true, nombre: true },

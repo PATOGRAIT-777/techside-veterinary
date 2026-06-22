@@ -20,15 +20,18 @@ enum UsuarioStatus {
 }
 
 model MxDivision {
-  id          String   @id @default(uuid()) @db.Uuid
-  nombre      String   @db.VarChar(120)
-  clave       String   @unique @db.VarChar(20)
-  direccion   String?  @db.VarChar(255)
-  telefono    String?  @db.VarChar(15)
-  activo      Boolean  @default(true)
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  sucursales  Sucursal[]
+  id           String   @id @default(uuid()) @db.Uuid
+  codigoPostal String   @map("codigo_postal") @db.VarChar(10)
+  colonia      String   @db.VarChar(255)
+  municipio    String   @db.VarChar(255)
+  estado       String   @db.VarChar(255)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  personas     Persona[]
+  sucursales   Sucursal[]
+
+  @@index([codigoPostal])
   @@map("mx_divisiones")
 }
 
@@ -37,19 +40,49 @@ model Persona {
   nombreCompleto      String   @map("nombre_completo") @db.VarChar(200)
   telefono            String   @db.VarChar(15)
   telefonoSecundario  String?  @map("telefono_secundario") @db.VarChar(15)
+  
+  // Dirección
   calle               String   @db.VarChar(200)
   numExterior         String?  @map("num_exterior") @db.VarChar(20)
   numInterior         String?  @map("num_interior") @db.VarChar(20)
-  sucursalId          String   @map("sucursal_id") @db.Uuid
+  
+  // NUEVO: Relación a la dirección usando el catálogo SEPOMEX
+  ubicacionId         String?  @map("ubicacion_id") @db.Uuid
+  ubicacion           MxDivision? @relation(fields: [ubicacionId], references: [id])
+
+  // NUEVO: Documentos extra que venían en el SQL
+  tipoIdentificacion  String?  @map("tipo_identificacion") @db.VarChar(50)
+  numeroIdentificacion String? @map("numero_identificacion") @db.VarChar(100)
   proofAddressId      String?  @map("proof_address_id") @db.Uuid
   proofIdId           String?  @map("proof_id_id") @db.Uuid
+
+  sucursalId          String   @map("sucursal_id") @db.Uuid
   sucursal            Sucursal @relation(fields: [sucursalId], references: [id])
+
+  // NUEVO: Contactos de emergencia
+  contactosEmergencia ContactoUsuario[]
+
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt           DateTime @updatedAt @map("updated_at")
   usuario             Usuario?
+
   @@index([telefono])
   @@index([sucursalId])
+  @@index([ubicacionId])
   @@map("persona")
+}
+
+model ContactoUsuario {
+  id         String   @id @default(uuid()) @db.Uuid
+  personaId  String   @map("persona_id") @db.Uuid
+  persona    Persona  @relation(fields: [personaId], references: [id], onDelete: Cascade)
+  nombre     String   @db.VarChar(200)
+  relacion   String   @db.VarChar(100)
+  telefono   String   @db.VarChar(15)
+  creadoEn   DateTime @default(now()) @map("creado_en")
+
+  @@index([personaId])
+  @@map("contactos_usuarios")
 }
 
 model Usuario {
@@ -67,6 +100,9 @@ model Usuario {
   passwordResets      PasswordResetToken[]
   mascotas            Mascota[]
   medico              Medico?
+
+  ordenes             Orden[]
+
   @@index([email])
   @@index([telefono])
   @@index([rol])
@@ -279,6 +315,9 @@ model Sucursal {
   medicos           Medico[]
   especialidades    SucursalEspecialidad[]
   citas             Cita[]
+
+  inventarios       InventarioSucursal[]
+  ordenes           Orden[]
 
   @@index([ubicacionId])
   @@index([activo])
@@ -502,4 +541,105 @@ model CitaEstadoHistorial {
   @@index([citaId])
   @@index([fechaCambio])
   @@map("cita_estado_historial")
+}
+
+// ============================================================
+// Dominio de Tienda e Inventario (E-Commerce)
+// ============================================================
+
+model CategoriaProducto {
+  id          String     @id @default(uuid()) @db.Uuid
+  nombre      String     @unique @db.VarChar(120)
+  descripcion String?    @db.Text
+  productos   Producto[]
+
+  @@map("categorias_producto")
+}
+
+model Producto {
+  id              String   @id @default(uuid()) @db.Uuid
+  codigoSku       String?  @unique @map("codigo_sku") @db.VarChar(100)
+  nombre          String   @db.VarChar(200)
+  descripcion     String?  @db.Text
+  precioVenta     Decimal  @map("precio_venta") @db.Decimal(10, 2)
+  costoCompra     Decimal? @map("costo_compra") @db.Decimal(10, 2)
+
+  categoriaId     String?  @map("categoria_id") @db.Uuid
+  categoria       CategoriaProducto? @relation(fields: [categoriaId], references: [id])
+
+  esMedicamento   Boolean  @default(false) @map("es_medicamento")
+  requiereReceta  Boolean  @default(false) @map("requiere_receta")
+
+  imagenUrl       String?  @map("imagen_url") @db.Text
+  marca           String?  @db.VarChar(100)
+  activo          Boolean  @default(true)
+
+  inventarios     InventarioSucursal[]
+  detallesOrden   DetalleOrden[]
+
+  @@map("productos")
+}
+
+model InventarioSucursal {
+  id                 String   @id @default(uuid()) @db.Uuid
+  sucursalId         String   @map("sucursal_id") @db.Uuid
+  productoId         String   @map("producto_id") @db.Uuid
+
+  cantidadExistencia Int      @default(0) @map("cantidad_existencia")
+  stockMinimo        Int      @default(5) @map("stock_minimo")
+  ubicacionEnAlmacen String?  @map("ubicacion_en_almacen") @db.VarChar(255)
+
+  fechaActualizacion DateTime @default(now()) @updatedAt @map("fecha_actualizacion")
+
+  sucursal           Sucursal @relation(fields: [sucursalId], references: [id], onDelete: Cascade)
+  producto           Producto @relation(fields: [productoId], references: [id], onDelete: Cascade)
+
+  @@unique([sucursalId, productoId])
+  @@map("inventario_sucursal")
+}
+
+enum EstadoOrden {
+  pendiente_pago
+  pagado
+  en_preparacion
+  enviado
+  entregado
+  cancelado
+  devolucion
+}
+
+model Orden {
+  id             String         @id @default(uuid()) @db.Uuid
+  usuarioId      String         @map("usuario_id") @db.Uuid
+  sucursalId     String         @map("sucursal_id") @db.Uuid // Desde qué sucursal se surte
+
+  fechaCompra    DateTime       @default(now()) @map("fecha_compra")
+  total          Decimal        @db.Decimal(10, 2)
+  estado         EstadoOrden    @default(pendiente_pago)
+  metodoPago     String?        @map("metodo_pago") @db.VarChar(50)
+  direccionEnvio String         @map("direccion_envio") @db.Text
+
+  usuario        Usuario        @relation(fields: [usuarioId], references: [id])
+  sucursal       Sucursal       @relation(fields: [sucursalId], references: [id])
+  detalles       DetalleOrden[]
+
+  @@index([usuarioId])
+  @@index([sucursalId])
+  @@map("ordenes")
+}
+
+model DetalleOrden {
+  id             String   @id @default(uuid()) @db.Uuid
+  ordenId        String   @map("orden_id") @db.Uuid
+  productoId     String   @map("producto_id") @db.Uuid
+
+  cantidad       Int
+  precioUnitario Decimal  @map("precio_unitario") @db.Decimal(10, 2)
+
+  orden          Orden    @relation(fields: [ordenId], references: [id], onDelete: Cascade)
+  producto       Producto @relation(fields: [productoId], references: [id])
+
+  @@index([ordenId])
+  @@index([productoId])
+  @@map("detalles_orden")
 }
