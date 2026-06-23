@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="../css/universalCss.css" type="text/css">
   <link rel="stylesheet" href="../css/divs.css" type="text/css">
   <link rel="stylesheet" href="../css/pInicio.css" type="text/css">
-  
   <style>
       body { background: #071025; color: #f8fafc; margin: 0; }
       .admin-cards { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 30px; }
@@ -20,8 +19,6 @@
       table th, table td { padding: 15px; border-bottom: 1px solid #1e293b; text-align: left; }
       table th { background: #1e293b; color: #38bdf8; }
       .main { padding: 20px; }
-      
-      /* Sidebar y Layout */
       .layout { display: flex; gap: 20px; align-items: flex-start; padding: 20px; }
       .sidebar { min-width: 220px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; }
       .sidebar-list a { display: block; padding: 10px; color: #cbd5e1; text-decoration: none; border-radius: 6px; margin-bottom: 5px; }
@@ -33,7 +30,7 @@
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" href="../initPag.html">🐶 TechSide Vet</a>
-      <nav class="main-nav" aria-label="Navegación principal">
+      <nav class="main-nav">
           <a href="dashboard.html" class="active">Dashboard</a>
           <a href="pacientes.html">Pacientes</a>
           <a href="citas.html">Citas</a>
@@ -62,22 +59,18 @@
 
     <main class="main">
       <h1>Panel administrativo</h1>
-      <p class="muted">Vista rápida de actividad y métricas.</p>
-
       <div class="admin-cards">
-        <div class="card-metric"><h3>Citas hoy</h3><p style="font-size:24px">12</p></div>
-        <div class="card-metric"><h3>Pacientes</h3><p style="font-size:24px">248</p></div>
-        <div class="card-metric"><h3>Pedidos pendientes</h3><p style="font-size:24px">5</p></div>
-        <div class="card-metric"><h3>Productos en stock</h3><p style="font-size:24px">134</p></div>
+        <div class="card-metric"><h3>Citas hoy</h3><p id="stat-citas" style="font-size:24px">0</p></div>
+        <div class="card-metric"><h3>Pacientes</h3><p id="stat-pacientes" style="font-size:24px">0</p></div>
+        <div class="card-metric"><h3>Pedidos</h3><p id="stat-ordenes" style="font-size:24px">0</p></div>
+        <div class="card-metric"><h3>Stock</h3><p id="stat-stock" style="font-size:24px">0</p></div>
       </div>
 
       <section>
         <h2>Próximas citas</h2>
         <table>
-          <thead><tr><th>Hora</th><th>Paciente</th><th>Dueño</th><th>Servicio</th><th>Sucursal</th><th>Doctor</th><th>Estado</th></tr></thead>
-          <tbody id="dashboard-appointments-body">
-            <tr><td>09:30</td><td>Firulais</td><td>María G.</td><td>Consulta</td><td>Lindavista</td><td>Dr. Pérez</td><td>Confirmada</td></tr>
-          </tbody>
+          <thead><tr><th>Hora</th><th>Paciente</th><th>Dueño</th><th>Servicio</th><th>Doctor</th><th>Estado</th></tr></thead>
+          <tbody id="dashboard-appointments-body"></tbody>
         </table>
       </section>
     </main>
@@ -88,6 +81,7 @@
     const token = localStorage.getItem('accessToken');
     const userStr = localStorage.getItem('user');
 
+    // Validación inmediata al cargar la página
     if (!token || !userStr) {
         window.location.href = '../initPag.html';
     } else {
@@ -113,6 +107,55 @@
             document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
         }
     }
-  </script>
+
+    // 2. CARGA DE DATOS (Todo debe estar aquí dentro para usar await)
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const headers = { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json' 
+            };
+
+            // Llamadas paralelas a tu API
+            const [statsRes, citasRes] = await Promise.all([
+                fetch('http://localhost:3000/api/v1/dashboard/stats', { headers }),
+                fetch('http://localhost:3000/api/v1/citas/proximas', { headers })
+            ]);
+
+            // Cargar Métricas
+            if (statsRes.ok) {
+                const stats = await statsRes.json();
+                document.getElementById('stat-citas').textContent = stats.citasHoy || 0;
+                document.getElementById('stat-pacientes').textContent = stats.totalPacientes || 0;
+                document.getElementById('stat-ordenes').textContent = stats.ordenesPendientes || 0;
+                document.getElementById('stat-stock').textContent = stats.productosStock || 0;
+            } else {
+                console.warn("No se pudieron cargar las estadísticas:", statsRes.status);
+            }
+
+            // Cargar Citas
+            if (citasRes.ok) {
+                const citas = await citasRes.json();
+                const tbody = document.getElementById('dashboard-appointments-body');
+                if (citas && citas.length > 0) {
+                    tbody.innerHTML = citas.map(c => `
+                        <tr>
+                            <td>${c.hora}</td>
+                            <td>${c.mascota}</td>
+                            <td>${c.dueno}</td>
+                            <td>${c.servicio}</td>
+                            <td>${c.medico}</td>
+                            <td>${c.estado}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No hay citas próximas.</td></tr>';
+                }
+            }
+        } catch (e) { 
+            console.error("Error al cargar dashboard:", e); 
+        }
+    });
+</script>
 </body>
 </html>

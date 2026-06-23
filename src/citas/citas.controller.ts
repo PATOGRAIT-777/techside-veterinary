@@ -40,7 +40,11 @@ export class CitasController {
   ) {
     return this.citasService.create(dto, usuario);
   }
-
+@Get('proximas')
+@UseGuards(JwtAuthGuard)
+async getProximasCitas(@CurrentUser() usuario: JwtPayload) {
+  return this.citasService.getProximasCitas(usuario);
+}
   @Get('medicos/:sucursalId')
 getMedicos(@Param('sucursalId') sucursalId: string) {
   return this.citasService.getMedicosPorSucursal(sucursalId);

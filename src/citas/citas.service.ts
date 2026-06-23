@@ -65,12 +65,72 @@ export class CitasService {
       nombre_completo: m.usuario?.persona?.nombreCompleto || 'Sin nombre' 
     }));
   }
+async getProximasCitas(usuario: JwtPayload) {
+    const hoy = new Date();
+    
+    const citas = await this.prisma.cita.findMany({
+      where: { 
+        estado: { not: EstadoCita.cancelada },
+        fecha: { gte: hoy }
+      },
+      // AQUÍ ESTABA EL ERROR: Agrega 'servicio: true'
+      include: { 
+          mascota: true, 
+          servicio: true, // <--- ESTO FALTABA
+          medico: { include: { usuario: { include: { persona: true } } } } 
+      },
+      orderBy: { fecha: 'asc' },
+      take: 5 
+    });
 
-  async getHorariosDisponibles(medicoId: string, fecha: string) {
-    // Nota: Aquí deberías implementar la lógica que cruza los horarios
-    // disponibles vs las citas ya agendadas en la DB.
-    return ["09:00", "10:00", "11:00", "12:00", "13:00"]; 
+    return citas.map(c => ({
+      hora: c.horaInicio.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      mascota: c.mascota.nombre,
+      dueno: "Cliente", 
+      servicio: c.servicio?.nombre || "N/A", // Ahora ya no dará error
+      medico: c.medico.usuario.persona.nombreCompleto,
+      estado: c.estado
+    }));
   }
+  // Agrega o reemplaza estos métodos en tu src/citas/citas.service.ts
+
+async getHorariosDisponibles(medicoId: string, fecha: string) {
+    const fechaDate = new Date(fecha + 'T00:00:00');
+    const diaSemana = this.numToDiaSemana(fechaDate.getDay());
+
+    // 1. Obtener horario del médico para ese día
+    const horario = await this.prisma.medicoHorario.findFirst({
+        where: { medicoId, diaSemana: diaSemana as any }
+    });
+
+    if (!horario) return []; // El médico no trabaja ese día
+
+    // 2. Obtener citas existentes para ese día
+    const citasExistentes = await this.prisma.cita.findMany({
+        where: { medicoId, fecha: fechaDate, estado: { not: EstadoCita.cancelada } }
+    });
+
+    // 3. Generar slots de 1 hora (ejemplo: 09:00, 10:00...)
+    const slots = [];
+    let horaActual = new Date(horario.horaInicio);
+    const horaFin = new Date(horario.horaFin);
+
+    while (horaActual < horaFin) {
+        const h = String(horaActual.getHours()).padStart(2, '0');
+        const m = String(horaActual.getMinutes()).padStart(2, '0');
+        const slot = `${h}:${m}`;
+
+        // Verificar si este slot está ocupado
+        const ocupado = citasExistentes.some(c => 
+            c.horaInicio.getHours() === horaActual.getHours()
+        );
+
+        if (!ocupado) slots.push(slot);
+        
+        horaActual.setHours(horaActual.getHours() + 1);
+    }
+    return slots;
+}
 
   // --- MÉTODOS DE NEGOCIO (CREATE, UPDATE, ETC) ---
 

@@ -22,7 +22,7 @@ import { PagosModule } from './pagos/pagos.module';
 import { HistorialMedicoModule } from './historial-medico/historial-medico.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-
+import { DashboardModule } from './Dashboard/dashboard.module';
 const throttlerGuardProvider: Provider = {
   provide: APP_GUARD,
   useClass: ThrottlerGuard,
@@ -64,6 +64,7 @@ const throttlerGuardProvider: Provider = {
     ConsultasModule,
     PagosModule,
     HistorialMedicoModule,
+    DashboardModule, 
   ],
   controllers: [AppController],
   providers: [AppService, throttlerGuardProvider],
