@@ -115,7 +115,8 @@ export class AuthController {
   @ApiTooManyRequestsResponse()
   @Post('login')
   @HttpCode(200)
-  @ThrottlerDecorator({ auth: { limit: 5, ttl: 900000 } })
+  @ThrottlerDecorator({ default: { limit: 5, ttl: 900000 } })
+  @UsePipes(new ZodValidationPipe(loginSchema))
   @UsePipes(new ZodValidationPipe(loginSchema))
   async login(@Body() dto: LoginDto) {
     return this.authService.login(dto);

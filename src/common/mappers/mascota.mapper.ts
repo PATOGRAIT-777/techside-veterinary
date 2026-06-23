@@ -8,7 +8,13 @@ import {
 import { MascotaResumenDto } from '../dto/mascota-resumen.dto';
 
 export const mascotaInclude = {
-  raza: { select: { id: true, nombre: true } },
+  raza: { 
+    select: { 
+      id: true, 
+      nombre: true, 
+      especie: { select: { id: true, nombre: true } }
+    } 
+  },
   color: { select: { id: true, nombre: true } },
   tipoPelo: { select: { id: true, nombre: true } },
   patronPelo: { select: { id: true, nombre: true } },
@@ -47,7 +53,14 @@ export function mapMascotaToResponse(
     id: mascota.id,
     propietarioId: mascota.propietarioId,
     nombre: mascota.nombre,
-    raza: toRelacion(mascota.raza),
+    
+    // 👇 Modificamos aquí para saltarnos el `toRelacion` y obligar a que envíe la especie al Frontend
+    raza: mascota.raza ? { 
+        id: mascota.raza.id, 
+        nombre: mascota.raza.nombre, 
+        especie: mascota.raza.especie 
+    } as MascotaRelacionDto : null,
+    
     color: toRelacion(mascota.color),
     tipoPelo: toRelacion(mascota.tipoPelo),
     patronPelo: toRelacion(mascota.patronPelo),

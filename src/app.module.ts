@@ -46,13 +46,8 @@ const throttlerGuardProvider: Provider = {
       {
         name: 'default',
         ttl: 60000,
-        limit: 10,
-      },
-      {
-        name: 'auth',
-        ttl: 900000,
-        limit: 5,
-      },
+        limit: 100,
+      }
     ]),
     PrismaModule,
     MxDivisionesModule,

@@ -8,130 +8,221 @@
     <link rel="stylesheet" href="../css/sidebar.css">
     <link rel="stylesheet" href="../css/initSes.css">
     <link rel="stylesheet" href="../css/divs.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+
     <style>
-        .reg-card { padding: 20px; color: white; }
-        .reg-card label { display: block; margin-top: 10px; font-size: 1rem; }
-        .reg-card input, .reg-card select, .reg-card textarea {
-            width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #ddd;
-            background: rgba(0,0,0,0.2); color: white; box-sizing: border-box;
+        /* --- PARCHE ESTRUCTURAL PARA LAS TARJETAS --- */
+        
+        /* El formulario ahora es el grid/flexbox principal */
+        #regPetForm {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+            width: 100%;
+            max-width: 1200px;
         }
-        .reg-card select option { background-color: #333; }
-        .form-row { display: flex; gap: 15px; }
-        .form-row > div { flex: 1; }
-        .preview-img { display: block; margin: 10px auto; width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 2px solid white; display:none;}
+
+        /* Corrección de la tarjeta para que el texto no se centre y se adapte al tamaño */
+        .reg-card {
+            text-align: left !important; /* Anula el center de divs.css */
+            width: 100% !important;      /* Anula el 35% de divs.css en pantallas chicas */
+            max-width: 480px;            /* Evita que se haga gigante */
+            min-width: 320px;            /* Evita que se aplaste */
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .reg-card h2 { text-align: center; margin-top: 0; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; }
+        .reg-card label { display: block; margin-top: 10px; font-size: 1.05rem; color: #fff; }
+
+        /* Estilo unificado para inputs que respeta tu diseño de divs.css */
+        .reg-card input[type="text"], 
+        .reg-card input[type="number"], 
+        .reg-card select, 
+        .reg-card textarea,
+        .calendario-custom {
+            width: 100%; 
+            padding: 0.9rem 1rem; 
+            margin-top: 5px; 
+            border-radius: 0.5rem; 
+            border: 1px solid #fff; 
+            background: linear-gradient(180deg,#071025 0%, var(--bg) 100%); 
+            color: #fff; 
+            box-sizing: border-box; 
+            font-size: 1rem;
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .reg-card input:focus, .reg-card select:focus, .reg-card textarea:focus {
+            box-shadow: 0 0 8px #22c55e; /* Brillo verde al seleccionar */
+            outline: none;
+        }
+
+        .reg-card select option { background-color: #071025; color: white; }
+
+        .reg-card input[type="checkbox"] { 
+            width: 18px; height: 18px; vertical-align: middle; 
+            margin-right: 8px; accent-color: #22c55e; cursor: pointer;
+            display: inline-block;
+        }
+
+        /* Contenedores Flexibles para poner 2 campos lado a lado */
+        .form-row { display: flex; gap: 15px; flex-wrap: wrap; width: 100%; }
+        .form-row > div { flex: 1; min-width: 140px; display: flex; flex-direction: column; }
+
+        /* Imagen de perfil */
+        .preview-img { 
+            display: none; margin: 10px auto; width: 130px; height: 130px; 
+            border-radius: 50%; object-fit: cover; border: 3px solid #22c55e; 
+        }
+
+        /* Lista de Catálogo de Alergias */
+        .catalog-list {
+            max-height: 180px; overflow-y: auto; background: rgba(0, 0, 0, 0.2);
+            border: 1px solid #fff; border-radius: 0.5rem; padding: 12px;
+            display: flex; flex-direction: column; gap: 10px; margin-top: 5px;
+        }
+        .alergia-item { border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; }
+        .alergia-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .alergia-item label { margin: 0; display: flex; align-items: center; cursor: pointer; }
+        .alergia-nota { margin-top: 8px !important; display: none; padding: 0.6rem !important; font-size: 0.9rem !important; }
+
+        .dependent { display: none; flex-direction: column; gap: 8px; margin-top: 5px; }
     </style>
 </head>
 
 <body>
     <header class="site-header">
         <div class="container header-inner">
-            <a class="brand" href="/">Clinica</a>
+            <a class="brand" href="initPag.html">🐶 TechSide Vet</a>
             <nav class="main-nav">
                 <a href="initPag.html">Inicio</a>
+                <a href="prodCatalog.html">Tienda</a>
+                <a href="horario.html">Disponibilidad</a>
                 <a href="listas.html">Mis mascotas</a>
+                <a href="regPet.html" class="active">Registrar mascota</a>
                 <a href="regUser.html">Mi cuenta</a>
             </nav>
+            <div class="header-actions">
+                <div id="user-info" style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="window.location.href='regUser.html'">
+                    <span id="header-user-name" style="font-weight: 600; color: #f8fafc;">Cargando...</span>
+                    <span id="header-user-role" style="background: #2563eb; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">CLIENTE</span>
+                </div>
+            </div>
         </div>
     </header>
 
     <section id="reg-section">
+        <h1 style="text-align: center; color: #fff; margin-top: 0; padding-top: 30px;">Registrar Nueva Mascota</h1>
+        
         <div class="reg-container">
-            
-            <form id="regPetForm" enctype="multipart/form-data"></form>>
+            <form id="regPetForm">
                 
                 <div class="reg-card">
                     <h2>Datos Generales</h2>
                     
-                    <label>Nombre *</label>
-                    <input type="text" name="nombre" required>
+                    <div style="text-align: center; width: 100%;">
+                        <img id="preview" class="preview-img" alt="Vista previa de tu mascota">
+                        <label style="text-align: left;">Foto principal (Opcional):</label>
+                        <input type="file" id="foto" accept="image/*" onchange="previewFile()" style="padding: 0.5rem; background: transparent; border: none;">
+                    </div>
+
+                    <label>Nombre de la mascota *</label>
+                    <input type="text" id="nombre" required placeholder="Ej. Firulais">
 
                     <div class="form-row">
                         <div>
                             <label>Especie *</label>
-                            <select id="especie" required>
-                                <option value="">Cargando...</option>
-                            </select>
+                            <select id="especieId" required><option value="">Cargando...</option></select>
                         </div>
                         <div>
                             <label>Raza *</label>
-                            <select id="raza" name="raza_id" required disabled>
-                                <option value="">Selecciona especie</option>
-                            </select>
+                            <select id="razaId" disabled required><option value="">Selecciona especie</option></select>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div>
+                            <label>Color *</label>
+                            <select id="colorId" required><option value="">-- Selecciona --</option></select>
+                        </div>
+                        <div>
+                            <label>Tipo de Pelo *</label>
+                            <select id="tipoPeloId" required><option value="">-- Selecciona --</option></select>
+                        </div>
+                        <div>
+                            <label>Patrón de Pelo *</label>
+                            <select id="patronPeloId" required><option value="">-- Selecciona --</option></select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div style="flex: 1.5;">
+                            <label>Nacimiento (Aprox.) *</label>
+                            <input type="text" class="calendario-custom" id="fechaNacimiento" placeholder="Selecciona la fecha..." required>
+                        </div>
+                        <div>
                             <label>Sexo *</label>
-                            <select name="sexo" required>
-                                <option value="Macho">Macho</option>
+                            <select id="genero" required>
+                                <option value="">-- Selecciona --</option>
                                 <option value="Hembra">Hembra</option>
+                                <option value="Macho">Macho</option>
                             </select>
                         </div>
                         <div>
                             <label>Peso (kg)</label>
-                            <input type="number" name="peso" step="0.1">
-                        </div>
-                    </div>
-
-                    <label>Fecha de Nacimiento</label>
-                    <input type="date" name="fecha_nacimiento">
-                    
-
-                <div class="reg-card">
-                    <h2>Características</h2>
-                    
-                    <div class="form-row">
-                        <div>
-                            <label>Color</label>
-                            <select name="color_id" id="color"><option value="">-- Selecciona --</option></select>
-                        </div>
-                        <div>
-                            <label>Tipo de Pelo</label>
-                            <select name="tipo_pelo_id" id="tipo_pelo"><option value="">-- Selecciona --</option></select>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div>
-                            <label>Patrón de Pelo</label>
-                            <select name="patron_pelo_id" id="patron_pelo"><option value="">-- Selecciona --</option></select>
-                        </div>
-                        <div>
-                            <label>Comportamiento</label>
-                            <select name="comportamiento_id" id="comportamiento"><option value="">-- Selecciona --</option></select>
+                            <input type="number" id="peso" step="0.1" placeholder="Ej. 12.5">
                         </div>
                     </div>
                 </div>
+
+                <div class="reg-card">
                     <h2>Detalles Médicos</h2>
+                    
+                    <label>Comportamiento habitual *</label>
+                    <select id="comportamientoId" required><option value="">-- Selecciona --</option></select>
 
-                    <label style="display:inline-flex; align-items:center; gap:10px; cursor:pointer;">
-                        <input type="checkbox" name="esterilizado" style="width:auto;"> 
-                        ¿Está esterilizado?
-                    </label>
+                    <label>Alergias Conocidas</label>
+                    <div id="alergias-container" class="catalog-list">
+                        <p class="muted" style="margin: 0; font-size: 0.9rem;">Cargando catálogo...</p>
+                    </div>
 
-                    <div class="form-row">
+                    <label>Observaciones / Notas Generales</label>
+                    <textarea id="observaciones" rows="3" placeholder="Describe enfermedades crónicas, medicamentos actuales, dietas especiales..."></textarea>
+
+                    <div style="display: flex; gap: 25px; margin-top: 15px;">
+                        <label style="cursor:pointer; margin-top:0;"><input type="checkbox" id="chk_esterilizado"> Está esterilizado</label>
+                        <label style="cursor:pointer; margin-top:0;"><input type="checkbox" id="chk_microchip"> Microchip o Tatuaje</label>
+                    </div>
+
+                    <div id="microchip-details" class="dependent form-row">
                         <div>
-                            <label>Microchip (Código)</label>
-                            <input type="text" name="microchip" placeholder="Ej: 123456789">
+                            <input type="text" id="microchip" placeholder="Número de microchip">
                         </div>
                         <div>
-                            <label>Tatuaje</label>
-                            <input type="text" name="tatuaje">
+                            <input type="text" id="tatuaje" placeholder="Número de tatuaje">
                         </div>
                     </div>
 
-                    <label>RUAC (Registro CDMX)</label>
-                    <input type="text" name="ruac">
+                    <label style="margin-top:15px;">RUAC (Registro Único de Animales CDMX)</label>
+                    <input type="text" id="ruac" placeholder="Opcional">
 
-                    <label>Carnet de Vacunación (Foto/PDF)</label>
-                    <input type="file" name="carnet" accept="image/*,application/pdf">
+                    <label style="display:inline-block; margin-top: 15px; cursor: pointer;">
+                        <input type="checkbox" id="chk_cartillaVacunacion"> Deseo subir su cartilla de vacunación
+                    </label>
+                    <div id="cartilla-details" class="dependent">
+                        <input type="file" id="carnet" accept=".pdf, image/*" style="padding: 0.5rem; background: transparent; border: none;">
+                    </div>
+                </div>
 
-                    <label>Observaciones</label>
-                    <textarea name="observaciones" rows="3" placeholder="Alergias, señas particulares, etc."></textarea>
-
-                    <button type="submit" class="btn-primary" style="margin-top:20px; width:100%; padding:15px; font-size:1.1rem; cursor:pointer;">
-                        Guardar Mascota
+                <div style="width: 100%; text-align: center; margin-top: 15px;">
+                    <button type="submit" class="reg-btn-submit" id="btn-submit" style="width: 100%; max-width: 400px; padding: 15px; font-size: 1.2rem; border-radius: 8px; border:none;">
+                        Registrar Mascota
                     </button>
                 </div>
 
@@ -139,123 +230,209 @@
         </div>
     </section>
 
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <p>© <span id="year"></span> TechSide</p>
+            <small class="muted">Términos y condiciones · Política de privacidad</small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
     <script src="../js/session.js"></script>
+
     <script>
-        const API_URL = 'http://localhost:3000/api';
-        let USER_ID = null;
+        document.getElementById('year').textContent = new Date().getFullYear();
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            // 1. Obtener ID Usuario
-            const userStr = localStorage.getItem('usuario');
-            if(userStr) try { USER_ID = JSON.parse(userStr).id; } catch(e){}
-            
-            if(!USER_ID) {
-                alert("Debes iniciar sesión.");
-                window.location.href = 'initPag.html';
-                return;
-            }
-
-            // 2. Cargar Catálogos
-            await cargarCatalogos();
-        });
-
-        async function cargarCatalogos() {
-            try {
-                const res = await fetch(`${API_URL}/pets/catalogs`);
-                const data = await res.json();
-                
-                // Función auxiliar para llenar selects por ID
-                const fill = (id, arr) => {
-                    const sel = document.getElementById(id);
-                    if(!sel) return;
-                    sel.innerHTML = '<option value="">-- Selecciona --</option>';
-                    arr.forEach(i => {
-                        const opt = document.createElement('option');
-                        opt.value = i.id;
-                        opt.textContent = i.nombre;
-                        sel.appendChild(opt);
-                    });
-                };
-
-                // Llenar Especies (Especial porque no se envía, solo filtra)
-                const selEsp = document.getElementById('especie');
-                selEsp.innerHTML = '<option value="">-- Selecciona --</option>';
-                data.especies.forEach(e => {
-                    const opt = document.createElement('option');
-                    opt.value = e.id; 
-                    opt.textContent = e.nombre;
-                    selEsp.appendChild(opt);
-                });
-
-                fill('color', data.colores);
-                fill('tipo_pelo', data.tipos_pelo);
-                fill('patron_pelo', data.patrones);
-                fill('comportamiento', data.comportamientos);
-
-            } catch (e) { console.error(e); alert('Error cargando catálogos'); }
-        }
-
-        // Cargar Razas al cambiar Especie
-        document.getElementById('especie').addEventListener('change', async (e) => {
-            const espId = e.target.value;
-            const selRaza = document.getElementById('raza');
-            selRaza.innerHTML = '<option>Cargando...</option>';
-            selRaza.disabled = true;
-
-            if(!espId) { selRaza.innerHTML='<option>Selecciona especie</option>'; return; }
-
-            try {
-                const res = await fetch(`${API_URL}/pets/catalogs/razas/${espId}`);
-                const razas = await res.json();
-                
-                selRaza.innerHTML = '<option value="">-- Selecciona Raza --</option>';
-                razas.forEach(r => {
-                    const opt = document.createElement('option');
-                    opt.value = r.id;
-                    opt.textContent = r.nombre;
-                    selRaza.appendChild(opt);
-                });
-                selRaza.disabled = false;
-            } catch(e) { console.error(e); }
-        });
-
-        // Enviar Formulario
-        document.getElementById('regPetForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
-            btn.disabled = true; btn.textContent = "Guardando...";
-
-            const formData = new FormData(e.target);
-            formData.append('propietario_id', USER_ID);
-
-            try {
-                const res = await fetch(`${API_URL}/pets/register`, {
-                    method: 'POST',
-                    body: formData
-                });
-                const r = await res.json();
-                
-                if(r.success) {
-                    alert('¡Mascota registrada!');
-                    window.location.href = 'listas.html';
-                } else {
-                    alert('Error: ' + r.message);
-                    btn.disabled = false; btn.textContent = "Guardar Mascota";
-                }
-            } catch(err) {
-                console.error(err);
-                alert('Error de conexión');
-                btn.disabled = false; btn.textContent = "Guardar Mascota";
-            }
+        flatpickr(".calendario-custom", {
+            locale: "es", 
+            dateFormat: "Y-m-d", 
+            maxDate: "today", 
+            theme: "dark"
         });
 
         function previewFile() {
             const preview = document.getElementById('preview');
             const file = document.getElementById('foto').files[0];
             const reader = new FileReader();
-            reader.onloadend = function () { preview.src = reader.result; preview.style.display = 'block'; }
-            if(file) reader.readAsDataURL(file);
+            reader.onloadend = function () { 
+                preview.src = reader.result; 
+                preview.style.display = 'block'; 
+            }
+            if(file) { reader.readAsDataURL(file); } else { preview.src = ""; preview.style.display = 'none'; }
         }
+
+        const token = localStorage.getItem('accessToken');
+        const userStr = localStorage.getItem('user');
+
+        if (!token || !userStr) {
+            window.location.href = 'initPag.html';
+        } else {
+            const userData = JSON.parse(userStr);
+            if (userData.rol === 'admin' || userData.rol === 'medico') {
+                window.location.href = 'regPetAdmin.html';
+            }
+            const userNameEl = document.getElementById('header-user-name');
+            if (userNameEl) userNameEl.textContent = `Hola, ${userData.nombreCompleto?.split(' ')[0] || userData.email}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+
+            async function fetchCatalogo(ruta) {
+                try {
+                    const res = await fetch(`http://localhost:3000/catalogos/${ruta}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    return res.ok ? await res.json() : [];
+                } catch { return []; }
+            }
+
+            function llenarSelect(selectId, datos, placeholder) {
+                const select = document.getElementById(selectId);
+                select.innerHTML = `<option value="">${placeholder}</option>`;
+                datos.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d.id;   
+                    opt.textContent = d.nombre;
+                    select.appendChild(opt);
+                });
+            }
+
+            const [especies, colores, tiposPelo, patronesPelo, comportamientos, alergias] = await Promise.all([
+                fetchCatalogo('especies'), fetchCatalogo('colores'), fetchCatalogo('tipos-pelo'),
+                fetchCatalogo('patrones-pelo'), fetchCatalogo('comportamientos'), fetchCatalogo('alergias')
+            ]);
+
+            llenarSelect('especieId', especies, '-- Selecciona --');
+            llenarSelect('colorId', colores, '-- Selecciona --');
+            llenarSelect('tipoPeloId', tiposPelo, '-- Selecciona --');
+            llenarSelect('patronPeloId', patronesPelo, '-- Selecciona --');
+            llenarSelect('comportamientoId', comportamientos, '-- Selecciona --');
+
+            const alergiasContainer = document.getElementById('alergias-container');
+            alergiasContainer.innerHTML = ''; 
+            
+            if (alergias.length > 0) {
+                alergias.forEach(a => {
+                    const divWrapper = document.createElement('div');
+                    divWrapper.className = 'alergia-item';
+
+                    const label = document.createElement('label');
+                    label.innerHTML = `<input type="checkbox" name="alergiaCheck" value="${a.id}" data-name="${a.nombre}"> ${a.nombre}`;
+                    
+                    const inputNota = document.createElement('input');
+                    inputNota.type = 'text'; inputNota.className = 'alergia-nota';
+                    inputNota.placeholder = `¿Detalles sobre la alergia a ${a.nombre}?`;
+                    inputNota.dataset.id = a.id;
+
+                    label.querySelector('input').addEventListener('change', (e) => {
+                        inputNota.style.display = e.target.checked ? 'block' : 'none';
+                        if(!e.target.checked) inputNota.value = ''; 
+                    });
+
+                    divWrapper.appendChild(label);
+                    divWrapper.appendChild(inputNota);
+                    alergiasContainer.appendChild(divWrapper);
+                });
+            } else {
+                alergiasContainer.innerHTML = '<p class="muted" style="margin:0;">No hay alergias registradas.</p>';
+            }
+
+            const especieSelect = document.getElementById('especieId');
+            const razaSelect = document.getElementById('razaId');
+            
+            especieSelect.addEventListener('change', async (e) => {
+                const espId = e.target.value;
+                razaSelect.innerHTML = '<option value="">Cargando...</option>';
+                razaSelect.disabled = true;
+
+                if(espId) {
+                    const razas = await fetchCatalogo(`razas?especieId=${espId}`);
+                    llenarSelect('razaId', razas, '-- Selecciona Raza --');
+                    razaSelect.disabled = false;
+                } else {
+                    razaSelect.innerHTML = '<option value="">Selecciona especie primero</option>';
+                }
+            });
+
+            const toggles = [['chk_microchip','microchip-details'], ['chk_cartillaVacunacion','cartilla-details']];
+            toggles.forEach(([chkId, targetId])=>{
+                const chk = document.getElementById(chkId);
+                const target = document.getElementById(targetId);
+                if(chk && target) chk.addEventListener('change', ()=> target.style.display = chk.checked ? 'flex' : 'none');
+            });
+
+            document.getElementById('regPetForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btnSubmit = document.getElementById('btn-submit');
+                
+                btnSubmit.textContent = "Guardando mascota...";
+                btnSubmit.disabled = true;
+
+                const formData = new FormData();
+                
+                formData.append('nombre', document.getElementById('nombre').value);
+                const fecha = document.getElementById('fechaNacimiento').value;
+                if(fecha) formData.append('fechaNacimiento', new Date(fecha).toISOString());
+
+                const agregarSiExiste = (idField, formKey) => {
+                    const val = document.getElementById(idField).value;
+                    if(val) formData.append(formKey || idField, val);
+                }
+                
+                agregarSiExiste('razaId'); agregarSiExiste('colorId'); agregarSiExiste('tipoPeloId');
+                agregarSiExiste('patronPeloId'); agregarSiExiste('comportamientoId'); agregarSiExiste('genero', 'sexo');
+                
+                agregarSiExiste('peso'); agregarSiExiste('ruac');
+                formData.append('esterilizado', document.getElementById('chk_esterilizado').checked);
+
+                if(document.getElementById('chk_microchip').checked) {
+                    agregarSiExiste('microchip'); agregarSiExiste('tatuaje');
+                }
+
+                let notasExtraAlergias = [];
+                document.querySelectorAll('input[name="alergiaCheck"]:checked').forEach(cb => {
+                    formData.append('alergiaIds', cb.value); 
+                    const notaInput = document.querySelector(`.alergia-nota[data-id="${cb.value}"]`);
+                    if(notaInput && notaInput.value.trim() !== '') {
+                        notasExtraAlergias.push(`- ${cb.dataset.name}: ${notaInput.value.trim()}`);
+                    }
+                });
+
+                let obsPrincipal = document.getElementById('observaciones').value.trim();
+                if (notasExtraAlergias.length > 0) obsPrincipal += (obsPrincipal ? "\n\n" : "") + "DETALLES DE ALERGIAS:\n" + notasExtraAlergias.join("\n");
+                if (obsPrincipal !== '') formData.append('observaciones', obsPrincipal);
+
+                const fotoFile = document.getElementById('foto').files[0];
+                if(fotoFile) formData.append('foto', fotoFile);
+
+                if(document.getElementById('chk_cartillaVacunacion').checked) {
+                    const carnetFile = document.getElementById('carnet').files[0];
+                    if(carnetFile) formData.append('carnet', carnetFile);
+                }
+
+                try {
+                    const res = await fetch('http://localhost:3000/mascotas', {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` },
+                        body: formData
+                    });
+
+                    if(res.ok) {
+                        alert("¡Tu mascota ha sido registrada con éxito!");
+                        window.location.href = "listas.html"; 
+                    } else {
+                        const errData = await res.json();
+                        alert("Error al registrar: \n" + JSON.stringify(errData.message || errData.details));
+                    }
+                } catch(error) {
+                    alert("Error de conexión con el servidor.");
+                } finally {
+                    btnSubmit.textContent = "Registrar Mascota";
+                    btnSubmit.disabled = false;
+                }
+            });
+        });
     </script>
 </body>
 </html>

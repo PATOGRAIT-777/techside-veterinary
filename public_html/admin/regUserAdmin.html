@@ -3,30 +3,45 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Mi Cuenta — TechSide</title>
+  <title>Mi Cuenta (Administración) — TechSide</title>
   <link rel="stylesheet" href="../css/userSet.css">
+  <link rel="stylesheet" href="../css/universalCss.css">
+
+  <style>
+    /* Estilos para forzar el comportamiento de campos no editables y el header dinámico */
+    input[disabled], input[readonly] {
+      background-color: #e9ecef !important;
+      color: #6c757d !important;
+      cursor: not-allowed;
+      border: 1px solid #ced4da;
+    }
+  </style>
 </head>
 <body>
   <header class="site-header">
     <div class="container header-inner">
-      <a class="brand" href="/">Clinica</a>
+      <a class="brand" href="initPag.html">🐶 TechSide Vet</a>
+      
       <nav class="main-nav" aria-label="Navegación principal">
         <a href="dashboard.html">Dashboard</a>
         <a href="citas.html">Citas</a>
-        <a href="expedientes.html">Expedientes</a>
-        <a href="listas.html">Mis mascotas</a>
-        <a href="regPetAdmin.html">Registrar mascota</a>
         <a href="pacientes.html">Pacientes</a>
+        <a href="expedientes.html">Expedientes</a>
         <a href="horario.html">Horario</a>
-        <a href="inventario.html">Inventario</a>
-        <a href="ordenes.html">Órdenes</a>
+        <a href="listas.html">Mis mascotas</a>
+        
+        <a href="regPetAdmin.html" class="admin-only">Registrar mascota</a>
+        <a href="inventario.html" class="admin-only">Inventario</a>
+        <a href="ordenes.html" class="admin-only">Órdenes</a>
+        
         <a href="prodCatalog.html">Tienda</a>
-        <a href="regUser.html" class="active">Mi cuenta</a>
+        <a href="regUserAdmin.html" class="active">Mi cuenta</a>
       </nav>
+
       <div class="header-actions">
-        <div id="auth-buttons">
-          <button class="btn-ghost">Registrarse</button>
-          <button class="btn-primary" onclick="openLogin()">Entrar</button>
+        <div id="user-info" style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="window.location.href='regUserAdmin.html'">
+          <span id="header-user-name" style="font-weight: 600; color: #1e293b;">Cargando...</span>
+          <span id="header-user-role" style="background: #dc2626; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">ADMIN</span>
         </div>
       </div>
     </div>
@@ -34,8 +49,8 @@
 
   <section class="hero">
     <div class="container">
-      <h1>Mi cuenta</h1>
-      <p class="muted">Gestiona tu perfil, contraseñas, mascotas y ajustes.</p>
+      <h1>Panel de Personal</h1>
+      <p class="muted">Gestiona tu información de perfil y configuraciones del sistema.</p>
     </div>
   </section>
 
@@ -45,15 +60,13 @@
         <div class="avatar" id="sidebar-avatar">--</div>
         <div class="profile-info">
           <strong id="sidebar-name">Cargando...</strong>
-          <small id="sidebar-role">Usuario</small>
+          <small id="sidebar-role">Personal</small>
         </div>
       </div>
 
       <nav class="account-nav">
         <a href="#perfil" class="is-active">Perfil</a>
-        <a href="listas.html">Mis mascotas</a>
-        <a href="#historial">Historial</a>
-        <a href="#ajustes">Ajustes</a>
+        <a href="#ajustes">Seguridad</a>
         <button id="logoutBtn" class="btn-ghost" style="width:100%;text-align:left; color: #dc2626;">Cerrar sesión</button>
       </nav>
     </aside>
@@ -62,9 +75,10 @@
       <article id="perfil" class="card">
         <h2>Información del perfil</h2>
         <form id="perfil-form" class="form-grid" autocomplete="off">
-          <label>
+          
+          <label class="full">
             Nombre Completo
-            <input type="text" name="nombre" placeholder="Cargando..." />
+            <input type="text" name="nombreCompleto" placeholder="Cargando..." required maxlength="200" />
           </label>
 
           <label>
@@ -73,75 +87,54 @@
           </label>
 
           <label>
-            Cambiar avatar
-            <input type="file" name="avatar" accept="image/*" disabled title="Función en desarrollo" />
+            Teléfono Principal
+            <input type="text" name="telefono" disabled placeholder="No se puede cambiar" />
+          </label>
+
+          <label>
+            Teléfono Secundario
+            <input type="text" name="telefonoSecundario" placeholder="Opcional" maxlength="15" />
           </label>
 
           <label class="full">
-            Biografía
-            <textarea name="bio" rows="4"></textarea>
+            Calle
+            <input type="text" name="calle" placeholder="Ej. Avenida Siempreviva" required maxlength="200" />
           </label>
 
           <label>
-            Fecha de nacimiento
-            <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" />
+            Número Exterior
+            <input type="text" name="numExterior" placeholder="Ej. 123" maxlength="20" />
           </label>
 
           <label>
-            Género
-            <select name="genero" id="genero">
-              <option value="">-- Selecciona --</option>
-              <option value="Femenino">Femenino</option>
-              <option value="Masculino">Masculino</option>
-              <option value="Otro">Otro</option>
-            </select>
-          </label>
-
-          <label>
-            Estado civil
-            <select name="estado_civil" id="estado_civil">
-              <option value="">-- Selecciona --</option>
-              <option value="Soltero/a">Soltero/a</option>
-              <option value="Casado/a">Casado/a</option>
-              <option value="Unión libre">Unión libre</option>
-              <option value="Viudo/a">Viudo/a</option>
-            </select>
-          </label>
-
-          <label>
-            Ocupación
-            <input type="text" name="ocupacion" id="ocupacion" placeholder="Ocupación" />
-          </label>
-
-          <label>
-            Empresa
-            <input type="text" name="empresa" id="empresa" placeholder="Empresa (opcional)" />
+            Número Interior
+            <input type="text" name="numInterior" placeholder="Ej. Depto 4" maxlength="20" />
           </label>
 
           <div class="form-actions full">
             <button type="submit" class="btn-primary" id="save-profile-btn">Guardar cambios</button>
-            <button type="button" class="btn-ghost">Cancelar</button>
+            <button type="button" class="btn-ghost" onclick="location.reload()">Cancelar</button>
           </div>
         </form>
       </article>
 
       <article id="ajustes" class="card" style="display: none;">
         <h2>Seguridad</h2>
-        <form class="form-grid">
+        <form id="form-password" class="form-grid">
           <label>
             Contraseña actual
-            <input type="password" name="current" />
+            <input type="password" name="current_password" required placeholder="Tu contraseña actual" />
           </label>
           <label>
             Nueva contraseña
-            <input type="password" name="newpass" />
+            <input type="password" name="new_password" required placeholder="Mínimo 8 caracteres" />
           </label>
           <label>
             Repetir nueva contraseña
-            <input type="password" name="newpass2" />
+            <input type="password" name="confirm_password" required placeholder="Confirma la nueva contraseña" />
           </label>
           <div class="form-actions full">
-            <button type="button" class="btn-primary" onclick="alert('Funcionalidad en desarrollo')">Actualizar contraseña</button>
+            <button type="submit" class="btn-primary">Actualizar contraseña</button>
           </div>
         </form>
       </article>
@@ -158,27 +151,46 @@
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // 1. VERIFICAR SESIÓN
+    // 1. VERIFICAR SESIÓN Y GESTIONAR ROLES
     const token = localStorage.getItem('accessToken');
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
 
     if (!token) {
-      // Si no hay token, lo mandamos al index para que inicie sesión
       window.location.href = 'initPag.html';
     } else {
-      // Ocultar botones de login del header porque ya hay sesión
-      const authButtons = document.getElementById('auth-buttons');
-      if(authButtons) authButtons.style.display = 'none';
+      // Configurar Header y Sidebar visualmente
+      const userNameEl = document.getElementById('header-user-name');
+      const userRoleEl = document.getElementById('header-user-role');
+      const roleDisplaySidebar = document.getElementById('sidebar-role');
 
-      // 2. CONFIGURAR INTERFAZ DE ADMIN
-      const roleDisplay = document.getElementById('sidebar-role');
+      let nombreMostrado = userData.email;
+      if (userData.nombreCompleto) {
+         nombreMostrado = userData.nombreCompleto.split(' ')[0];
+      }
+
+      if (userNameEl) userNameEl.textContent = `Hola, ${nombreMostrado}`;
+
       if (userData.rol) {
-        // Poner la primera letra en mayúscula (Admin, Medico, Cliente)
-        roleDisplay.textContent = userData.rol.charAt(0).toUpperCase() + userData.rol.slice(1);
+         const rolFormateado = userData.rol.charAt(0).toUpperCase() + userData.rol.slice(1);
+         
+         // Actualizar textos de roles
+         if (roleDisplaySidebar) roleDisplaySidebar.textContent = rolFormateado;
+         if (userRoleEl) {
+             userRoleEl.textContent = rolFormateado;
+             userRoleEl.style.background = userData.rol === 'admin' ? '#dc2626' : '#16a34a'; // Rojo para admin, verde para medico
+         }
+
+         // Lógica de permisos de navegación: Ocultar módulos que el médico no debe ver
+         if (userData.rol === 'medico') {
+             const adminLinks = document.querySelectorAll('.admin-only');
+             adminLinks.forEach(link => {
+                 link.style.display = 'none';
+             });
+         }
       }
     }
 
-    // 3. CARGAR PERFIL DESDE EL BACKEND
+    // 2. CARGAR PERFIL DESDE EL BACKEND
     document.addEventListener('DOMContentLoaded', async () => {
       try {
         const response = await fetch('http://localhost:3000/personas/me', {
@@ -191,20 +203,14 @@
         if (response.ok) {
           const profile = await response.json();
           
-          // Llenar Formulario
-          document.querySelector('[name="nombre"]').value = profile.nombreCompleto || '';
-          document.querySelector('[name="email"]').value = userData.email || '';
+          document.querySelector('[name="nombreCompleto"]').value = profile.nombreCompleto || '';
+          document.querySelector('[name="email"]').value = profile.email || userData.email || '';
+          document.querySelector('[name="telefono"]').value = profile.telefono || '';
+          document.querySelector('[name="telefonoSecundario"]').value = profile.telefonoSecundario || '';
+          document.querySelector('[name="calle"]').value = profile.calle || '';
+          document.querySelector('[name="numExterior"]').value = profile.numExterior || '';
+          document.querySelector('[name="numInterior"]').value = profile.numInterior || '';
           
-          if(profile.fechaNacimiento) {
-             // Formatear a YYYY-MM-DD para el input tipo date
-             document.querySelector('[name="fecha_nacimiento"]').value = new Date(profile.fechaNacimiento).toISOString().split('T')[0];
-          }
-          // Si tu backend retorna estos campos, se asignan
-          if(profile.genero) document.querySelector('[name="genero"]').value = profile.genero;
-          if(profile.estadoCivil) document.querySelector('[name="estado_civil"]').value = profile.estadoCivil;
-          if(profile.ocupacion) document.querySelector('[name="ocupacion"]').value = profile.ocupacion;
-          
-          // Actualizar Sidebar
           const nameDisplay = document.getElementById('sidebar-name');
           const avatarDisplay = document.getElementById('sidebar-avatar');
 
@@ -219,7 +225,7 @@
       }
     });
 
-    // 4. ACTUALIZAR PERFIL (PATCH)
+    // 3. ACTUALIZAR PERFIL (PATCH)
     const perfilForm = document.getElementById('perfil-form');
     perfilForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -229,16 +235,14 @@
 
       const formData = new FormData(perfilForm);
       
-      // Creamos el payload que espera tu backend (revisa tu DTO de Personas)
       const payload = {
-        nombreCompleto: formData.get('nombre'),
-        // Descomenta los demás si tu controlador PATCH /personas/me los acepta:
-        // fechaNacimiento: formData.get('fecha_nacimiento') ? new Date(formData.get('fecha_nacimiento')).toISOString() : undefined,
-        // genero: formData.get('genero') || undefined,
-        // estadoCivil: formData.get('estado_civil') || undefined,
+        nombreCompleto: formData.get('nombreCompleto'),
+        telefonoSecundario: formData.get('telefonoSecundario') || null,
+        calle: formData.get('calle'),
+        numExterior: formData.get('numExterior') || null,
+        numInterior: formData.get('numInterior') || null,
       };
 
-      // Limpiamos los nulos o vacíos
       Object.keys(payload).forEach(key => (payload[key] === undefined || payload[key] === "") && delete payload[key]);
 
       try {
@@ -259,7 +263,6 @@
           alert('Error: ' + (errorData.message || 'No se pudo actualizar'));
         }
       } catch (error) {
-        console.error('Error al actualizar:', error);
         alert('Error de conexión con el servidor.');
       } finally {
         btn.textContent = 'Guardar cambios';
@@ -267,31 +270,75 @@
       }
     });
 
+    // 4. CAMBIAR CONTRASEÑA
+    const passwordForm = document.getElementById('form-password');
+    if (passwordForm) {
+      passwordForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const cur = passwordForm.current_password.value;
+          const nue = passwordForm.new_password.value;
+          const con = passwordForm.confirm_password.value;
+
+          if(nue !== con) {
+              alert('Las nuevas contraseñas no coinciden');
+              return;
+          }
+          if(nue.length < 8) { 
+               alert('La nueva contraseña debe tener al menos 8 caracteres');
+               return;
+          }
+
+          try {
+              const res = await fetch(`http://localhost:3000/auth/change-password`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type':'application/json',
+                    'Authorization': `Bearer ${token}`
+                  },
+                  body: JSON.stringify({
+                      currentPassword: cur, 
+                      newPassword: nue
+                  })
+              });
+
+              if(res.ok) { 
+                  alert('¡Contraseña actualizada con éxito!'); 
+                  passwordForm.reset(); 
+              } else { 
+                  const errorData = await res.json();
+                  alert('Error: ' + (errorData.message || 'Contraseña actual incorrecta.')); 
+              }
+          } catch(e) { 
+              alert('Error de conexión con el servidor'); 
+          }
+      });
+    }
+
     // 5. CERRAR SESIÓN
     document.getElementById('logoutBtn').addEventListener('click', () => {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('user');
-      window.location.href = 'initPag.html';
+      if(confirm("¿Seguro que quieres cerrar sesión?")) {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('user');
+        window.location.href = 'initPag.html';
+      }
     });
 
-    // 6. LÓGICA VISUAL DE TABS (PESTAÑAS)
+    // 6. LÓGICA VISUAL DE TABS
     document.querySelectorAll('.account-nav a').forEach(a => {
       a.addEventListener('click', e => {
         const href = e.currentTarget.getAttribute('href');
         if(href.startsWith('#')) {
           e.preventDefault();
-          // Quitar clases activas del menú
           document.querySelectorAll('.account-nav a').forEach(x => x.classList.remove('is-active'));
           e.currentTarget.classList.add('is-active');
 
-          // Ocultar todos los artículos
           document.querySelectorAll('.main article').forEach(article => article.style.display = 'none');
-          
-          // Mostrar el artículo seleccionado
           document.getElementById(href.substring(1)).style.display = 'block';
         }
       });
     });
   </script>
+
+  <script src="../js/session.js"></script>
 </body>
 </html>

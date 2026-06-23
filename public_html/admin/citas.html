@@ -7,93 +7,62 @@
     <link rel="stylesheet" href="../css/universalCss.css">
     <link rel="stylesheet" href="../css/pInicio.css">
     <style>
-        /* Estilos preservados de tu diseño original */
+        body { background: #071025; color: #f8fafc; }
+        
         .cita-container {
             max-width: 800px;
             margin: 40px auto;
-            background: #fff;
+            background: rgba(15, 23, 42, 0.95);
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
-        .step-wizard {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-            position: relative;
-        }
-        .step-wizard::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: #ddd;
-            z-index: 0;
-            transform: translateY(-50%);
-        }
+
+        .step-wizard { display: flex; justify-content: space-between; margin-bottom: 30px; position: relative; }
+        .step-wizard::before { content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background: #334155; z-index: 0; transform: translateY(-50%); }
+        
         .step-indicator {
-            width: 40px;
-            height: 40px;
-            background: #ddd;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            z-index: 1;
-            font-weight: bold;
-            color: #666;
-            transition: 0.3s;
+            width: 40px; height: 40px; background: #1e293b; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; position: relative; z-index: 1;
+            font-weight: bold; color: #94a3b8; transition: 0.3s;
         }
-        .step-indicator.active { background: #16a34a; color: #fff; }
-        .step-indicator.completed { background: #16a34a; color: #fff; }
+        .step-indicator.active { background: #22c55e; color: #fff; }
+        .step-indicator.completed { background: #22c55e; color: #fff; }
         
         .form-step { display: none; animation: fadeIn 0.5s; }
         .form-step.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #fff; }
         .form-control {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
+            width: 100%; padding: 12px; border-radius: 8px;
+            border: 1px solid #334155; background: #0f172a; color: white;
         }
 
-        /* GRID DE HORAS (TU DISEÑO ORIGINAL) */
-        .horas-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            gap: 10px;
-            margin-top: 15px;
-        }
+        .horas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-top: 15px; }
         .btn-hora {
-            padding: 10px;
-            border: 1px solid #16a34a;
-            background: #fff;
-            color: #16a34a;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: 0.2s;
+            padding: 10px; border: 1px solid #22c55e; background: #0f172a;
+            color: #38bdf8; border-radius: 6px; cursor: pointer; transition: 0.2s; text-align: center;
         }
-        .btn-hora:hover { background: #dcfce7; }
-        .btn-hora.active { background: #16a34a; color: #fff; }
-        .btn-hora:disabled { border-color: #ccc; color: #ccc; cursor: not-allowed; background: #f9f9f9; }
-
+        .btn-hora:hover { background: #1e293b; }
+        .btn-hora.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+        
         .btn-actions { display: flex; justify-content: space-between; margin-top: 30px; }
-        .btn-prev, .btn-next {
-            padding: 10px 25px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .btn-prev { background: #e5e7eb; color: #374151; }
-        .btn-next { background: #16a34a; color: #fff; }
+        .btn-next { padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; background: #22c55e; color: #fff; }
+        .btn-prev { padding: 12px 25px; border: 1px solid #475569; border-radius: 8px; cursor: pointer; font-weight: bold; background: transparent; color: #cbd5e1; }
+        
+        .resumen-box { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px; color: #e2e8f0; }
+        .header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+}
+.main-nav { display: flex; gap: 20px; }
+.main-nav a { color: #cbd5e1; text-decoration: none; font-weight: 500; }
+.main-nav a:hover, .main-nav a.active { color: #fff; }
     </style>
     <script src="../js/session.js"></script>
 </head>
@@ -101,12 +70,21 @@
 
 <header class="site-header">
     <div class="container header-inner">
-        <a class="brand" href="../admin/initPag.html">🐶 TechSide Vet</a>
-        <nav class="main-nav">
-            <a href="../admin/initPag.html">Inicio</a>
-            <a href="listas.html">Mis Mascotas</a>
-        </nav>
-        <button onclick="logout()" class="btn-danger">Cerrar Sesión</button>
+      <a class="brand" href="../admin/initPag.html">🐶 TechSide Vet</a>
+      <nav class="main-nav" aria-label="Navegación principal">
+        <a href="../admin/initPag.html">Inicio</a>
+        <a href="prodCatalog.html">Tienda</a>
+        <a href="horario.html">Disponibilidad</a>
+        <a href="listas.html">Mis mascotas</a>
+        <a href="regUser.html">Mi cuenta</a>
+      </nav>
+      
+      <div class="header-actions">
+        <div id="user-info" style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="window.location.href='regUser.html'">
+          <span id="header-user-name" style="font-weight: 600; color: #f8fafc;">Cargando...</span>
+          <span id="header-user-role" style="background: #2563eb; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">CLIENTE</span>
+        </div>
+      </div>
     </div>
 </header>
 
@@ -181,7 +159,7 @@
             </div>
 
             <div class="form-step" id="step3">
-                <div style="background: #f3f4f6; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                <div style="background: #334155; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
                     <h3 style="margin-top:0;">Resumen</h3>
                     <p><strong>Paciente:</strong> <span id="summary-mascota">...</span></p>
                     <p><strong>Servicio:</strong> <span id="summary-servicio">...</span></p>
@@ -204,62 +182,76 @@
     // ============================================
     // CONFIGURACIÓN Y ESTADO GLOBAL
     // ============================================
-    const API_URL = 'http://localhost:3000/api/citas'; // Ajusta si tu puerto es diferente
-    let currentStep = 1;
+    const token = localStorage.getItem('accessToken');
+    const API_URL = 'http://localhost:3000/api/v1/citas';
     let usuarioActual = null;
+    let currentStep = 1;
 
     // ============================================
     // 1. CARGA INICIAL (AL ABRIR LA PÁGINA)
     // ============================================
-    document.addEventListener('DOMContentLoaded', async () => {
-        // A. Verificar Sesión
+   document.addEventListener('DOMContentLoaded', async () => {
         const userStr = localStorage.getItem('user');
         if (!userStr) {
-            alert("Debes iniciar sesión para agendar.");
             window.location.href = '../admin/initPag.html';
             return;
         }
+        
         usuarioActual = JSON.parse(userStr);
+        console.log("Usuario cargado:", usuarioActual);
 
-        // B. Cargar Datos en Paralelo (Mascotas, Sucursales, Servicios)
         try {
+            const headers = { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json' 
+            };
+            
+            // Hacemos las peticiones
             const [initDataRes, mascotasRes] = await Promise.all([
-                fetch(`${API_URL}/init-data`),
-                fetch(`${API_URL}/mis-mascotas/${usuarioActual.id}`)
+                fetch(`${API_URL}/init-data`, { headers }),
+                fetch(`${API_URL}/mis-mascotas/${usuarioActual.id}`, { headers })
             ]);
+
+            // Verificamos si hubo error en alguna
+            if (!initDataRes.ok || !mascotasRes.ok) {
+                console.error("Error en respuesta:", { 
+                    initData: initDataRes.status, 
+                    mascotas: mascotasRes.status 
+                });
+                alert("Error del servidor. Revisa la consola (F12).");
+                return;
+            }
 
             const initData = await initDataRes.json();
             const mascotas = await mascotasRes.json();
 
-            // Llenar Select Sucursales
+            console.log("Datos iniciales recibidos:", initData);
+            console.log("Mascotas recibidas:", mascotas);
+
+            // 1. Llenar Select Sucursales
             const sucSelect = document.getElementById('sucursal');
             sucSelect.innerHTML = '<option value="">Selecciona...</option>';
             initData.sucursales.forEach(s => {
                 sucSelect.innerHTML += `<option value="${s.id}">${s.nombre}</option>`;
             });
 
-            // Llenar Select Servicios
+            // 2. Llenar Select Servicios
             const servSelect = document.getElementById('servicio');
             servSelect.innerHTML = '<option value="">Selecciona...</option>';
             initData.servicios.forEach(s => {
-                // Guardamos el nombre en un atributo data para el resumen
-                servSelect.innerHTML += `<option value="${s.id}" data-nombre="${s.nombre}">${s.nombre} (${s.duracion_minutos} min) - $${s.precio}</option>`;
+                servSelect.innerHTML += `<option value="${s.id}" data-nombre="${s.nombre}">${s.nombre} ($${s.precioBase})</option>`;
             });
 
-            // Llenar Select Mascotas
+            // 3. Llenar Select Mascotas
             const mascSelect = document.getElementById('mascota');
-            if (mascotas.length > 0) {
-                mascSelect.innerHTML = '<option value="">Selecciona...</option>';
-                mascotas.forEach(m => {
-                    mascSelect.innerHTML += `<option value="${m.id}" data-nombre="${m.nombre}">${m.nombre}</option>`;
-                });
-            } else {
-                mascSelect.innerHTML = '<option value="">Sin mascotas registradas</option>';
-            }
+            mascSelect.innerHTML = mascotas.length > 0 ? '<option value="">Selecciona...</option>' : '<option value="">Sin mascotas registradas</option>';
+            mascotas.forEach(m => {
+                mascSelect.innerHTML += `<option value="${m.id}" data-nombre="${m.nombre}">${m.nombre}</option>`;
+            });
 
         } catch (error) {
-            console.error("Error cargando datos:", error);
-            alert("Error conectando con el servidor. Revisa la consola.");
+            console.error("Error crítico:", error);
+            alert("Error al conectar con la base de datos.");
         }
     });
 
@@ -267,71 +259,43 @@
     // 2. LÓGICA DE INTERACCIÓN
     // ============================================
     
-    // A. Cuando cambia la Sucursal -> Cargar Médicos
+    // Lógica de Médicos
     document.getElementById('sucursal').addEventListener('change', async (e) => {
-        const sucursalId = e.target.value;
         const medicoSelect = document.getElementById('medico');
-        
-        if(!sucursalId) {
-            medicoSelect.innerHTML = '<option value="">Selecciona sucursal primero</option>';
-            medicoSelect.disabled = true;
-            return;
-        }
+        if(!e.target.value) return;
 
-        medicoSelect.innerHTML = '<option>Cargando médicos...</option>';
-        try {
-            const res = await fetch(`${API_URL}/medicos/${sucursalId}`);
-            const medicos = await res.json();
-            
-            medicoSelect.innerHTML = '<option value="">Selecciona...</option>';
-            medicos.forEach(m => {
-                medicoSelect.innerHTML += `<option value="${m.id}" data-nombre="${m.nombre_completo}">${m.nombre_completo}</option>`;
-            });
-            medicoSelect.disabled = false;
-        } catch (err) {
-            console.error(err);
-            medicoSelect.innerHTML = '<option>Error al cargar</option>';
-        }
+        const res = await fetch(`${API_URL}/medicos/${e.target.value}`, { headers: { 'Authorization': `Bearer ${token}` } });
+        const medicos = await res.json();
+        
+        medicoSelect.innerHTML = '<option value="">Selecciona...</option>';
+        medicos.forEach(m => medicoSelect.innerHTML += `<option value="${m.id}" data-nombre="${m.nombre_completo}">${m.nombre_completo}</option>`);
+        medicoSelect.disabled = false;
     });
 
-    // B. Cuando cambia Médico o Fecha -> Cargar Horarios (GRID DINÁMICO)
-    const cargarHorarios = async () => {
+    // Lógica de Horarios
+    async function cargarHorarios() {
         const medicoId = document.getElementById('medico').value;
         const fecha = document.getElementById('fecha').value;
-        const grid = document.getElementById('horas-grid');
-        const loader = document.getElementById('loading-hours');
-
         if(!medicoId || !fecha) return;
 
+        const res = await fetch(`${API_URL}/horarios-disponibles?medicoId=${medicoId}&fecha=${fecha}`, { headers: { 'Authorization': `Bearer ${token}` } });
+        const slots = await res.json();
+        const grid = document.getElementById('horas-grid');
         grid.innerHTML = '';
-        loader.style.display = 'block';
-
-        try {
-            const res = await fetch(`${API_URL}/horarios-disponibles?medicoId=${medicoId}&fecha=${fecha}`);
-            const slots = await res.json();
-            
-            loader.style.display = 'none';
-
-            if(slots.length === 0) {
-                grid.innerHTML = '<p style="grid-column: 1/-1; color:#ef4444;">No hay disponibilidad para esta fecha.</p>';
-                return;
-            }
-
-            // Generar Botones Dinámicamente (Respetando tu diseño)
-            slots.forEach(hora => {
-                const btn = document.createElement('div');
-                btn.className = 'btn-hora';
-                btn.textContent = hora;
-                btn.onclick = () => seleccionarHora(hora, btn);
-                grid.appendChild(btn);
-            });
-
-        } catch (err) {
-            console.error(err);
-            loader.style.display = 'none';
-            grid.innerHTML = '<p>Error cargando horarios.</p>';
-        }
-    };
+        slots.forEach(hora => {
+            const btn = document.createElement('div');
+            btn.className = 'btn-hora';
+            btn.textContent = hora;
+            btn.onclick = () => {
+                document.querySelectorAll('.btn-hora').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById('horaSeleccionada').value = hora;
+            };
+            grid.appendChild(btn);
+        });
+    }
+    document.getElementById('medico').addEventListener('change', cargarHorarios);
+    document.getElementById('fecha').addEventListener('change', cargarHorarios);
 
     document.getElementById('medico').addEventListener('change', cargarHorarios);
     document.getElementById('fecha').addEventListener('change', cargarHorarios);
@@ -413,34 +377,65 @@
         e.preventDefault();
 
         const datosCita = {
-            mascota_id: document.getElementById('mascota').value,
-            sucursal_id: document.getElementById('sucursal').value,
-            servicio_id: document.getElementById('servicio').value,
-            medico_id: document.getElementById('medico').value,
+            mascotaId: document.getElementById('mascota').value, // Asegúrate de que los nombres coincidan con tu DTO en NestJS
+            sucursalId: document.getElementById('sucursal').value,
+            servicioId: document.getElementById('servicio').value,
+            medicoId: document.getElementById('medico').value,
             fecha: document.getElementById('fecha').value,
-            hora_inicio: document.getElementById('horaSeleccionada').value
+            horaInicio: document.getElementById('horaSeleccionada').value // Cambiado a camelCase
         };
 
         try {
-            const response = await fetch(`${API_URL}/agendar`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(datosCita)
-            });
-
-            const result = await response.json();
+            const response = await fetch(API_URL, { 
+    method: 'POST',
+    headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}` 
+    },
+    body: JSON.stringify(datosCita)
+});
 
             if (response.ok) {
-                alert(`¡Cita agendada con éxito!\nID de confirmación: ${result.citaId}`);
-                window.location.href = '../admin/initPag.html'; // Redirigir al inicio o perfil
+                alert("¡Cita agendada con éxito!");
+                window.location.href = 'listas.html'; 
             } else {
-                alert("Error: " + (result.error || "No se pudo agendar"));
+                const result = await response.json();
+                alert("Error: " + (result.message || "No se pudo agendar"));
             }
         } catch (error) {
             console.error(error);
             alert("Error de conexión al guardar la cita.");
         }
     });
+
+    // Pequeño extra: bloquear fechas pasadas en el input date
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('fecha').setAttribute('min', today);
+
+    const userStr = localStorage.getItem('user');
+
+    if (!token || !userStr) {
+        window.location.href = 'initPag.html';
+    } else {
+        try {
+            const userData = JSON.parse(userStr);
+            
+            const userNameEl = document.getElementById('header-user-name');
+            const nameDisplaySidebar = document.getElementById('sidebar-name');
+            const avatarDisplaySidebar = document.getElementById('sidebar-avatar');
+
+            let nombreMostrado = userData.email;
+            if (userData.nombreCompleto) {
+                nombreMostrado = userData.nombreCompleto.split(' ')[0];
+            }
+
+            if (userNameEl) userNameEl.textContent = `Hola, ${nombreMostrado}`;
+            if (nameDisplaySidebar) nameDisplaySidebar.textContent = nombreMostrado;
+            if (avatarDisplaySidebar && userData.nombreCompleto) {
+                avatarDisplaySidebar.textContent = nombreMostrado.substring(0,2).toUpperCase();
+            }
+        } catch (e) {}
+    }
 </script>
 
 </body>

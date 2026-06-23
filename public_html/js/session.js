@@ -3,13 +3,14 @@
 (function() {
     console.log("🔒 Sistema de Seguridad: Verificando sesión...");
 
-    // 1. Leer datos del usuario
-    const userStr = localStorage.getItem('usuario'); // Ojo: en tu login usabas 'usuario' o 'user', verifica cual es
-    const token = localStorage.getItem('token');
+    // 1. Leer datos del usuario con las claves CORRECTAS
+    const userStr = localStorage.getItem('user'); 
+    const token = localStorage.getItem('accessToken'); 
     
     // Obtener nombre del archivo actual
     const path = window.location.pathname;
-    const page = path.split("/").pop();
+    let page = path.split("/").pop();
+    if (page === "") page = "index.html"; // Por si la ruta es solo "/"
 
     // Páginas PÚBLICAS (No requieren login)
     const publicPages = ['initPag.html', 'index.html', 'registro.html', 'formAgregar.html'];
@@ -18,8 +19,8 @@
     if (!token && !publicPages.includes(page)) {
         console.warn("⛔ Usuario no identificado. Redirigiendo al login.");
         alert("Debes iniciar sesión para ver esta página.");
-        // Ajusta la ruta ../ o ./ segun donde esté tu archivo
-        window.location.href = '../admin/initPag.html'; 
+        // Redirección relativa al directorio actual
+        window.location.href = 'initPag.html'; 
         return;
     }
 
@@ -30,39 +31,48 @@
             user = JSON.parse(userStr);
         } catch (e) {
             console.error("Error leyendo usuario", e);
-            localStorage.clear();
-            window.location.href = '../admin/initPag.html';
+            cerrarSesionDirecta();
             return;
         }
 
         // A. Protección de Rutas ADMIN
         // Lista de páginas que SOLO un admin o médico puede ver
-        const adminPages = ['dashboard.html', 'pacientes.html', 'inventario.html', 'ordenes.html'];
+        const adminPages = [
+            'dashboard.html', 
+            'pacientes.html', 
+            'inventario.html', 
+            'ordenes.html', 
+            'regUserAdmin.html',
+            'regPetAdmin.html'
+        ];
         
         // Si la página actual es de admin Y el usuario es 'cliente'
         if (adminPages.includes(page) && user.rol === 'cliente') {
             alert("⛔ Acceso Denegado: Esta área es solo para personal.");
-            window.location.href = '../admin/citas.html'; // Lo mandamos a una página segura para clientes
+            window.location.href = 'regUser.html'; // Lo mandamos a su cuenta de cliente
             return;
         }
 
         // B. Mostrar Nombre en el Header (Opcional)
-        // Si tienes un elemento <span id="user-name-display"></span> en tu HTML
         const display = document.getElementById('user-name-display');
         if (display) {
-            display.textContent = user.nombre_completo || user.email;
+            // Se utiliza nombreCompleto tal como viene de la base de datos de Persona
+            display.textContent = user.nombreCompleto || user.email;
         }
     }
 
 })();
 
+// Función interna para matar sesión corrupta sin preguntar
+function cerrarSesionDirecta() {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('user');
+    window.location.href = 'initPag.html';
+}
+
 // Función global para cerrar sesión (Úsala en tu botón del menú)
 function cerrarSesion() {
     if(confirm("¿Seguro que deseas salir?")) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('usuario');
-        localStorage.removeItem('user');
-        window.location.href = '../admin/initPag.html';
+        cerrarSesionDirecta();
     }
 }
-

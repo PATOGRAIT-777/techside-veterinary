@@ -28,12 +28,20 @@ async function bootstrap() {
     allowedHeaders: CORS_ALLOWED_HEADERS,
     credentials: false,
   });
-  app.use(helmet());
-  app.useGlobalInterceptors(new SanitizeInterceptor());
+app.use(
+    helmet({
+      crossOriginResourcePolicy: false,
+    }),
+  );  app.useGlobalInterceptors(new SanitizeInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter());
 
   // Serve static assets for custom Swagger branding
   app.useStaticAssets(join(process.cwd(), 'public'));
+
+  // Exponer la carpeta uploads para poder ver las fotos de las mascotas
+  app.useStaticAssets(join(process.cwd(), 'uploads'), {
+    prefix: '/uploads/',
+  });
 
   // Swagger — disabled in production
   if (nodeEnv !== 'production') {

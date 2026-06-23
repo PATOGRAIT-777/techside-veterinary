@@ -154,8 +154,8 @@ export class MascotasService {
 
   async findAllByOwner(propietarioId: string) {
     const mascotas = await this.prisma.mascota.findMany({
-      where: { propietarioId },
-      include: mascotaInclude,
+      where: { propietarioId }, // <-- Corregido: ya no dice usuario.id
+      include: mascotaInclude,  // <-- Usamos la constante global para evitar errores de tipado
     });
     return mascotas.map(mapMascotaToResponse);
   }

@@ -1,24 +1,97 @@
+<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Mis mascotas — TechSide</title>
   <link rel="stylesheet" href="../css/universalCss.css" type="text/css">
+  
+  <style>
+      /* Estilos para las tarjetas de mascotas en formato Grid */
+      .grid-cards {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+          gap: 15px;
+          margin-top: 20px;
+      }
+      .card-item {
+          background: linear-gradient(160deg, #0840c2 0%, #071025 100%);
+          border-radius: 12px;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          overflow: hidden;
+          cursor: pointer;
+          transition: transform 0.2s, box-shadow 0.2s;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      }
+      .card-item:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 8px 15px rgba(8, 64, 194, 0.5);
+      }
+      .card-item img {
+          width: 100%;
+          height: 150px;
+          object-fit: cover;
+          border-bottom: 3px solid #22c55e;
+      }
+      .card-body {
+          padding: 15px;
+          color: white;
+      }
+      .card-body h3 { margin: 0 0 5px 0; color: #fff; font-size: 1.3rem;}
+      .card-body small { color: #cbd5e1; font-size: 0.9rem;}
+      
+      .btn-primary {
+          display: inline-block;
+          background: #f97316;
+          color: white;
+          padding: 8px 15px;
+          border-radius: 6px;
+          text-decoration: none;
+          font-weight: bold;
+          text-align: center;
+          width: 100%;
+          box-sizing: border-box;
+          transition: background 0.2s;
+      }
+      .btn-primary:hover { background: #ea580c; }
+      
+      /* Botón verde para "Registrar Mascota" */
+      .btn-green { background: #22c55e; }
+      .btn-green:hover { background: #16a34a; }
+
+      /* Ajustes para el Modal */
+      .login-modal {
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+          background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 1000;
+      }
+      .login-content {
+          background: #0f172a; border-radius: 12px; width: 90%; max-width: 500px;
+          padding: 25px; border: 1px solid #334155; color: white;
+          max-height: 85vh; overflow-y: auto; position: relative;
+      }
+      .close {
+          position: absolute; top: 15px; right: 20px; font-size: 1.5rem; color: #cbd5e1; cursor: pointer;
+      }
+      .close:hover { color: white; }
+  </style>
 </head>
 <body>
   <header class="site-header">
     <div class="container header-inner">
-      <a class="brand" href="/">Clinica</a>
+      <a class="brand" href="initPag.html">🐶 TechSide Vet</a>
       <nav class="main-nav" aria-label="Navegación principal">
-        <a  href="initPag.html">Inicio</a>
+        <a href="initPag.html">Inicio</a>
         <a href="prodCatalog.html">Tienda</a>
         <a href="horario.html">Disponibilidad</a>
         <a class="active" href="listas.html">Mis mascotas</a>
         <a href="regUser.html">Mi cuenta</a>
       </nav>
+      
       <div class="header-actions">
-        <button class="btn-ghost">Registrarse</button>
-        <button class="btn-primary" onclick="openLogin()">Entrar</button>
+        <div id="user-info" style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="window.location.href='regUser.html'">
+          <span id="header-user-name" style="font-weight: 600; color: #f8fafc;">Cargando...</span>
+          <span id="header-user-role" style="background: #2563eb; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">CLIENTE</span>
+        </div>
       </div>
     </div>
   </header>
@@ -26,36 +99,34 @@
   <section class="hero">
     <div class="container">
       <h1>Mis mascotas</h1>
-      <p class="muted">Tus mascotas guardadas, sus datos, etc.</p>
+      <p class="muted">Tus mascotas guardadas, sus datos clínicos e historial.</p>
     </div>
   </section>
 
   <main class="container layout">
-    <aside class="sidebar">
-      <div class="profile-card">
-        <div class="avatar">PA</div>
+    <aside class="sidebar" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px;">
+      <div class="profile-card" style="text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 20px;">
+        <div class="avatar" id="sidebar-avatar" style="width: 80px; height: 80px; margin: 0 auto 10px; background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; border-radius: 50%; font-weight: bold;">US</div>
         <div class="profile-info">
-          <strong>Patograit A.</strong>
-          <small>Usuario</small>
+          <strong id="sidebar-name" style="display: block; color: #fff; font-size: 1.2rem;">Cargando...</strong>
+          <small id="sidebar-role" style="color: #94a3b8;">Cliente</small>
         </div>
       </div>
-      <nav class="account-nav">
-        <a href="regUser.html">Mi cuenta</a>
-        <a class="is-active" href="listas.html">Mis Mascotas</a>
+      <nav class="account-nav" style="display: flex; flex-direction: column; gap: 10px;">
+        <a href="regUser.html" style="color: #fff; text-decoration: none; padding: 10px; border-radius: 6px;">Mi cuenta</a>
+        <a class="is-active" href="listas.html" style="color: #fff; text-decoration: none; padding: 10px; border-radius: 6px; background: rgba(255,255,255,0.1);">Mis Mascotas</a>
       </nav>
     </aside>
 
     <section class="main">
-      <article class="card">
-        <h2>Registrados</h2>
-        <div id="pets-grid" class="grid-cards">
-          <!-- Pet cards populated dynamically -->
+      <article class="card" style="background: rgba(15, 23, 42, 0.85); border-radius: 12px; padding: 30px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;">
+            <h2 style="color: white; margin: 0;">Mascotas Registradas</h2>
+            <a href="regPet.html" class="btn-primary btn-green" style="width: auto;">+ Registrar Mascota</a>
         </div>
-      </article>
 
-      <article class="card">
-          <a class="brand" href="regPet.html"><h2>Registrar Mascota</h2></a>
-        <div class="grid-cards">
+        <div id="pets-grid" class="grid-cards">
+          <p style="color: #cbd5e1;">Cargando tus mascotas...</p>
         </div>
       </article>
     </section>
@@ -68,121 +139,192 @@
     </div>
   </footer>
 
-  <script> document.getElementById('year').textContent = new Date().getFullYear(); </script>
-  <!-- Pet detail modal (read-only view for clients) -->
   <div id="pet-modal" class="login-modal" style="display:none" onclick="if(event.target===this) this.style.display='none'">
     <div class="login-content">
       <span class="close" onclick="document.getElementById('pet-modal').style.display='none'">&times;</span>
       <div id="pet-view-form">
-        <h2 id="pet-modal-title">Detalle mascota</h2>
-        <div id="pet-fields"></div>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button type="button" class="btn-ghost" onclick="document.getElementById('pet-modal').style.display='none'">Cerrar</button>
+        <h2 id="pet-modal-title" style="margin-top:0; border-bottom:1px solid #334155; padding-bottom:10px; color:#38bdf8;">Detalle mascota</h2>
+        
+        <div style="text-align:center; margin-bottom: 15px;">
+            <img id="pet-modal-img" src="" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #22c55e;">
+        </div>
+
+        <div id="pet-fields" style="display: flex; flex-direction: column; gap: 8px;"></div>
+        
+        <div style="display:flex; gap:10px; margin-top:20px">
+          <button type="button" style="flex:1; background: transparent; border: 1px solid #cbd5e1; color: white; padding: 10px; border-radius: 6px; cursor: pointer;" onclick="document.getElementById('pet-modal').style.display='none'">Cerrar Detalles</button>
         </div>
       </div>
     </div>
   </div>
 
-  <script>
-    function openPetDetail(id){
-      const pets = window.__pets_cache || JSON.parse(localStorage.getItem('pets_cache')||'[]');
-      const pet = pets.find(x=>x.id===id);
-      if(!pet) return;
-      document.getElementById('pet-modal-title').textContent = (pet.name||'Sin nombre') + ' — ' + (pet.species||'N/D');
-      const container = document.getElementById('pet-fields'); container.innerHTML='';
-      // display fields as read-only text
-      const fields = [
-        {k:'ruac',label:'Clave RUAC'},
-        {k:'name',label:'Nombre'},
-        {k:'species',label:'Especie'},
-        {k:'age',label:'Edad'},
-        {k:'gender',label:'Género'},
-        {k:'sterilized',label:'¿Esterilizado?'},
-        {k:'microchipped',label:'¿Tiene microchip?'},
-        {k:'microchipNumber',label:'Número de chip'},
-        {k:'size',label:'Tamaño'},
-        {k:'primaryColor',label:'Color primario'},
-        {k:'secondaryColor',label:'Color secundario'},
-        {k:'coverage',label:'Cobertura corporal'},
-        {k:'weight',label:'Peso (kg)'},
-        {k:'photo',label:'URL Foto'},
-        {k:'provenance',label:'Procedencia'},
-        {k:'outdoorSupervision',label:'Supervisión en exterior'},
-        {k:'behavior',label:'Comportamiento'},
-        {k:'vaccinationCard',label:'Cartilla de vacunación'},
-        {k:'lastRabies',label:'Última vacuna de rabia'},
-        {k:'disabled',label:'¿Discapacitada?'},
-        {k:'disabilityType',label:'Tipo de discapacidad'},
-        {k:'dewormed',label:'¿Desparasitada?'},
-        {k:'lastDeworm',label:'Última desparasitación'},
-        {k:'homeLocation',label:'Ubicación en el hogar'},
-        {k:'idMethod',label:'Forma de identificación'}
-      ];
-      fields.forEach(f=>{
-        const row = document.createElement('div'); row.style.marginBottom='6px';
-        const lbl = document.createElement('div'); lbl.style.fontSize='0.9em'; lbl.style.color='#444'; lbl.textContent = f.label;
-        const val = document.createElement('div'); val.style.fontWeight='600'; val.style.color='#111';
-        const v = (pet[f.k]===true)?'Sí':(pet[f.k]===false?'No':(pet[f.k]||'—'));
-        val.textContent = v;
-        row.appendChild(lbl); row.appendChild(val); container.appendChild(row);
-      });
+  <script src="../js/session.js"></script>
 
-      // show last appointment summary (if exists)
-      const appointments = JSON.parse(localStorage.getItem('appointments')||'[]');
-      const appt = appointments.filter(a=>a.petId===id || a.pet===pet.name).slice(-1)[0];
-      if(appt){
-        const info = document.createElement('div'); info.style.marginTop='8px'; info.innerHTML = `<strong>Próxima/última cita:</strong> ${appt.date||appt.day||'N/D'} ${appt.time||appt.hour||''} — ${appt.branch||appt.branchName||'N/D'} / ${appt.doctor||'N/D'}<br><strong>Procedimiento:</strong> ${appt.procedure||appt.padecimiento||'N/D'}<br><strong>Precio:</strong> ${appt.price?('$'+appt.price):'N/D'}`;
-        container.appendChild(info);
-      }
+  <script> 
+    document.getElementById('year').textContent = new Date().getFullYear(); 
+    
+    const token = localStorage.getItem('accessToken');
+    const userStr = localStorage.getItem('user');
 
-      document.getElementById('pet-modal').style.display='flex';
-      // store current pet id for reference (read-only)
-      document.getElementById('pet-view-form').dataset.petId = id;
+    if (!token || !userStr) {
+        window.location.href = 'initPag.html';
+    } else {
+        try {
+            const userData = JSON.parse(userStr);
+            
+            const userNameEl = document.getElementById('header-user-name');
+            const nameDisplaySidebar = document.getElementById('sidebar-name');
+            const avatarDisplaySidebar = document.getElementById('sidebar-avatar');
+
+            let nombreMostrado = userData.email;
+            if (userData.nombreCompleto) {
+                nombreMostrado = userData.nombreCompleto.split(' ')[0];
+            }
+
+            if (userNameEl) userNameEl.textContent = `Hola, ${nombreMostrado}`;
+            if (nameDisplaySidebar) nameDisplaySidebar.textContent = nombreMostrado;
+            if (avatarDisplaySidebar && userData.nombreCompleto) {
+                avatarDisplaySidebar.textContent = nombreMostrado.substring(0,2).toUpperCase();
+            }
+        } catch (e) {}
     }
-  </script>
-  <script>
-    // Populate user info and pets dynamically (ready for DB)
-    (function(){
-      const userName = localStorage.getItem('userName') || 'Usuario Ejemplo';
-      const avatar = localStorage.getItem('userAvatar') || '../img/extras/doge.jpg';
-      // Insert avatar/name into header (if present in sidebar)
-      document.querySelectorAll('.profile-info strong').forEach(el=>el.textContent = userName);
-      document.querySelectorAll('.avatar').forEach(av=>{ if(av.innerHTML.trim()==='PA'){ av.style.backgroundImage = `url(${avatar})`; av.style.backgroundSize='cover'; av.textContent=''; }});
 
-      fetch('pets.json').then(r=>r.json()).then(pets=>{
+    // ARREGLO GLOBAL PARA GUARDAR LAS MASCOTAS CARGADAS
+    window.__pets_cache = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        await cargarMascotas();
+    });
+
+    async function cargarMascotas() {
         const grid = document.getElementById('pets-grid');
-        // cache for modal editing
-        window.__pets_cache = pets;
-        pets.forEach(p=>{
-          const a = document.createElement('div'); a.className='card-item';
-          a.tabIndex = 0;
-          a.dataset.petId = p.id;
-          // try to find an appointment for this pet
-          const appointments = JSON.parse(localStorage.getItem('appointments')||'[]');
-          const appt = appointments.find(a0=> a0.petId===p.id || a0.pet===p.name);
-          const apptInfo = appt ? `<div class="pet-apt"><small>${appt.branch||appt.branchName||''} • ${appt.date||appt.day||''} ${appt.time||appt.hour||''}</small></div>` : '';
-          const scheduleBtn = `<div style="margin-top:6px"><a class="btn-primary" href="citas.html#pet-${p.id}" onclick="event.stopPropagation()">Agendar cita</a></div>`;
-          a.innerHTML = `<img src="${p.image}" alt="${p.name}"><div class="card-body"><h3>${p.name}</h3><small>${p.age} · ${p.status || ''}</small>${apptInfo}${scheduleBtn}</div>`;
-          a.addEventListener('click', (e)=>{ if(e.target.closest && (e.target.closest('a') || e.target.closest('button'))) return; e.preventDefault(); openPetDetail(p.id); });
-          grid.appendChild(a);
-        });
-      }).catch(err=>{
-        console.error(err);
-        // fallback to local cache
-        const grid = document.getElementById('pets-grid');
-        const pets = JSON.parse(localStorage.getItem('pets_cache')||'[]');
-        window.__pets_cache = pets;
-        pets.forEach(p=>{
-          const a = document.createElement('div'); a.className='card-item'; a.tabIndex=0;
-          a.dataset.petId = p.id;
-          const scheduleBtn = `<div style="margin-top:6px"><a class="btn-primary" href="citas.html#pet-${p.id}" onclick="event.stopPropagation()">Agendar cita</a></div>`;
-          a.innerHTML = `<img src="${p.image}" alt="${p.name}"><div class="card-body"><h3>${p.name}</h3><small>${p.age} · ${p.status}</small>${scheduleBtn}</div>`;
-          a.addEventListener('click', (e)=>{ if(e.target.closest && (e.target.closest('a') || e.target.closest('button'))) return; e.preventDefault(); openPetDetail(p.id); });
-          grid.appendChild(a);
-        });
+        try {
+            const res = await fetch('http://localhost:3000/mascotas', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            if(!res.ok) {
+                grid.innerHTML = '<p style="color:#cbd5e1;">No tienes mascotas registradas aún.</p>';
+                return;
+            }
+            
+            const mascotas = await res.json();
+            grid.innerHTML = ''; 
+            
+            if (!mascotas || mascotas.length === 0) {
+                grid.innerHTML = '<p style="color:#cbd5e1;">No tienes mascotas registradas aún.</p>';
+                return;
+            }
+
+            // Guardamos en caché para usar en el Modal
+            window.__pets_cache = mascotas;
+
+            mascotas.forEach(p => {
+                let edadTexto = "Edad N/D";
+                if (p.fechaNacimiento) {
+                    const nac = new Date(p.fechaNacimiento);
+                    const hoy = new Date();
+                    const anios = hoy.getFullYear() - nac.getFullYear();
+                    edadTexto = anios + (anios === 1 ? " año" : " años");
+                }
+
+                // Lógica de Foto Corregida
+                let fotoUrl = '../img/extras/doge.jpg'; 
+                if (p.fotoPerfil && p.fotoPerfil.url) {
+                    const urlPura = p.fotoPerfil.url.replace(/\\/g, '/');
+                    fotoUrl = urlPura.startsWith('http') ? urlPura : `http://localhost:3000${urlPura.startsWith('/') ? '' : '/'}${urlPura}`;
+                }
+
+                const card = document.createElement('div'); 
+                card.className = 'card-item';
+                card.dataset.petId = p.id;
+                
+                // Botón para agendar cita
+                const scheduleBtn = `<div style="margin-top:10px"><a class="btn-primary" href="citas.html#pet-${p.id}" onclick="event.stopPropagation()">Agendar cita médica</a></div>`;
+                
+                card.innerHTML = `
+                    <img src="${fotoUrl}" alt="${p.nombre}" onerror="this.onerror=null; this.src='../img/extras/doge.jpg';">
+                    <div class="card-body">
+                        <h3>${p.nombre}</h3>
+                        <small>${edadTexto} · ${p.sexo || 'Sexo N/D'}</small>
+                        ${scheduleBtn}
+                    </div>
+                `;
+                
+                // Abrir modal al hacer clic en la tarjeta
+                card.addEventListener('click', (e) => { 
+                    if(e.target.closest('a')) return; // No abrir modal si dio clic en "Agendar"
+                    openPetDetail(p.id, fotoUrl); 
+                });
+                
+                grid.appendChild(card);
+            });
+
+        } catch (error) {
+            grid.innerHTML = '<p style="color:#ef4444;">Error de red al cargar mascotas.</p>';
+        }
+    }
+
+    // FUNCION QUE LLENA Y ABRE EL MODAL DINÁMICAMENTE
+    function openPetDetail(id, fotoUrl) {
+      const pet = window.__pets_cache.find(x => x.id === id);
+      if(!pet) return;
+console.log("🔍 Datos de la mascota desde el Backend:", pet);
+
+      document.getElementById('pet-modal-title').textContent = `${pet.nombre} — Detalles`;
+      document.getElementById('pet-modal-title').textContent = `${pet.nombre} — Detalles`;
+      document.getElementById('pet-modal-img').src = fotoUrl;
+
+      const container = document.getElementById('pet-fields'); 
+      container.innerHTML = '';
+
+      // Mapeo seguro de propiedades (Evitando mostrar "undefined")
+      const safeStr = (val) => val ? val : 'No registrado';
+      const safeBool = (val) => val ? 'Sí' : 'No';
+
+      // Diccionario de campos a mostrar
+      const fields = [
+        // Buscamos la especie directa, o si viene anidada dentro de la raza:
+        { label: 'Especie', value: pet.especie?.nombre || pet.raza?.especie?.nombre || 'N/D' },
+        { label: 'Raza', value: pet.raza?.nombre || 'N/D' },
+        { label: 'Género', value: safeStr(pet.sexo) },
+        { label: 'Peso', value: pet.peso ? `${pet.peso} kg` : 'N/D' },
+        { label: 'Color', value: pet.color?.nombre || 'N/D' },
+        { label: 'Tipo de Pelo', value: pet.tipoPelo?.nombre || 'N/D' },
+        { label: 'Comportamiento', value: pet.comportamiento?.nombre || 'N/D' },
+        { label: '¿Esterilizado?', value: safeBool(pet.esterilizado) },
+        { label: 'Microchip/Tatuaje', value: safeStr(pet.microchip || pet.tatuaje) },
+        { label: 'Clave RUAC', value: safeStr(pet.ruac) },
+        { label: 'Observaciones / Alergias', value: safeStr(pet.observaciones) }
+      ];
+
+      fields.forEach(f => {
+        const row = document.createElement('div'); 
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+        row.style.paddingBottom = '4px';
+
+        const lbl = document.createElement('div'); 
+        lbl.style.fontSize = '0.9em'; 
+        lbl.style.color = '#94a3b8'; 
+        lbl.textContent = f.label + ':';
+        
+        const val = document.createElement('div'); 
+        val.style.fontWeight = '500'; 
+        val.style.color = '#fff';
+        val.style.textAlign = 'right';
+        val.style.maxWidth = '60%';
+        val.textContent = f.value;
+
+        row.appendChild(lbl); 
+        row.appendChild(val); 
+        container.appendChild(row);
       });
-    })();
+
+      // Mostrar el modal
+      document.getElementById('pet-modal').style.display='flex';
+    }
   </script>
 </body>
 </html>
-<script src="../js/session.js"></script>

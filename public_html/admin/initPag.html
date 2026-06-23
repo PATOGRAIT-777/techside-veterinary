@@ -28,6 +28,7 @@
       </div>
     </div>
 
+
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" href="initPag.html">🐶 TechSide Vet</a>
@@ -36,11 +37,20 @@
         <a href="prodCatalog.html">Tienda</a>
         <a href="horario.html">Disponibilidad</a>
         <a href="listas.html">Mis mascotas</a>
-        <a href="regUser.html">Mi cuenta</a>
+        <a href="regUser.html" id="nav-cuenta-link">Mis cuentas</a>
       </nav>
       <div class="header-actions">
-        <button class="btn-ghost" ><a href="formAgregar.html">Registrarse</a></button>
-        <button class="btn-primary" onclick="openLogin()">Entrar</button>
+        
+        <div id="auth-buttons" style="display: flex; gap: 10px;">
+          <button class="btn-ghost" onclick="window.location.href='formAgregar.html'">Registrarse</button>
+          <button class="btn-primary" onclick="openLogin()">Entrar</button>
+        </div>
+
+        <div id="user-info" style="display: none; align-items: center; gap: 12px; cursor: pointer;" onclick="redirigirPerfil()">
+          <span id="header-user-name" style="font-weight: 600; color: #1e293b;"></span>
+          <span id="header-user-role" style="background: #2563eb; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;"></span>
+        </div>
+
       </div>
     </div>
   </header>
@@ -156,11 +166,81 @@
   </footer>
 
   <script>
-    // Lógica visual del modal
+    // ----------------------------------------------------
+    // 1. MANEJO DEL ENCABEZADO Y SESIÓN ACTIVA
+    // ----------------------------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('accessToken');
+      const userStr = localStorage.getItem('user');
+
+      if (token && userStr) {
+        try {
+          const user = JSON.parse(userStr);
+
+          // Ocultar los botones de login/registro
+          const authButtons = document.getElementById('auth-buttons');
+          if (authButtons) authButtons.style.display = 'none';
+
+          // Mostrar la información del usuario
+          const userInfo = document.getElementById('user-info');
+          const userNameEl = document.getElementById('header-user-name');
+          const userRoleEl = document.getElementById('header-user-role');
+
+          if (userInfo) userInfo.style.display = 'flex';
+          
+          // Extraer el primer nombre
+          let nombreMostrado = user.email;
+          if (user.nombreCompleto) {
+             nombreMostrado = user.nombreCompleto.split(' ')[0];
+          }
+
+          if (userNameEl) userNameEl.textContent = `Hola, ${nombreMostrado}`;
+          
+          if (userRoleEl && user.rol) {
+             userRoleEl.textContent = user.rol;
+             
+             // Aquí actualizamos tanto la insignia visual como el link del menú principal
+             const navCuentaLink = document.getElementById('nav-cuenta-link');
+
+             if(user.rol === 'admin' || user.rol === 'medico') {
+                 // Cambiar color a rojo(admin) o verde(medico)
+                 userRoleEl.style.background = user.rol === 'admin' ? '#dc2626' : '#16a34a'; 
+                 
+                 // Redirigir el enlace del menú a la zona de administración
+                 if (navCuentaLink) {
+                     navCuentaLink.href = 'regUserAdmin.html';
+                 }
+             }
+             // Si el rol es 'cliente', el enlace se queda como 'regUser.html' por defecto.
+          }
+
+        } catch (e) {
+          console.error("Error al procesar la sesión:", e);
+        }
+      }
+    });
+
+    // Función para que al hacer clic en el nombre redirija al perfil correspondiente
+    function redirigirPerfil() {
+       const userStr = localStorage.getItem('user');
+       if(userStr) {
+          const user = JSON.parse(userStr);
+          if (user.rol === 'admin' || user.rol === 'medico') {
+             window.location.href = 'regUserAdmin.html';
+          } else {
+             window.location.href = 'regUser.html';
+          }
+       }
+    }
+
+
+    // ----------------------------------------------------
+    // 2. LÓGICA DEL MODAL DE LOGIN
+    // ----------------------------------------------------
     function openLogin() {
       document.getElementById('login-modal').style.display = 'flex';
       const msg = document.getElementById('login-message');
-      if (msg) msg.style.display = 'none'; // Limpia el mensaje de error al abrir
+      if (msg) msg.style.display = 'none';
     }
 
     function closeLogin() {
@@ -179,21 +259,20 @@
     const yearSpan = document.getElementById('year');
     if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 
-    // LÓGICA DE CONEXIÓN CON EL BACKEND DE TECHSIDE (NestJS)
+    // ----------------------------------------------------
+    // 3. PETICIÓN FETCH DE INICIO DE SESIÓN
+    // ----------------------------------------------------
     document.getElementById('login-form').addEventListener('submit', async function(e) {
-      e.preventDefault(); // Evita que se recargue la página
+      e.preventDefault();
       
       const form = e.target;
-      // Tu input se llama "email", pero el backend NestJS espera "emailOrPhone" (login.dto.ts)
       const emailOrPhone = form.email.value;
       const password = form.password.value;
       const messageBox = document.getElementById('login-message');
 
-      // Limpia mensajes previos
       messageBox.style.display = 'none';
 
       try {
-        // Asegúrate de cambiar 'http://localhost:3000' por la URL de tu API si está en producción
         const response = await fetch('http://localhost:3000/auth/login', {
           method: 'POST',
           headers: {
@@ -208,30 +287,31 @@
         const data = await response.json();
 
         if (response.ok) {
-          // Éxito: Guardamos el token en LocalStorage
           localStorage.setItem('accessToken', data.accessToken);
           localStorage.setItem('user', JSON.stringify(data.user));
 
-          // Mostrar mensaje de éxito
           messageBox.style.color = 'green';
           messageBox.textContent = '¡Inicio de sesión exitoso!';
           messageBox.style.display = 'block';
 
-          // Opcional: Redirigir al usuario o cerrar el modal después de 1 segundo
           setTimeout(() => {
             closeLogin();
-            // window.location.href = 'regUser.html'; // Descomenta para redirigir
+            const userRole = data.user.rol;
+            
+            if (userRole === 'admin' || userRole === 'medico') {
+              window.location.href = 'regUserAdmin.html';
+            } else {
+              window.location.href = 'regUser.html';
+            }
           }, 1000);
 
         } else {
-          // Error desde el backend (Ej: credenciales incorrectas)
           messageBox.style.color = 'red';
           messageBox.textContent = Array.isArray(data.message) ? data.message[0] : (data.message || 'Error de autenticación');
           messageBox.style.display = 'block';
         }
 
       } catch (error) {
-        // Error de red (el servidor no responde)
         messageBox.style.color = 'red';
         messageBox.textContent = 'Error de conexión con el servidor.';
         messageBox.style.display = 'block';
